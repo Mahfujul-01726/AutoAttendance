@@ -1,0 +1,18 @@
+include README.md
+include LICENSE
+include CONTRIBUTING.md
+include CODE_OF_CONDUCT.md
+include CHANGELOG.md
+include SECURITY.md
+include API.md
+include QUICKSTART.md
+include INSTALLATION.md
+include ARCHITECTURE.md
+include IMPLEMENTATION.md
+include .env.example
+include requirements.txt
+include pytest.ini
+include .flake8
+include .editorconfig
+recursive-include tests *.py
+recursive-include . *.md

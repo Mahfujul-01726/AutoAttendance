@@ -1,0 +1,155 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "auto-attendance"
+version = "1.0.0"
+description = "Professional real-time face recognition attendance system with anti-spoofing detection"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "AutoAttendance Contributors", email = "contact@autoattendance.dev" }
+]
+keywords = [
+    "face-recognition",
+    "attendance",
+    "insightface",
+    "anti-spoofing",
+    "real-time",
+    "deep-learning"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: GPU",
+    "Intended Audience :: Education",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Office/Business",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "opencv-python>=4.8.0",
+    "opencv-contrib-python>=4.8.0",
+    "numpy>=1.24,<2.1; python_version < '3.13'",
+    "numpy>=2.1.0; python_version >= '3.13'",
+    "pandas>=2.0",
+    "Pillow>=10.0",
+    "python-dotenv>=1.0",
+    "openpyxl>=3.1",
+    "insightface>=0.7.3",
+    "onnxruntime>=1.17",
+    "ml-dtypes>=0.5.1",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=0.21.0",
+    "black>=23.0",
+    "flake8>=6.0",
+    "mypy>=1.5",
+    "isort>=5.12",
+    "pre-commit>=3.4",
+]
+docs = [
+    "sphinx>=7.0",
+    "sphinx-rtd-theme>=1.3",
+    "sphinx-autodoc-typehints>=1.24",
+]
+gpu = [
+    "onnxruntime-gpu>=1.17",
+]
+
+[project.urls]
+Homepage = "https://github.com/Mahfujul-01726/AutoAttendance"
+Documentation = "https://autoattendance.readthedocs.io"
+Repository = "https://github.com/Mahfujul-01726/AutoAttendance.git"
+"Issue Tracker" = "https://github.com/Mahfujul-01726/AutoAttendance/issues"
+Changelog = "https://github.com/Mahfujul-01726/AutoAttendance/releases"
+
+[project.scripts]
+auto-attendance = "cli:main"
+auto-attendance-api = "api:main"
+
+[tool.setuptools]
+packages = ["auto_attendance"]
+
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_mode = 3
+include_trailing_comma = true
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--strict-markers -v --tb=short"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    "*/tests/*",
+    "*/site-packages/*",
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+precision = 2

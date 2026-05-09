@@ -1,0 +1,149 @@
+# AutoAttendance GitHub Issue Templates
+
+## Bug Report Template
+
+name: 🐛 Bug Report
+description: Report a bug to help us improve
+labels: ["bug"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+  - type: input
+    id: title
+    attributes:
+      label: Bug Title
+      description: A concise title for the bug
+      placeholder: "ex. Camera initialization fails on Windows 11"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and detailed description of what the bug is
+      placeholder: "Describe what happened..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: How to reproduce the bug
+      placeholder: |
+        1. First step...
+        2. Second step...
+        3. Bug occurs...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should have happened
+      placeholder: "Expected..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened
+      placeholder: "Actual..."
+    validations:
+      required: true
+
+  - type: input
+    id: python_version
+    attributes:
+      label: Python Version
+      placeholder: "ex. 3.11.0"
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      placeholder: "ex. Windows 11, Ubuntu 22.04"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Logs
+      description: Paste any relevant error messages
+      render: "bash"
+      placeholder: "Paste error logs here..."
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other context about the problem
+      placeholder: "Additional details..."
+
+---
+
+## Feature Request Template
+
+name: ✨ Feature Request
+description: Suggest a new feature
+labels: ["enhancement"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new feature!
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the feature you'd like
+      placeholder: "I would like..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use Case
+      description: Why would this feature be useful?
+      placeholder: "This would help because..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Any suggestions on how to implement this?
+      placeholder: "Suggested implementation..."
+
+---
+
+## Question Template
+
+name: ❓ Question
+description: Ask a question about AutoAttendance
+labels: ["question"]
+
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      placeholder: "What would you like to know?"
+    validations:
+      required: true

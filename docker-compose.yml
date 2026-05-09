@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  auto-attendance:
+    build: .
+    container_name: auto-attendance
+    ports:
+      - "8000:8000"
+    environment:
+      - CAMERA_ID=0
+      - FRAME_WIDTH=640
+      - FRAME_HEIGHT=480
+      - FPS=30
+      - FRAME_PROCESS_INTERVAL=5
+      - INSIGHTFACE_MODEL_NAME=buffalo_l
+      - INSIGHTFACE_MAX_FACES=1
+      - DOG_SIGMA1=1.0
+      - DOG_SIGMA2=2.0
+      - SPOOF_THRESHOLD=0.5
+      - RECOGNITION_THRESHOLD=0.6
+      - SMTP_SERVER=smtp.gmail.com
+      - SMTP_PORT=587
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./logs:/app/logs
+      - /dev/video0:/dev/video0  # Camera access (Linux only)
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  data:
+  models:
+  logs:

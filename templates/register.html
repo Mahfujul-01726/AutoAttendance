@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+
+{% block page_title %}Register Person{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="section">
+        <h2>Register New Person</h2>
+        <p class="section-description">Follow these steps to add a new person to the system</p>
+
+        <div class="step-indicator">
+            <div class="step active" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-title">Enter Name</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-title">Collect Faces</div>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-title">Train Model</div>
+            </div>
+        </div>
+
+        <!-- Step 1: Enter Name -->
+        <div id="stepContent1" class="step-content active">
+            <div class="form-group">
+                <label for="personName" class="form-label">Person's Name *</label>
+                <input type="text" id="personName" class="form-input" placeholder="Enter full name" required>
+                <div class="form-hint">Example: John Doe, Ahmed Hassan</div>
+            </div>
+
+            <button class="btn btn-primary" onclick="proceedToStep2()">
+                Next: Collect Faces →
+            </button>
+        </div>
+
+        <!-- Step 2: Collect Faces -->
+        <div id="stepContent2" class="step-content" style="display: none;">
+            <div class="alert alert-info">
+                <span class="alert-icon">ℹ️</span>
+                <div>
+                    <strong>Camera Instructions:</strong>
+                    <ul>
+                        <li>Position your face clearly in front of the camera</li>
+                        <li>Try different angles and lighting conditions</li>
+                        <li>Collect at least 20-30 face samples for best results</li>
+                        <li>Remove glasses or hats for better recognition</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="camera-section">
+                <div class="camera-placeholder">
+                    <div class="camera-icon">📷</div>
+                    <div class="camera-text">Camera Feed</div>
+                    <video id="cameraFeed" class="camera-feed" style="display: none;"></video>
+                </div>
+
+                <div class="camera-info">
+                    <div class="info-row">
+                        <span class="info-label">Person Name:</span>
+                        <span class="info-value" id="collectingPersonName">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Faces Collected:</span>
+                        <span class="info-value" id="facesCollectedCount">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value" id="collectionStatus">Ready</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-success" id="startCollectionBtn" onclick="startCollection()">
+                    ▶️ Start Collection
+                </button>
+                <button class="btn btn-danger" id="stopCollectionBtn" onclick="stopCollection()" style="display: none;">
+                    ⏹️ Stop Collection
+                </button>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="backToStep1()">
+                    ← Back
+                </button>
+                <button class="btn btn-primary" onclick="proceedToStep3()" id="nextStep3Btn" disabled>
+                    Next: Train Model →
+                </button>
+            </div>
+        </div>
+
+        <!-- Step 3: Train Model -->
+        <div id="stepContent3" class="step-content" style="display: none;">
+            <div class="alert alert-info">
+                <span class="alert-icon">ℹ️</span>
+                <div>
+                    <strong>Training Information:</strong>
+                    The system will process all collected face samples and create a unique profile for this person. This
+                    usually takes 10-30 seconds.
+                </div>
+            </div>
+
+            <div class="training-info">
+                <div class="info-box">
+                    <div class="info-title">Person Details</div>
+                    <div class="info-item">
+                        <span class="label">Name:</span>
+                        <span class="value" id="trainingPersonName">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="label">Total Samples:</span>
+                        <span class="value" id="totalSamplesTrain">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-success btn-lg" id="trainBtn" onclick="trainModel()">
+                🚀 Train Model
+            </button>
+
+            <div id="trainingProgress" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="progress-text">Training in progress...</div>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="backToStep2()">
+                    ← Back
+                </button>
+                <button class="btn btn-secondary" id="completeBtn" onclick="completeRegistration()"
+                    style="display: none;">
+                    ✓ Complete Registration
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registered Persons List -->
+    <div class="section">
+        <h2>Registered Persons</h2>
+        <div id="personsList" class="persons-grid">
+            <div class="text-center text-muted">Loading...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentPerson = null;
+    let facesCollected = 0;
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadPersonsList();
+    });
+
+    function proceedToStep2() {
+        const name = document.getElementById('personName').value.trim();
+        if (!name) {
+            showToast('Please enter a person name', 'error');
+            return;
+        }
+
+        currentPerson = name;
+        document.getElementById('collectingPersonName').textContent = name;
+
+        // Show step 2
+        document.getElementById('stepContent1').style.display = 'none';
+        document.getElementById('stepContent2').style.display = 'block';
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step2').classList.add('active');
+    }
+
+    function backToStep1() {
+        document.getElementById('stepContent2').style.display = 'none';
+        document.getElementById('stepContent1').style.display = 'block';
+        document.getElementById('step1').classList.add('active');
+        document.getElementById('step2').classList.remove('active');
+    }
+
+    function startCollection() {
+        fetch('/api/register/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: currentPerson })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Started collecting faces', 'success');
+                    document.getElementById('startCollectionBtn').style.display = 'none';
+                    document.getElementById('stopCollectionBtn').style.display = 'inline-block';
+                    document.getElementById('collectionStatus').textContent = 'Collecting...';
+                    // In a real implementation, you would stream camera feed here
+                } else {
+                    showToast(data.message, 'error');
+                }
+            });
+    }
+
+    function stopCollection() {
+        fetch('/api/register/stop', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    document.getElementById('startCollectionBtn').style.display = 'inline-block';
+                    document.getElementById('stopCollectionBtn').style.display = 'none';
+                    document.getElementById('collectionStatus').textContent = 'Stopped';
+                    document.getElementById('nextStep3Btn').disabled = false;
+                    facesCollected = 20; // Simulated - in real app, this would be actual count
+                    document.getElementById('facesCollectedCount').textContent = facesCollected;
+                } else {
+                    showToast(data.message, 'error');
+                }
+            });
+    }
+
+    function proceedToStep3() {
+        if (facesCollected < 5) {
+            showToast('Please collect at least 5 face samples', 'error');
+            return;
+        }
+
+        document.getElementById('stepContent2').style.display = 'none';
+        document.getElementById('stepContent3').style.display = 'block';
+        document.getElementById('step2').classList.remove('active');
+        document.getElementById('step3').classList.add('active');
+        document.getElementById('trainingPersonName').textContent = currentPerson;
+        document.getElementById('totalSamplesTrain').textContent = facesCollected;
+    }
+
+    function backToStep2() {
+        document.getElementById('stepContent3').style.display = 'none';
+        document.getElementById('stepContent2').style.display = 'block';
+        document.getElementById('step2').classList.add('active');
+        document.getElementById('step3').classList.remove('active');
+    }
+
+    function trainModel() {
+        document.getElementById('trainBtn').style.display = 'none';
+        document.getElementById('trainingProgress').style.display = 'block';
+
+        fetch('/api/register/train', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ person_name: currentPerson })
+        })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('trainingProgress').style.display = 'none';
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    document.getElementById('completeBtn').style.display = 'inline-block';
+                } else {
+                    showToast(data.message, 'error');
+                    document.getElementById('trainBtn').style.display = 'inline-block';
+                }
+            });
+    }
+
+    function completeRegistration() {
+        showToast('Person registered successfully!', 'success');
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    }
+
+    function loadPersonsList() {
+        fetch('/api/persons')
+            .then(response => response.json())
+            .then(persons => {
+                const container = document.getElementById('personsList');
+                if (persons.length === 0) {
+                    container.innerHTML = '<div class="text-center text-muted">No persons registered yet</div>';
+                    return;
+                }
+
+                container.innerHTML = persons.map(person => `
+                    <div class="person-card">
+                        <div class="person-avatar">👤</div>
+                        <div class="person-info">
+                            <div class="person-name">${person.name}</div>
+                            <div class="person-detail">${person.samples} samples</div>
+                        </div>
+                        <button class="btn-icon btn-delete" onclick="deletePerson('${person.name}')">🗑️</button>
+                    </div>
+                `).join('');
+            });
+    }
+
+    function deletePerson(name) {
+        if (confirm(`Delete ${name} and all associated data?`)) {
+            fetch('/api/person/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        loadPersonsList();
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                });
+        }
+    }
+</script>
+{% endblock %}

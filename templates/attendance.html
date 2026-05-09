@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block page_title %}Attendance Records{% endblock %}
+
+{% block content %}
+<div class="attendance-container">
+    <div class="section">
+        <div class="section-header">
+            <h2>Attendance Records</h2>
+            <div class="header-actions">
+                <input type="date" id="filterDate" class="form-input" style="width: 150px;">
+                <button class="btn btn-secondary" onclick="exportAttendance('csv')">
+                    📥 CSV
+                </button>
+                <button class="btn btn-secondary" onclick="exportAttendance('json')">
+                    📥 JSON
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter and Search -->
+        <div class="filter-bar">
+            <input type="text" id="searchInput" class="form-input" placeholder="Search by name...">
+            <select id="filterStatus" class="form-input">
+                <option value="">All Records</option>
+                <option value="present">Present</option>
+                <option value="absent">Absent</option>
+            </select>
+        </div>
+
+        <!-- Attendance Table -->
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Distance</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTable">
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-content">
+                <div class="stat-label">Total Records</div>
+                <div class="stat-value" id="totalRecords">0</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+                <div class="stat-label">Present</div>
+                <div class="stat-value" id="presentCount">0</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">❌</div>
+            <div class="stat-content">
+                <div class="stat-label">Absent</div>
+                <div class="stat-value" id="absentCount">0</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">📈</div>
+            <div class="stat-content">
+                <div class="stat-label">Attendance Rate</div>
+                <div class="stat-value" id="attendanceRate">0%</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let allRecords = [];
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadAttendanceRecords();
+        document.getElementById('searchInput').addEventListener('input', filterRecords);
+        document.getElementById('filterStatus').addEventListener('change', filterRecords);
+        document.getElementById('filterDate').addEventListener('change', filterRecords);
+    });
+
+    function loadAttendanceRecords() {
+        fetch('/api/recent-attendance?days=30')
+            .then(response => response.json())
+            .then(records => {
+                allRecords = records;
+                displayRecords(records);
+                updateStatistics(records);
+            })
+            .catch(error => {
+                console.error('Error loading records:', error);
+                showToast('Failed to load attendance records', 'error');
+            });
+    }
+
+    function displayRecords(records) {
+        const tbody = document.getElementById('attendanceTable');
+
+        if (records.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No records found</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = records.map(record => `
+            <tr>
+                <td>${record.name}</td>
+                <td>${record.date}</td>
+                <td>${record.time}</td>
+                <td>
+                    <span class="distance-badge">${record.distance}</span>
+                </td>
+                <td>
+                    <span class="badge badge-success">Present</span>
+                </td>
+                <td>
+                    <button class="btn-icon" onclick="deleteRecord('${record.name}', '${record.date}')">🗑️</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function filterRecords() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const statusFilter = document.getElementById('filterStatus').value;
+        const dateFilter = document.getElementById('filterDate').value;
+
+        let filtered = allRecords.filter(record => {
+            const matchName = record.name.toLowerCase().includes(searchTerm);
+            const matchDate = !dateFilter || record.date === dateFilter;
+            return matchName && matchDate;
+        });
+
+        displayRecords(filtered);
+    }
+
+    function updateStatistics(records) {
+        document.getElementById('totalRecords').textContent = records.length;
+        document.getElementById('presentCount').textContent = records.length; // All are present
+        document.getElementById('absentCount').textContent = '0';
+
+        if (records.length > 0) {
+            const rate = Math.round((records.length / (records.length + 0)) * 100);
+            document.getElementById('attendanceRate').textContent = rate + '%';
+        }
+    }
+
+    function deleteRecord(name, date) {
+        if (confirm(`Delete attendance record for ${name} on ${date}?`)) {
+            fetch('/api/attendance/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, date: date })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast('Record deleted successfully', 'success');
+                        loadAttendanceRecords();
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                });
+        }
+    }
+
+    function exportAttendance(format) {
+        window.location.href = `/api/export/${format}?days=30`;
+        showToast('Download started', 'success');
+    }
+</script>
+{% endblock %}

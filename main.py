@@ -35,7 +35,7 @@ from config import (
     FRAME_HEIGHT,
 )
 from face_recognition import FaceRecognitionModule
-from anti_spoofing import AntiSpoofingModule
+from anti_spoofing import AntiSpoofing
 from attendance_manager import AttendanceManager
 from database import AttendanceDatabase
 from logger import get_logger, log_system_event
@@ -66,6 +66,7 @@ class AttendanceSystem:
         
         # Initialize components
         self.recognizer = FaceRecognitionModule()
+        self.anti_spoofing = AntiSpoofing()
         self.attendance_manager = AttendanceManager()
         self.db = AttendanceDatabase()
         
@@ -150,7 +151,7 @@ class AttendanceSystem:
                 continue
             
             # Anti-spoofing check
-            is_real, spoof_score = AntiSpoofingModule.is_liveness_detected(face_crop, face_crop)
+            is_real, spoof_score = self.anti_spoofing.analyze(face_crop)
             
             if is_real:
                 # Real face detected

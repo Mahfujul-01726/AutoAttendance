@@ -234,6 +234,22 @@ class AttendanceDatabase:
             ).fetchall()
         return [dict(row) for row in rows]
 
+    def get_total_embeddings(self):
+        """Get total count of face embeddings."""
+        with self._connect() as conn:
+            row = conn.execute("SELECT COUNT(*) as count FROM face_embeddings").fetchone()
+            return int(row["count"]) if row else 0
+
+    def get_attendance_by_date(self, date):
+        """Get attendance records for a specific date."""
+        with self._connect() as conn:
+            rows = conn.execute(
+                """SELECT student_name, time, confidence FROM attendance 
+                   WHERE date = ? ORDER BY time DESC""",
+                (date,)
+            ).fetchall()
+        return [tuple(row) for row in rows]
+
     def export_snapshot(self):
         return json.dumps(
             {

@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+                <div class="stat-label">Total Persons</div>
+                <div class="stat-value" id="totalPersons">0</div>
+                <div class="stat-subtitle">Registered users</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">🎭</div>
+            <div class="stat-content">
+                <div class="stat-label">Face Embeddings</div>
+                <div class="stat-value" id="totalEmbeddings">0</div>
+                <div class="stat-subtitle">Trained faces</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+                <div class="stat-label">Present Today</div>
+                <div class="stat-value" id="presentToday">0</div>
+                <div class="stat-subtitle">{{ now }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <h2>Quick Actions</h2>
+        <div class="actions-grid">
+            <a href="/register" class="action-button action-primary">
+                <span class="action-icon">➕</span>
+                <span class="action-text">Add New Person</span>
+            </a>
+            <button class="action-button action-secondary" onclick="startAttendance()">
+                <span class="action-icon">▶️</span>
+                <span class="action-text">Start Attendance</span>
+            </button>
+            <a href="/attendance" class="action-button action-secondary">
+                <span class="action-icon">📊</span>
+                <span class="action-text">View Records</span>
+            </a>
+            <button class="action-button action-secondary" onclick="exportData()">
+                <span class="action-icon">📥</span>
+                <span class="action-text">Export Data</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="section">
+        <div class="section-header">
+            <h2>Recent Attendance</h2>
+            <a href="/attendance" class="link-text">View All →</a>
+        </div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Distance</th>
+                    </tr>
+                </thead>
+                <tbody id="recentAttendanceTable">
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">Loading...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- System Info -->
+    <div class="section">
+        <h2>System Information</h2>
+        <div class="info-grid">
+            <div class="info-item">
+                <div class="info-label">Camera Status</div>
+                <div class="info-value">
+                    <span class="badge badge-success">Connected</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Model Status</div>
+                <div class="info-value">
+                    <span class="badge badge-success">Loaded</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Database</div>
+                <div class="info-value">
+                    <span class="badge badge-success">Active</span>
+                </div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">API Status</div>
+                <div class="info-value">
+                    <span class="badge badge-success">Running</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Load dashboard data on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        loadDashboardData();
+        // Refresh data every 5 seconds
+        setInterval(loadDashboardData, 5000);
+    });
+
+    function loadDashboardData() {
+        fetch('/api/stats')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('totalPersons').textContent = data.total_persons;
+                document.getElementById('totalEmbeddings').textContent = data.total_embeddings;
+                document.getElementById('presentToday').textContent = data.present_today;
+                updateSystemStatus(data.system_status);
+            })
+            .catch(error => console.error('Error loading stats:', error));
+
+        fetch('/api/recent-attendance?days=7')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('recentAttendanceTable');
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No records yet</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = data.map(record => `
+                    <tr>
+                        <td>${record.name}</td>
+                        <td>${record.date}</td>
+                        <td>${record.time}</td>
+                        <td>${record.distance}</td>
+                    </tr>
+                `).join('');
+            })
+            .catch(error => console.error('Error loading attendance:', error));
+    }
+
+    function updateSystemStatus(status) {
+        const indicator = document.getElementById('statusIndicator');
+        const value = document.getElementById('statusValue');
+
+        if (status === 'running') {
+            indicator.className = 'status-indicator active';
+            value.textContent = 'Running';
+        } else {
+            indicator.className = 'status-indicator';
+            value.textContent = 'Idle';
+        }
+    }
+
+    function startAttendance() {
+        if (confirm('Start attendance tracking? The system will process camera feed.')) {
+            fetch('/api/attendance/start', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        loadDashboardData();
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Failed to start attendance', 'error');
+                });
+        }
+    }
+
+    function exportData() {
+        const format = prompt('Export format? (csv/json)', 'csv');
+        if (format) {
+            window.location.href = `/api/export/${format}`;
+            showToast('Download started', 'success');
+        }
+    }
+</script>
+{% endblock %}
