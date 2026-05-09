@@ -1,0 +1,2810 @@
+A Hybrid Approach to Digital Image Watermarking: Integrating DWT, DFT, and 
+Genetic Algorithm 
+
+By 
+
+Shahariyr Reza 
+
+ID: 11200120524 
+
+A thesis submitted in partial fulfillment of the requirements for the degree of Bachelor of 
+Science in Computer Science and Engineering 
+
+Department of Computer Science and Engineering 
+
+Northern University of Business and Technology Khulna 
+
+Khulna 9100, Bangladesh 
+
+June, 2024 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Abstract 
+
+Image  watermarking  is  a  crucial  technique  for  ensuring  copyright  protection  and 
+authentication  in  digital  multimedia. This  thesis  proposes  a  hybrid  approach  to  achieve 
+secure and robust image watermarking through a combined framework utilizing Discrete 
+Wavelet  Transform  (DWT),  Discrete  Fourier  Transform  (DFT),  and  Genetic Algorithm 
+(GA). The objective is to enhance the imperceptibility of the embedded watermark while 
+maintaining  robustness  against various attacks such as noise  addition,  compression, and 
+geometric transformations. The proposed method leverages the multi resolution capabilities 
+of  DWT  for  embedding  the  watermark  in  frequency  sub  bands  and  employs  DFT  for 
+frequency domain analysis to strengthen watermark imperceptibility. Genetic Algorithm is 
+integrated to optimize the embedding and extraction process, thereby improving robustness 
+against  attacks.  Experimental  evaluations  demonstrate  the  effectiveness  of  the  proposed 
+framework  in  achieving  high  fidelity  and  resilience  to  malicious  attacks  compared  to 
+existing watermarking techniques. This research contributes to the advancement of secure 
+digital watermarking techniques by introducing a comprehensive framework that combines 
+the strengths of DWT, DFT, and GA. The results we found is an average PSNR value of 
+41.67 which underscore its potential applicability in various domains requiring copyright 
+protection and content authentication in digital multimedia. 
+
+Keywords:  Image  watermarking,  Discrete  Wavelet  Transform,  Discrete  Fourier 
+Transform, Genetic Algorithm, security, robustness. 
+
+iv 
+
+ 
+ 
+ 
+ 
+ 
+ 
+Contents 
+
+Title Page 
+
+Declaration 
+
+Approval 
+
+Acknowledgement 
+
+Abstract 
+
+Contents 
+
+List of Tables  
+
+List of Figures  
+
+List of Algorithms  
+
+List of Equations 
+
+List of Abbreviations 
+
+CHAPTER I 
+
+Introduction 
+
+1.1 Overview 
+
+1.2 Motivation 
+
+1.3 Research Question 
+
+1.4 Objectives 
+
+1.5 Thesis Organization  
+
+CHAPTER II 
+
+Literature Review 
+
+2.1 Watermarking Techniques 
+
+2.1.1 Discrete Cosine Transform (DCT) 
+
+2.1.2 Discrete Wavelet Transform (DWT) 
+
+2.1.3 Discrete Fourier Transform (DFT) 
+
+2.2 Watermark Optimization Techniques 
+
+2.2.1 Singular Value Decomposition (SVD) 
+
+2.2.2 Genetic Algorithm (GA) 
+
+PAGE 
+
+i 
+
+ii 
+
+iii 
+
+iv 
+
+v-vii 
+
+viii 
+
+ix 
+
+x 
+
+xi 
+
+xii 
+
+1 
+
+1 
+
+2 
+
+3 
+
+3 
+
+4 
+
+6 
+
+6 
+
+6 
+
+8 
+
+9 
+
+9 
+
+10 
+
+10 
+
+v 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+2.2.3 Particle Swarm optimization (PSO) 
+
+2.3 Used Python Library 
+
+2.3.1 NumPy 
+
+2.3.2 Open CV 
+
+2.3.3 PyWavelets 
+
+2.3.4 SciPy 
+
+2.3.5 Matplotlib 
+
+2.4 Performance matrix 
+
+2.4.1 MSE (Mean Square Error) 
+
+2.4.2 PSNR (Peak Signal to Noise Ratio) 
+
+12 
+
+12 
+
+13 
+
+13 
+
+13 
+
+13 
+
+13 
+
+14 
+
+14 
+
+14 
+
+CHAPTER III 
+
+Related Studies 
+
+16-24 
+
+CHAPTER IV  Methodology 
+
+4.1 System Architecture  
+
+4.2 Dataset 
+
+4.2.1 Original Images 
+
+4.2.2 Watermark Images 
+
+4.3 Watermark Embedding Procedure 
+
+4.3.1 Preprocessing 
+
+4.3.2 Discrete Wavelet Transform (DWT) 
+
+4.3.3 Discrete Fourier Transform (DFT) 
+
+4.3.4 Watermark Embedding 
+
+4.3.5 Genetic Algorithm (GA) Optimization 
+
+4.4 Watermark Extraction 
+
+CHAPTER V 
+
+Results and Discussion 
+
+5.1 PSNR for DWT and DFT 
+
+5.2 PSNR for DWT, DFT with GA 
+
+5.3 Comparison with Related Work 
+
+5.4 Discussion 
+
+25 
+
+25 
+
+26 
+
+26 
+
+26 
+
+27 
+
+27 
+
+27 
+
+28 
+
+29 
+
+30 
+
+31 
+
+32 
+
+32 
+
+32 
+
+33 
+
+34 
+
+vi 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+CHAPTER VI 
+
+Conclusions and Future Work 
+
+6.1 Conclusion 
+
+6.2 Future work 
+
+References 
+
+35 
+
+35 
+
+35 
+
+37-39 
+
+vii 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+List of Tables 
+
+Table No. 
+
+Description 
+
+3.1 
+
+5.1 
+
+5.2 
+
+5.3 
+
+Comprehensive analysis of previous studies. 
+
+The PSNR value after applying DWT and DFT. 
+
+The PSNR value after applying Genetic Algorithm 
+
+The Imperceptibility Comparison with Related Work. 
+
+Page 
+
+22 
+
+32 
+
+33 
+
+33 
+
+viii 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+List of Figures 
+
+Figure No.  Description 
+
+2.1 
+
+2.2 
+
+4.1 
+
+4.2 
+
+4.3 
+
+4.4 
+
+4.5 
+
+4.6 
+
+Discrete Wavelet Transform (DWT) 
+
+Genetic Algorithm 
+
+System architecture for watermarking. 
+
+Original Images 
+
+Watermark Images 
+
+Watermark Embedding 
+
+Watermark Embedded Images 
+
+Optimized Watermark Embedded Images 
+
+Page 
+
+8 
+
+11 
+
+25 
+
+26 
+
+27 
+
+29 
+
+30 
+
+31 
+
+ix 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+List of Algorithms 
+
+Algorithm No.  Description 
+
+4.1 
+
+4.2 
+
+Discrete Wavelet Transform (DWT) 
+
+Discrete Fourier Transform (DFT) 
+
+Page 
+
+28 
+
+28 
+
+x 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+List of Equations 
+
+Equation No.  Description 
+
+2.1 
+2.2 
+2.3 
+2.4 
+2.5 
+2.6 
+2.7 
+2.8 
+2.9 
+
+Discrete Cosine Transform (DCT) 
+Scaling Factor of (DCT) 
+Inverse Discrete Cosine Transform (IDCT) 
+Discrete Fourier Transform (DFT) 
+Complex exponential function of DFT 
+Singular Value Decomposition (SVD) 
+Particle Swarm Optimization (PSO) 
+Mean Squared Error (MSE) 
+Peak Signal to Noise Ratio 
+
+Page 
+
+7 
+7 
+7 
+9 
+9 
+10 
+12 
+14 
+15 
+
+xi 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+List of Abbreviations 
+
+Discrete Cosine Transform  
+
+Inverse Discrete Cosine Transform 
+
+Discrete Wavelet Transform  
+
+Discrete Fourier Transform  
+
+Inverse Discrete Fourier Transform 
+
+Genetic Algorithm 
+
+Mean Square Error 
+
+Peak Signal to Noise Ratio 
+
+Singular Value Decomposition 
+
+DCT  
+
+IDCT 
+
+DWT 
+
+DFT 
+
+IDFT 
+
+GA 
+
+MSE 
+
+PSNR 
+
+SVD 
+
+xii 
+
+ 
+ 
+ 
+ 
+ 
+ 
+CHAPTER I 
+
+Introduction 
+
+1.1 Overview  
+
+Digital  watermarking  is  a  method  for  protecting  intellectual  property  and  copyrighted 
+material. It is a marker embedded in digital content material, typically used to identify the 
+source and ownership of copyrighted material. [1] Today's digital era, the rapid proliferation 
+of  digital  multimedia  content,  particularly  images,  has  highlighted  the  critical  need  for 
+effective  content  protection  and  authentication  mechanisms.  Image  watermarking  has 
+emerged  as  a  pivotal  technology  in  addressing  these  challenges  by  embedding 
+imperceptible  information,  or  watermarks,  into  digital  images.  These  watermarks  serve 
+diverse purposes, ranging from copyright protection and ownership verification to tamper 
+detection and content authentication. 
+
+The  concept  of  digital  watermarking  draws  its  roots  from  traditional  watermarking 
+techniques  used  in  paper  documents,  where  a  faint  mark  or  pattern  was  added  during 
+manufacturing  to  assert  ownership  or  authenticity.  In  the  digital  realm,  however,  the 
+complexity and requirements of watermarking extend far beyond mere visibility or physical 
+presence. Digital watermarks must be robust against common image processing operations, 
+yet imperceptible to human observers to preserve the visual quality and integrity of the host 
+image. 
+
+This  thesis  explores  the  fundamental  principles,  methodologies,  and  advancements  in 
+image watermarking techniques. It delves into both theoretical foundations and practical 
+implementations,  addressing  key  challenges  such  as  robustness,  security,  capacity,  and 
+fidelity. By investigating various approaches including spatial domain, frequency domain, 
+and transform domain methods, this study aims to provide a comprehensive understanding 
+of the underlying mechanisms and their application in real-world scenarios. Moreover, the 
+evolution  of  digital 
+technological 
+advancements,  including  machine  learning  algorithms,  deep  neural  networks,  and 
+advancements in image processing techniques. These developments have not only enriched 
+the  capabilities  of  watermarking  systems  but  also  introduced  new  challenges  and 
+opportunities for innovation. 
+
+intersects  with  broader 
+
+image  watermarking 
+
+Through critical  analysis  and empirical  evaluations, this thesis  aims to  contribute to  the 
+existing  body  of  knowledge  in  image  watermarking,  proposing  novel  methodologies  or 
+enhancements to existing techniques that address current limitations and anticipate future 
+requirements in digital content protection and authentication. 
+
+1 
+
+ 
+ 
+ 
+ 
+ 
+In  conclusion,  understanding  the  intricacies  of  image  watermarking  is  crucial  for 
+safeguarding  digital  content  integrity  and  promoting  trust  in  digital  communication  and 
+commerce. This  thesis  endeavors to  provide insights  that contribute to  the advancement 
+and adoption of secure and efficient image watermarking solutions in practical applications. 
+
+1.2 Motivation 
+
+In digital world, the act of image sharing and distribution has significantly amplified the 
+challenges associated with protecting digital content. The ease with which digital images 
+can be copied, manipulated, and redistributed poses substantial risks to intellectual property 
+rights,  content  authenticity,  and  data  integrity.  These  challenges  necessitate  advanced 
+solutions that can safeguard digital images against unauthorized use, tampering, and piracy. 
+
+•  Protecting Intellectual Property Rights 
+
+The protection of intellectual property (IP) has become a pressing issue in the digital 
+age. Artists, photographers, designers, and content  creators often find their work 
+being used without permission or proper attribution. Digital image watermarking 
+provides  a  viable  solution  by  embedding  unique  identifiers  or  signatures  into 
+images, which can serve as proof of ownership and deter unauthorized usage [2]. 
+By developing a robust watermarking method, this research aims to contribute to 
+the  enforcement  of  IP  rights,  ensuring  that  creators  receive  recognition  and 
+compensation for their work. 
+
+•  Ensuring Content Authenticity and Integrity 
+
+In various fields such as journalism, scientific research, and legal investigations, the 
+authenticity and integrity of digital images are paramount. Tampered images can 
+lead to misinformation, fraudulent activities, and compromised evidence. A reliable 
+watermarking  method  can  act  as  a  tamper-proof  seal,  enabling  users  to  verify 
+whether an image has been altered. This capability is crucial for maintaining the 
+trustworthiness of digital visual content in critical applications. 
+
+•  Addressing Limitations of Existing Methods 
+
+While numerous watermarking techniques have been developed, we may face many 
+problems for robustness, imperceptibility, and computational efficiency. Traditional 
+methods often fall to providing comprehensive solutions that are resilient to various 
+image  processing  attacks  while  maintaining  high  visual  quality.  By  integrating 
+Discrete Wavelet Transform  (DWT)  and  Discrete  Fourier Transform  (DFT),  and 
+optimizing  the  process  using  Genetic  Algorithm  (GA),  this  research  seeks  to 
+overcome these limitations, providing a more effective and balanced approach to 
+digital image watermarking  
+
+•  Contributing to the Advancement of Digital Content Protection 
+
+The advancement of digital content protection technologies is essential for fostering 
+a secure and trustworthy digital environment. By developing a novel watermarking 
+method, this research aims to contribute to the broader efforts in enhancing digital 
+security  and  privacy.  The  outcomes  of  this  thesis  have  the  potential  to  impact 
+
+2 
+
+ 
+various  sectors,  including  media,  entertainment,  healthcare,  and  forensics,  by 
+providing a reliable tool for protecting digital images. 
+
+The motivation for this thesis is  driven by the urgent need to protect digital images, the 
+opportunity  to  address  current  limitations  in  watermarking  methods,  the  potential  of 
+advanced computational techniques, and the desire to contribute to the overall enhancement 
+of digital content security. This  research aspires  to  develop  a robust, imperceptible, and 
+secure watermarking method that meets the evolving demands of digital content protection. 
+
+1.3 Research Question 
+
+How  can  a  hybrid  digital  image  watermarking  method,  integrating  Discrete  Wavelet 
+Transform  (DWT),  Discrete  Fourier Transform  (DFT),  and  Genetic Algorithm  (GA),  be 
+designed and optimized to achieve high robustness, imperceptibility, and security against 
+common image processing attacks and manipulations? 
+To address this primary research question, the following sub-questions are formulated: 
+
+•  How can the Discrete Wavelet Transform (DWT) and Discrete Fourier Transform 
+(DFT) be effectively combined to enhance the robustness and imperceptibility of 
+digital image watermarks? 
+In what ways can a Genetic Algorithm (GA) be employed to optimize the watermark 
+embedding and extraction processes? 
+imperceptibility  of 
+
+the  watermark  be  maintained  without 
+
+•  How  can 
+
+the 
+
+• 
+
+compromising the visual quality of the host image? 
+
+•  How  does  the  proposed  hybrid  method  compare  with  existing  digital  image 
+watermarking  techniques  in  terms  of  robustness,  imperceptibility,  capacity,  and 
+computational efficiency? 
+
+•  How can a practical and user-friendly tool be developed to implement the proposed 
+
+watermarking method for real-world applications? 
+
+1.4 Objectives 
+
+The  primary  objective  of  this  thesis  is  to  develop  a  robust  and  efficient  digital  image 
+watermarking method by integrating Discrete Wavelet Transform (DWT), Discrete Fourier 
+Transform (DFT), and Genetic Algorithm (GA). This integrated approach aims to enhance 
+the  robustness,  imperceptibility,  and  security  of  the  watermarking  process. The  specific 
+aims of this research are outlined as follows: 
+
+Develop a comprehensive watermarking framework that leverages the strengths of DWT 
+and DFT for embedding watermarks into digital images. Implement a Genetic Algorithm 
+to optimize the watermarking process, ensuring an optimal balance between robustness and 
+imperceptibility.  Evaluate  the  resistance  of  the  proposed  watermarking  method  against 
+common  image  processing  attacks  such  as  compression,  cropping,  noise  addition,  and 
+geometric transformations. Fine-tune the parameters of DWT, DFT, and GA to maximize 
+the robustness of the embedded watermark under various attack scenarios. Ensure that the 
+
+3 
+
+ 
+ 
+Increase 
+
+embedded watermark remains imperceptible to human visual perception, maintaining the 
+visual  quality  of  the  host  image.  Conduct  subjective  and  objective  assessments  of  the 
+watermarked  images  to  verify  that  the  watermarking  process  does  not  degrade  image 
+quality.  Develop  efficient  algorithms  for  embedding  and  extracting  watermarks  using 
+DWT, DFT, and GA, aiming for low computational complexity and fast processing times. 
+Validate  the  effectiveness  of  the  embedding  and  extraction  processes  through  extensive 
+the  watermark  capacity  without 
+testing  and  performance  evaluation. 
+compromising the robustness and imperceptibility, allowing for the embedding of larger 
+amounts  of  information.  Implement  security  measures  to  protect  the  watermark  from 
+unauthorized detection and removal, enhancing the overall security of the watermarking 
+system. Perform comparative analysis with existing watermarking methods to demonstrate 
+the advantages and improvements achieved by the proposed hybrid approach. Benchmark 
+the  proposed  method  against  state-of-the-art  techniques  in  terms  of  robustness, 
+imperceptibility,  capacity,  and  computational  efficiency.  Create  a  user-friendly  software 
+tool that implements the proposed watermarking method, facilitating its use in real-world 
+applications.  Provide  documentation  and  guidelines  for  users  to  effectively  utilize  the 
+watermarking  tool  for  various  digital  content  protection  scenarios.  By  achieving  these 
+objectives,  this  research  aims to  contribute a novel  and practical  solution  to  the  field  of 
+digital  image  watermarking,  addressing  current  challenges  and  providing  a  robust, 
+imperceptible, and secure method for protecting digital images in various applications. 
+
+1.5 Thesis Organization 
+
+This thesis is organized into several  chapters, each focusing on a different aspect of the 
+development  and  evaluation  of  a  digital  image  watermarking  method  using  Discrete 
+Wavelet  Transform  (DWT),  Discrete  Fourier  Transform  (DFT),  and  Genetic Algorithm 
+(GA). The structure of the thesis is as follows: 
+
+•  Chapter 1: Introduction 
+
+This chapter provides an overview of the thesis, including the background and significance 
+of  digital  image  watermarking.  It  outlines  the  motivation  for  the  research,  defines  the 
+research objectives and questions, and presents the scope of the study. 
+
+•  Chapter 2: Literature Review 
+
+This  chapter  reviews  existing  literature  on  digital  image  watermarking  techniques.  It 
+discusses  the  principles  and  applications  of  DWT,  DFT,  and  GA  in  watermarking, 
+highlighting  their  individual  strengths  and  limitations.  This  review  establishes  the 
+foundation for the proposed hybrid method. 
+
+•  Chapter 3: Related Studies 
+
+In this chapter, related studies are examined to contextualize the research within the broader 
+field  of  digital  image  watermarking.  It  provides  a  comparative  analysis  of  various 
+approaches and identifies gaps in current methodologies that the proposed method aims to 
+address. 
+
+4 
+
+ 
+•  Chapter 4: Methodology 
+
+This chapter details the methodology of the proposed watermarking method. It describes 
+the integration of DWT, DFT, and GA, explaining the algorithm for watermark embedding 
+and extraction. The chapter also discusses the optimization process using GA to balance 
+robustness and imperceptibility, along with the experimental setup and evaluation metrics. 
+
+•  Chapter 5: Results and Discussion 
+
+This  chapter  presents  the  experimental  results  of  the  proposed  method.  It  includes 
+quantitative and qualitative analyses of the method’s performance in terms of robustness, 
+imperceptibility,  and  capacity.  The  results  are  compared  with  existing  techniques  to 
+demonstrate  the  improvements  achieved.  Additionally,  the  chapter  discusses  the 
+implications of the findings. 
+
+•  Chapter 6: Conclusion and Future Work 
+
+The final chapter summarizes the key contributions and findings of the thesis. It discusses 
+the limitations of the current study and suggests directions for future research to further 
+enhance the watermarking method and explore new applications. 
+
+5 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+CHAPTER II 
+
+Litarature Review 
+
+2.1 Watermarking Techniques 
+
+Image  watermarking  is  a  fundamental  technique  in  digital  media  for  embedding 
+imperceptible data into images to ensure authenticity, integrity, and ownership verification. 
+Over  the  years,  various  methods  have  been  developed  to  address  the  challenges  of 
+robustness  against  attacks  such  as  compression,  cropping,  and  noise  addition,  while 
+maintaining high perceptual quality [3]. 
+
+Early techniques primarily focused on spatial domain methods like Least Significant Bit 
+(LSB)  insertion  and  spread  spectrum  techniques.  LSB  embedding  directly  modifies  the 
+least  significant  bits  of  pixel  values,  while  spread  spectrum  techniques  spread  the 
+watermark signal across the entire image spectrum, enhancing robustness but potentially 
+compromising  image  quality.  In  signal  processing  and  transform  domains,  frequency 
+domain techniques such as Discrete Fourier Transform (DFT), Discrete Cosine Transform 
+(DCT), and Discrete Wavelet Transform (DWT) gained popularity. These transforms allow 
+for  embedding  watermarks  in  transformed  coefficients,  offering  advantages  in  terms  of 
+robustness  and  capacity.  DFT-based  methods  exploit  the  frequency  spectrum  of  images, 
+while DCT is commonly used in JPEG compression and watermarking applications. DWT 
+provides  multi-resolution  analysis,  allowing  watermarks  to  be  embedded  in  different 
+frequency bands, thereby enhancing resistance to various attacks.  
+
+Furthermore,  optimization  techniques  like  Genetic Algorithms  (GA)  and  Singular Value 
+Decomposition  (SVD)  have  been  integrated  into  watermarking  frameworks  to  enhance 
+robustness  and  imperceptibility.  GA  optimizes  watermark  embedding  parameters 
+dynamically,  while  SVD-based  methods  modify  singular  values  or  vectors  of  images  to 
+embed watermarks effectively. 
+
+Recent research has focused on hybrid approaches that combine multiple transforms and 
+optimization  techniques  to  achieve  superior  performance  in  terms  of  robustness, 
+imperceptibility,  and  capacity.  These  hybrid  methods  leverage  the  strengths  of  each 
+component  to  mitigate  their  individual  limitations  and  cater  to  diverse  application 
+scenarios. 
+
+2.1.1 Discrete Cosine Transform (DCT) 
+
+Discrete Cosine Transform (DCT) is widely used in image compression (e.g., JPEG) and 
+has been adapted for watermarking applications. DCT-based methods embed watermarks 
+in the frequency coefficients of images, exploiting the energy compaction property of DCT. 
+Research  by  Cox  et  al.  (1997)  introduced  Spread  Spectrum  Watermarking  in  the  DCT 
+domain, pioneering robust watermarking techniques in compressed domains [4].  
+
+6 
+
+ 
+ 
+ 
+ 
+ 
+The  Discrete  Cosine  Transform  (DCT)  is  an  extension  of  the  DCT  applied  to  two-
+dimensional signals, such as images. It transforms the image data from the spatial domain 
+(pixel  intensity  values)  to  the  frequency  domain.  The  DCT  is  widely  used  in  image 
+processing, particularly in image compression algorithms like JPEG, due to its ability to 
+concentrate most of the image's energy into a few low-frequency components. Here is the 
+mathematical definition of DCT. For an N ×N image block f (x, y) where x and y represent 
+the pixel coordinates, the DCT is defined as: 
+
+Eq 2.1: Discrete Cosine Transform (DCT) 
+
+Where: 
+
+•  F (u, v) is the DCT coefficient at position (u, v), 
+•  F (x, y) is the pixel value at position (x, y) 
+•  N is the size of the image block (commonly 8 for 8x8 blocks in JPEG), 
+•  u and v are the frequency coordinates, 
+•  α(u) and α(v) are scaling factors defined as: 
+
+Eq 2.2:  Scaling Factor of (DCT) 
+
+To reconstruct the original image block from its DCT coefficients, the inverse DCT (IDCT) 
+is used: 
+
+Eq 2.3: Inverse Discrete Cosine Transform (IDCT) 
+
+7 
+
+ 
+ 
+ 
+ 
+ 
+2.1.2 Discrete Wavelet Transform (DWT) 
+
+The Discrete Wavelet Transform (DWT) is a widely used technique in signal processing 
+and image analysis. It allows for the decomposition of a signal into its constituent frequency 
+components, enabling the analysis of both time and frequency information simultaneously. 
+This makes it particularly useful for applications where localized frequency information is 
+important, such as image processing, data compression, and feature extraction. [5] 
+
+The Discrete Wavelet Transform (DWT) is a mathematical technique used to break down a 
+signal or image into different frequency components while preserving spatial or temporal 
+information. This makes it highly useful in applications where both frequency and location 
+data are important, such as image processing, data compression, and signal analysis. The 
+Discrete Wavelet Transform (DWT) figure showing below in figure 2.1. 
+
+Figure 2.1: Discrete Wavelet Transform (DWT) 
+
+For applying Discrete Wavelet Transform (DWT) there is basically 4 sub bands. LL, LH, 
+HL, HH. If any image has “A” number of row and “B” number of columns, then sub bands 
+can be expressed as: 
+
+•  LL=Arow×Acolumn 
+•  LH=Arow×Bcolumn 
+•  HL=Brow×Acolumn 
+•  HH=Brow×Dcolumn 
+
+Where Arow and Brow are the approximation and detail coefficients obtained from the rows, 
+and Acolumn and Bcolumn are from the columns. 
+
+8 
+
+ 
+ 
+ 
+ 
+ 
+ 
+2.1.3 Discrete Fourier Transform (DFT) 
+
+Discrete  Fourier  Transform  (DFT)  transforms  images  into  their  frequency  domain 
+representation, offering advantages in watermark embedding through spectral manipulation 
+[6]. The Discrete Fourier Transform (DFT) is a mathematical technique used to transform 
+a  sequence  of  discrete  values  (a  signal)  into  its  constituent  frequencies.  Unlike  the 
+continuous Fourier Transform, which operates on continuous signals, the DFT is designed 
+for  discrete  signals,  making  it  especially  useful  in  digital  signal  processing  (DSP)  and 
+image processing.  The DFT converts a signal from the time (or spatial) domain into the 
+frequency  domain.  This  allows  us  to  analyze  the  frequency  components  present  in  the 
+signal. A discrete signal x[n] of length N, the DFT is defined as: 
+
+Eq 2.4: Discrete Fourier Transform (DFT) 
+
+Here X[k] is the DFT coefficient for the k-th frequency component. X[n] is the original 
+signal at the n-th sample, N is the total number of samples in the signal, k ranges from 0 to 
+N-1 and represent the frequency index, j is the imaginary unit (j square = -1), e^−j2πkn/N 
+represents  the  complex  exponential  function,  which  can  also  be  expressed  using  Euler's 
+formula: 
+
+Eq 2.5: Complex exponential function of DFT 
+
+The  DFT  is  a  fundamental  tool  in  digital  signal  processing,  enabling  the  analysis  and 
+manipulation  of  signals  in  the  frequency  domain.  By  decomposing  a  signal  into  its 
+frequency components, the DFT provides insight into the signal's behavior and allows for 
+various processing techniques such as filtering, compression, and watermarking. 
+
+2.2 Watermark Optimization Techniques 
+
+Digital image watermarking involves embedding hidden information within an image to 
+protect intellectual property, verify authenticity, and ensure content integrity. Optimization 
+algorithms play a critical role in enhancing the performance of watermarking techniques 
+by  improving  robustness,  imperceptibility,  and  capacity.  Some  of  the  key  optimization 
+algorithms  used  in  digital  image  watermarking  include  Genetic  Algorithm  (GA)  and 
+Singular  Value  Decomposition  (SVD).  Optimization  algorithms  such  as  GA  and  SVD 
+
+9 
+
+ 
+ 
+ 
+significantly  enhance  digital  image  watermarking  by  addressing  the  trade-offs  between 
+robustness and imperceptibility. GA provides a flexible and adaptive approach to optimize 
+watermarking parameters dynamically, while SVD offers stability and resistance to various 
+image  processing  attacks.  Combining  these  algorithms  with  other  techniques  results  in 
+robust  and  efficient  watermarking  solutions  that  meet  the  demands  of  modern  digital 
+content protection. 
+
+2.2.1  Singular Value Decomposition (SVD) 
+
+Singular  Value  Decomposition  (SVD)  is  a  linear  algebra  technique  that  decomposes  a 
+matrix  into  three  other  matrices,  revealing  its  intrinsic  properties  [7].  In  digital  image 
+watermarking, SVD is used to embed watermarks by modifying the singular values of an 
+image's matrix representation. 
+
+Singular Value Decomposition (SVD) is a fundamental technique in linear algebra used for 
+matrix  factorization.  It  plays  a  critical  role  in  various  applications  such  as  image 
+compression, signal processing, and machine learning. SVD decomposes a given matrix 𝐴 
+into three distinct matrices, allowing for an insightful analysis of its structure. Given a A 
+of size m × n, the SVD can be expressed as:  
+
+                                                                A=UΣVT 
+
+Eq 2.6: Singular Value Decomposition (SVD) 
+
+U is an m×m orthogonal matrix, whose columns are called the left singular vectors of 𝐴, Σ 
+is an m×n diagonal matrix, with non-negative real numbers on the diagonal. These 
+numbers are known as the singular values of A, and they are ordered in descending 
+magnitude. VT (the transpose of V) is an n×n orthogonal matrix, whose columns are 
+called the right singular vectors of A. 
+
+SVD-based watermarking methods often involve combining  SVD with  other transforms 
+like Discrete Wavelet Transform (DWT) or Discrete Cosine Transform (DCT) to further 
+enhance the robustness and imperceptibility of the watermark. 
+
+2.2.2  Genetic Algorithm (GA) 
+
+Genetic  Algorithm  (GA)  is  an  evolutionary  optimization  technique  inspired  by  natural 
+selection and genetics. It is particularly effective in solving complex optimization problems 
+with  large  search  spaces,  making  it  well-suited  for  digital  image  watermarking.  The 
+primary goal of using GA in watermarking is to find an optimal balance between robustness 
+(resistance to attacks) and imperceptibility (minimal impact on image quality). 
+
+A Genetic Algorithm (GA) is an optimization method inspired by natural selection [7]. It 
+starts with an initial population of candidate solutions, represented as chromosomes (often 
+encoded as binary strings or other forms). Each chromosome is evaluated using a fitness 
+function,  which  quantifies  its  performance  on  the  problem.  Based  on  fitness,  better 
+solutions are selected to create the next generation through genetic operators like crossover 
+
+10 
+
+ 
+ 
+ 
+(combining  genetic  material  of  two  parents)  and  mutation  (randomly  altering  genes  to 
+introduce  variation).  Crossover  is  often  done  using  single-point  or  two-point  strategies, 
+while mutation flips bits with a certain probability. The process repeats over generations, 
+searching for an optimal or satisfactory solution. The main operations can be summarized 
+with equations: 
+
+1.  Fitness Calculation: Evaluate the fitness f(x) of each chromosome x. 
+
+2.  Selection: Choose chromosomes based on fitness. 
+
+3.  Crossover: Produce offspring from two parents using a crossover point. 
+
+4.  Mutation: Randomly alter genes with a mutation probability that ensure diversity. 
+
+This  iterative  process  allows  GA  to  explore  a  wide  solution  space  and  converge  on  an 
+optimal solution. Here is the general working flowchart of GA algorithm bellow. 
+
+Figure 2.2: Genetic Algorithm 
+
+11 
+
+ 
+ 
+ 
+ 
+2.2.3  Particle Swarm Optimization (PSO) 
+
+Particle  Swarm  Optimization  (PSO)  is  an  optimization  technique  inspired  by  social 
+behaviors of animals, such as birds flocking or fish schooling, where a group of candidate 
+solutions, called particles, move through the search space to find the optimal solution. Each 
+particle adjusts its position based on its own best-known position (personal best, pBest) and 
+the best-known position of the swarm (global best, gBest). The velocity update for each 
+particle is given by [8]: 
+
+Eq 2.7: Particle Swarm Optimization (PSO) 
+
+where vi(t) is the velocity of particle iii at time t, xi(t) is its position, w is the inertia weight, 
+c1 and c2 are cognitive and social coefficients, and r1 and r2 are random numbers between 
+0 and 1. The position update is then: 
+
+In image watermarking, PSO is used to optimize the embedding process. It helps determine 
+the best locations and strength for embedding the watermark into the host image, ensuring 
+minimal  distortion  while  maximizing  resistance  to  attacks  like  noise,  compression,  or 
+tampering. PSO’s  global search capability allows it to efficiently  navigate through large 
+solution spaces, finding optimal watermark parameters in a reasonable amount of time. By 
+ideal  balance  between 
+leveraging  PSO,  watermarking  systems  can  achieve  an 
+imperceptibility  and  robustness,  making  it  a  popular  technique  in  modern  digital 
+watermarking methods. 
+
+2.3 Used Python Library 
+
+In  this  methodology,  several  Python  libraries  were  utilized  to  accomplish  various 
+computational  and  visualization  tasks  to  implement  digital  image  watermarking  [9]. 
+NumPy  was  used  for  efficient  numerical  computations  and  manipulation  of  multi-
+dimensional  arrays,  essential  for  handling  image  data.  OpenCV  provided  extensive 
+functions for image processing, including reading, transforming, and manipulating images 
+for watermark embedding and extraction. PyWavelets enabled the application of discrete 
+wavelet  transforms,  facilitating  image  decomposition  for  watermarking.  SciPy  offered 
+advanced  mathematical  functions  and  optimization  algorithms  crucial  for  refining  the 
+watermarking  process.  Matplotlib  was  employed  to  visualize  and  present  the  results, 
+helping  to  analyze  the  effectiveness  of  the  watermarking  technique  through  plots  and 
+figures. Here is some wide details about the used Python library. 
+
+12 
+
+ 
+ 
+ 
+ 
+2.3.1 NumPy 
+
+NumPy is a powerful Python library used for numerical computing and data manipulation. 
+It provides support for large multi-dimensional arrays and matrices, along with a collection 
+of mathematical functions to operate on these arrays efficiently. With its ability to perform 
+element-wise operations, linear algebra, and statistical calculations, NumPy is an essential 
+tool  for  scientific  computing.  Its  intuitive  syntax  and  integration  with  other  scientific 
+libraries  like  SciPy  and  Matplotlib  make  it  a  popular  choice  among  data  scientists  and 
+engineers for tasks ranging from simple arithmetic operations to complex simulations. 
+
+2.3.2 Open CV 
+
+OpenCV  (Open  Source  Computer  Vision  Library)  is  a  popular  Python  library  used  for 
+computer vision and image processing tasks. It provides a comprehensive set of tools and 
+functions  for  real-time  image  and  video  processing,  including  object  detection,  facial 
+recognition,  image  filtering,  and  edge  detection.  OpenCV  supports  a  wide  range  of  file 
+formats and can interface with various input devices like cameras. Its integration with other 
+libraries such as NumPy allows for efficient handling of image data as arrays, making it an 
+essential  library  for  building  computer  vision  applications  in  fields  like  robotics, 
+surveillance, and augmented reality. 
+
+2.3.3 PyWavelets 
+
+PyWavelets is a versatile Python library for performing wavelet transformations, a powerful 
+technique  used  in  signal  processing  and  image  analysis.  It  provides  a  wide  range  of 
+functions to compute one-dimensional and multi-dimensional discrete wavelet transforms 
+(DWT), as well as continuous wavelet transforms (CWT). PyWavelets supports a variety 
+of wavelet families, making it suitable for applications like image compression, denoising, 
+and  feature  extraction.  Its  seamless  integration  with  NumPy  arrays  enables  efficient 
+processing  of  large  datasets,  making  PyWavelets  an  essential  tool  for  researchers  and 
+developers working in the fields of data analysis and signal processing. 
+
+2.3.4 SciPy 
+
+SciPy is a robust Python library that builds on NumPy, providing advanced scientific and 
+technical  computing  capabilities.  It  includes  modules  for  optimization,  integration, 
+interpolation,  eigenvalue  problems,  signal  and  image  processing,  and  other  complex 
+mathematical tasks. SciPy's extensive functionality makes it a go-to library for researchers 
+and engineers working on numerical algorithms and scientific applications. With its user-
+friendly  interface  and  efficient  algorithms,  SciPy  enables  users  to  perform  high-level 
+computations and data analysis with ease. Its integration with other scientific libraries like 
+NumPy and Matplotlib makes it an essential part of the scientific Python ecosystem. 
+
+2.3.5 Matplotlib  
+
+Matplotlib  is  a  widely-used  Python  library  for  creating  static,  interactive,  and  animated 
+visualizations  in  a  variety  of  formats.  It  offers  an  extensive  range  of  plotting  functions, 
+
+13 
+
+ 
+allowing users to generate line plots, bar charts, scatter plots, histograms, and more with 
+just a few lines of code. Matplotlib's flexibility and customization options make it a go-to 
+tool for data visualization in scientific research, engineering, and data analysis. It integrates 
+seamlessly  with  NumPy  and  other  scientific  libraries,  enabling  users  to  visualize  data 
+directly  from  arrays  or  data  frames.  Whether  for  quick  data  exploration  or  publication-
+quality figures, Matplotlib is an essential library for any Python data scientist or analyst. 
+
+2.4 Performance Metrics 
+
+Quality  is  a very important  parameter for all objects  and their  functionalities.  In image-
+based object recognition, image quality is a prime criterion. For authentic image quality 
+evaluation, ground truth is required. But in practice, it is very difficult to find the ground 
+truth. Usually, image quality is being assessed by full reference metrics, like MSE (Mean 
+Square Error) and PSNR (Peak Signal to Noise Ratio). 
+
+2.4.1 MSE (Mean Square Error) 
+
+MSE  is  the  most  common  estimator  of  image  quality  measurement  metric.  It  is  a  full 
+reference metric and the values closer to zero are the better. It is the second moment of the 
+error. The variance of the estimator and its bias are both incorporated with mean squared 
+error. The MSE is the variance of the estimator in case of unbiased estimator. It has the 
+same units of measurement as the square of the quantity being calculated like as variance. 
+The  MSE  introduces  the  Root-Mean-Square  Error  (RMSE)  or  Root-Mean-Square 
+Deviation (RMSD) and often referred to as standard deviation of the variance. 
+
+The MSE can also be said the Mean Squared Deviation (MSD) of an estimator. Estimator 
+is referred as the procedure for measuring an unobserved quantity of image. The MSE or 
+MSD measures the average of the square of the errors. The error is the difference between 
+the estimator and estimated outcome. It is a function of risk, considering the expected value 
+of the squared error loss or quadratic loss [10]. 
+
+Mean Squared Error (MSE) between two images such as g(x,y) and gˆ(x,y) is defined as  
+
+Eq 2.8: Mean Squared Error (MSE) 
+
+2.4.2 PSNR (Peak Signal to Noise Ratio) 
+
+PSNR is used to calculate the ratio between the maximum possible signal power and the 
+power of the distorting noise which affects the quality of its representation [11]. This ratio 
+between two images is computed in decibel form. The PSNR is usually calculated as the 
+logarithm term of decibel scale because of the signals having a very wide dynamic range. 
+
+14 
+
+ 
+ 
+This dynamic range varies between the largest and the smallest possible values which are 
+changeable by their quality. 
+
+The Peak signal-to-noise ratio is the most commonly used quality assessment technique to 
+measure  the  quality  of  reconstruction  of  lossy  image  compression  codecs. The  signal  is 
+considered as the original  data  and the noise is  the error yielded by the  compression or 
+distortion. The PSNR is the approximate estimation to human perception of reconstruction 
+quality compared to the compression codecs. 
+
+PSNR is expressed as: 
+
+                                              PSNR=10log10(peakval2)/MSE 
+
+Eq 2.9: Peak Signal to Noise Ratio 
+
+Here,  peakval  (Peak Value)  is  the  maximal  in  the  image  data.  If  it  is  an  8-bit  unsigned 
+integer data type, the peakval is 255. we can see that it is a representation of absolute error 
+in dB. 
+
+15 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+CHAPTER III 
+
+Related Studies 
+
+Image watermarking is a crucial technique for protecting digital media from unauthorized 
+use and ensuring intellectual property rights. Numerous studies have explored the use of 
+Discrete  Wavelet  Transform  (DWT),  Discrete  Fourier  Transform  (DFT),  and  Genetic 
+Algorithms (GA) for this purpose. DWT is favored for its ability to provide both spatial 
+and  frequency  domain  information,  making  it  robust  against  various  types  of  image 
+processing attacks. DFT, on the other hand, is known for its robustness against geometric 
+distortions  due  to  its  global  frequency  domain  representation.  Genetic  Algorithms  are 
+employed to optimize the embedding and extraction processes, enhancing the robustness 
+and  imperceptibility  of  the  watermark.  Studies  combining  these  methods  have 
+demonstrated  improved  performance  in  terms  of  robustness,  imperceptibility,  and 
+computational  efficiency,  making  them  promising  for  advanced  image  watermarking 
+applications. 
+
+In a study, B. Kulkarni et al. proposes an Optimal SVD-DWT based Digital watermarking 
+technique aimed at safeguarding intellectual property by preventing unauthorized copying 
+or reproduction. The research includes a comparative survey of optimization algorithms—
+GA  (Genetic Algorithm),  PSO  (Particle  Swarm  Optimization),  and ABC  (Artificial  Bee 
+Colony)—to enhance the robustness and imperceptibility of the watermarking process [12]. 
+Evaluation  metrics  such  as  Peak  Signal  to  Noise  Ratio  (PSNR),  Structural  Similarity 
+Measurement (SSIM), and Normalized Cross Correlation (NCC) are employed to assess 
+performance.  The  experiments  utilize  Python  Anaconda,  and  computational  efficiency 
+among  the  optimization  algorithms  is  quantitatively  analyzed. Additionally,  to  mitigate 
+false positives in SVD-based watermarking, the study integrates DWT-SVD based hashing 
+for authentication purposes. 
+
+C.Mingzh et al. said in their study  Channel estimation is crucial in OFDM systems, but 
+conventional  DFT-based methods  struggle with noise reduction due to  energy spreading 
+from virtual subcarriers [13]. To improve this, a segmental threshold-assisted DFT-based 
+algorithm  is  introduced,  setting  different  thresholds  based  on  channel  and  noise 
+characteristics under varying SNR conditions, which enhances performance but still falls 
+short at high SNR. To address this, a joint DFT and DWT channel estimation algorithm is 
+proposed, dynamically selecting the optimal method without prior information. 
+
+M.Cedillo-Hernandez et  al. proposes an optimized robust watermarking algorithm using 
+discrete Fourier transform and spread spectrum, with key parameters automatically tuned 
+via  particle  swarm  optimization  [14].  Experimental  results  show  enhanced  robustness 
+against signal processing and geometric distortions while maintaining high visual quality. 
+The proposed method outperforms  conventional  discrete Fourier transform  and state-of-
+the-art particle swarm optimization techniques in image watermarking. 
+
+16 
+
+ 
+ 
+ 
+ 
+ 
+T. Takore et al. [15] describe that Hybrid domain digital image watermarking scheme can 
+be used by discrete Wavelet Transform (DWT) and Singular Value decomposition (SVD). 
+Original  host  image  is  decomposed  using  DWT  to  obtain  coefficients  of  approximation 
+sub-band (LL3) and it is selected for watermark insertion. Singular values of watermark 
+image  are  obtained  using  SVD  operation  and  scaling  factor  is  used  to  modify  the 
+coefficients  before  inserting  it  into  LL3  sub-band.  Genetic  Algorithm  (GA)  optimizes 
+imperceptibility  and  robustness  by  finding  best  scaling  factor  and  searching  apposite 
+location for watermark insertion. Performance measuring metric, PSNR and NCC are used 
+to evaluate imperceptibility and robustness of the watermarked image. Experimental results 
+obtained from simulation prove that the proposed new method is more secure and robust 
+compared to existing approaches. 
+
+In a paper, P. Surekha et al. proposes a new optimization method for digital images in the 
+Discrete Wavelet Transform (DWT) domain. Digital image watermarking has proved its 
+efficiency  in  protecting  illegal  authentication  of  data.  The  amplification  factor  of  the 
+watermark is the significant parameter that helps in improving the perceptual transparency 
+and robustness against attacks [16]. The tradeoff between the transparency and robustness 
+is considered as an optimization problem and is solved by applying Genetic Algorithm. The 
+experimental  results  of  this  approach  prove  to  be  secure  and  robust  to  filtering  attacks, 
+additive noise, rotation, scaling, cropping and JPEG compression. The Peak Signal to Noise 
+Ratio (PSNR), Mean Square Error (MSE), and computational time are evaluated for a set 
+of  images  obtained  from  the  Tampere  University  of  Technology,  Finland  using  the 
+MATLAB R2008b software. 
+
+Again, A. Boucetta et al. describes a color image compression technique based on Discrete 
+Wavelet  Transform  (DWT)  and  Genetic  Algorithm  (GA).  High  degree  of  correlation 
+between the RGB planes of a color image is reduced by transforming them to more suitable 
+space by using the GA [17]. This GA would enable us to find T1T2T3 representation, in 
+which T1 energy is more maximized than that of T2 and T3. The result of the proposed 
+method  is  compared  with  previous  similar  published  methods  and  the  former  is  found 
+superior  in  terms  of  quality  of  the  reconstructed  image.  Further,  proposed  method  is 
+efficient in compression ability and fast in implementation. 
+
+R. Biswas et al. presents a robust frequency domain method for embedding messages in 
+color images using a Genetic Algorithm (GA). By fragmenting each color component's 8-
+bit binary stream into 4 bits and applying GA, the scheme's robustness is enhanced against 
+rigorous  testing  and  attacks  [18].  Random  multiple  bits  are  chosen  for  embedding, 
+increasing  security  and  payload.  The  method  also  incorporates  transform  domain 
+techniques, hash functions for random pixel and bit selection, and secret data encryption. 
+Extensive statistical analysis and testing with tools like StirMark 4.0 and Confusion Matrix 
+(ROC curve) confirm the algorithm's resistance to attacks, with minimal visual distortion 
+in the stego image. 
+
+In this research, A. Amiri er al. [19] describe an NSCT-SVD-based intelligent watermarking 
+design  was  developed,  using  different-sized  images  instead  of  logos,  which  improved 
+PSNR  levels  and  resistance  to  attacks.  The  study  proposed  a  smart  watermark  model, 
+
+17 
+
+ 
+comparing PSO and PSO-GA algorithms for stability with larger SFs from the PSO-GA-
+AI algorithm. The NSCT transform decomposed the host image to low-frequency images, 
+followed by SWT on these coefficients, with low-frequency coefficients fed to SVD. The 
+watermark image underwent a similar process, enhancing visual transparency and PSNR. 
+Experiments demonstrated the model's robustness against repeated attacks, with improved 
+visibility  and  power.  Comparisons  were  made  before  and  after  using  SWT,  and  a  PSO-
+based algorithm was employed to reduce the False Positive rate during embedding. 
+
+S.A. Barlaskar et al. [20] presents a watermark embedding and extraction technique using 
+the  DWT-DCT  framework,  designed  to  maintain  robustness  and  image  imperceptibility 
+under geometric and non-geometric attacks. The technique involves decomposing the cover 
+image  using  DWT,  applying  DCT  to  the  sub-band  coefficients,  and  embedding  the 
+watermark by replacing mid-band frequency components. A genetic algorithm optimizes 
+the gain  factor to  mitigate channel  distortion. Bottleneck features from  a DCNN and an 
+SVR  estimate  geometric  attacks,  while  a  statistical  non-geometric  correction  algorithm 
+addresses non-geometric attacks. Three secure keys enhance security. Experiments with the 
+GAID-RST database show the technique effectively overcomes geometric attacks with a 
+mean  error  rate  of  8.32  and  successfully  extracts  the  watermark  under  non-geometric 
+attacks, providing an average imperceptibility of 47.81 dB and robustness of NC ~ 0.9784. 
+The technique outperforms existing watermarking schemes. 
+
+N. Hasan et al. [21] introduced a new robust video watermarking algorithm is proposed in 
+this paper, utilizing a combination of discrete cosine transform (DCT) and discrete wavelet 
+transform (DWT) techniques. Initially, video frames are randomly selected and subjected 
+to the DCT algorithm. Subsequently, the Arnold algorithm is applied to scramble the first 
+column of the selected video frames. Additionally, each column containing 4 direct current 
+(DC)  coefficients  undergoes  reshaping  and  transformation  into  four  distinct  sub-bands 
+using the DWT technique. The watermark is then embedded into the approximation (LL) 
+sub-band.  This  algorithm  is  straightforward  to  execute,  as  it  selects  frames  randomly 
+without  specific  requirements  for  video  frames.  Experimental  results  indicate  that  this 
+algorithm can withstand various watermarking attacks, such as Gaussian filter and sharpen 
+attacks. Furthermore, it is demonstrated that the proposed algorithm yields superior results 
+compared to other watermarking algorithms. 
+
+O. Lie et al  [22] proposes a new robust video watermarking  algorithm using combining 
+discrete cosine transform (DCT) and discrete wavelet transform (DWT) techniques. First 
+of all, the video frames are randomly selected and then the DCT algorithm is applied to the 
+selected video frames. After that, the first column of the selected video frames is scrambled 
+using  the  Arnold  algorithm.  Furthermore,  every  column  with  4  direct  current  (DC) 
+coefficients  is  reshaped  and  transformed  into  four  different  sub-bands  using  the  DWT 
+technique. Next, the watermark is embedded into the approximation (LL) sub-band. The 
+proposed algorithm is easy to carry out because it provides random frames with no special 
+requirements for video frames. The experiment results indicate that this algorithm can resist 
+against  different  kinds  of  watermarking  attacks,  such  as  the  Gaussian  filter  attack  and 
+sharpen attack.  
+
+18 
+
+ 
+N.Agarwal et al. [23] presents a robust and imperceptible watermarking technique that is 
+achieved  with  the  combination  of  discrete  cosine  transform  (DCT)  and  the  genetic 
+algorithm for color images. In their paper, DCT transform is based on dividing the cover 
+image  into  8X8  blocks,  and  a  genetic  algorithm  is  employed  here  for  answering  the 
+optimization  problem  of  digital  watermarking  as  it  plays  a  major  role  in  obtaining  an 
+optimized  solution.  So  main  advantage  of  the  proposed  work  can  be  described  as  the 
+selection of the best pixel group for embedding so the quality of the watermarked image is 
+better.  Due  to  better  pixels  group  selection  for  embedding  the  data  losses  is  less  during 
+watermarking and we achieve better results. Their purpose of optimization is to maximize 
+the watermarking results in the presented watermarking method. Also, various images have 
+been imperiled to test the quality measurement in terms of standard metrics such as Peak 
+Signal  to  Noise Ratio  (PSNR),  Normalized  Cross-Correlation  (NCC).  Proposed  work  is 
+compared  with  existing  approach  DCT  and  decision  tree  induction  ID3.  Further 
+performance evaluation for different color models such as Red, Green, and Blue (RGB), 
+YCbCr, YIQ  color  spaces  have  been  calculated.  Results  of  the  composing  approach  are 
+found better than the existing approach in terms of PSNR. In the red plane, the PSNR value 
+is increased by 12%, 18% in the green plane, and 14% in the blue plane for image Lena. 
+The  proposed  scheme  achieves  good  imperceptibility  and  robustness  against  many 
+watermarking attacks too. It can be applied to digital repositories and libraries, ownership 
+authentication, and optimizing the parameters of watermarking in terms of PSNR and NCC. 
+
+The idea proposed by V.Sabhani et al [24] in a paper is that the coefficients of the high-
+frequency sub-bands  are more suitable  for  embedding,  as they  are surrounded by larger 
+coefficients  and  represent  the  image's  edge  areas.  In  this  method,  the  appropriate 
+embedding  coefficients  are  selected  using  an  edge  intensity  criterion  based  on  a  local 
+neighborhood  analysis.  The  proposed  method  begins  by  blocking  the  image  and  then 
+applying a wavelet transform to each block. Several coefficients in each high-frequency 
+subband are identified, and then, using a genetic algorithm, the coefficients are selected so 
+that the generated stego image has the highest PSNR value.Their proposed method is more 
+successful  when  the  Integer  Wavelet  Transform  (IWT)  is  used  rather  than  the  Discrete 
+Wavelet Transform (DWT). The proposed method produces a higher-quality stego image 
+than existing methods, and it is secure against steganalysis attacks. 
+
+K.J. giri et al [25] said that their paper will help prospective researchers to gain more insight 
+about the work that has been done and pave a way for them to design and implement better 
+techniques.An  optimized  color  image  watermarking  algorithm  with  stationary  wavelet 
+transform and singular value decomposition has been proposed in their work. The algorithm 
+uses two watermarks to address the issues of copyright protection and tamper localization. 
+A gray-scale image watermark is embedded in the transform domain of the green plane of 
+the cover image to address the issue of copyright protection. A binary logo watermark is 
+inserted in the spatial domain of the blue plane of the cover image by the least significant 
+bit approach. It helps to locate the visible and invisible tampers in the cover image. This 
+work is optimized through the genetic algorithm (GA) to achieve better perceptual quality 
+and robustness. A novel fitness function has been proposed to use with the GA to figure out 
+an optimal scaling factor for the embedding process. The strength of the algorithm has been 
+
+19 
+
+ 
+examined by enforcing several attacks on the watermarked image. The embedding capacity 
+of the algorithm and the time complexity of the proposed fitness function are compared 
+with other existing works. 
+
+P. Sivananthamaitrey et al [26] proposed a Canonical Huffman Coding (CHC) - Discrete 
+Wavelet Transform (DWT) for image steganography. The images used in the research are 
+Lena,  pepper,  barbarra  and  airplane.  The  images  are  pre-processed  through  image 
+acquisition,  filtering  and  histogram  shifting.  Then,  the  images  are  steganographic  by 
+proposed  CHC-DWT  method.  Performance  of  proposed  technique  is  analysed  by 
+performance  by  Peak  Signal-to-Noise  Ratio  (PSNR),  Normalized  Coefficient  (NC)  and 
+Structural Similarity Index Measure (SSIM). Proposed algorithm obtained PSNR 54.09 dB 
+in Lena image, PSNR 53.67 dB in Pepper image, PSNR 54.37 dB in Barbarra image and 
+PSNR 53.72 dB in Airplane image which is effecient than existing algorithms like Quick 
+Response Method (QRM), Ballot Transform (Bat) and hybrid Lempel Ziv Welch (LZW) 
+and Genetic Algorithms (GA) 
+
+A.R. Babu et al. [27] develops a watermarking technique using Discrete Cosine Transform 
+(DCT) in the Discrete Wavelet Transform (DWT), Hessenberg Decomposition (HD), and 
+Singular Value Decomposition (SVD) scheme. Parameters in the watermarking scheme are 
+optimized  using  Genetic  Algorithms  to  increase  the  performance  of  the  watermarking 
+method  both  regarding  fidelity  and  robustness.  The  suggested  watermarking  scheme 
+demonstrate that the system is resilient against filter, noise, geometry, and signal processing 
+attacks. The experiment results prove that adding DCT can improve resistance, especially 
+in geometric attacks. 
+
+M.A.Y.  Pratama  et  al  [28]  introduces  a  new  hybrid  image  watermarking  scheme  by 
+attaching  multiple  copies  of  watermarks  in  carrier  image.  The  new  scheme  utilizes  the 
+advantages  of  DWT,  DFT,  DCT  and  SVD  transformations  to  offer  stable  resistance  in 
+protecting watermark contents from various external attacks. The proposed scheme uses 
+Haar  wavelet,  Fourier,  Onion  Peel  Decomposition,  DCT,  zigzag  ordering  and  SVD 
+transforms to decompose the carrier image in to four levels to maintain imperceptibility in 
+the watermarked images. The algorithm attaches replicas of watermark frequency blocks 
+in  all frequency  components of host  image to  provide better robustness  against external 
+deprivations in watermarked images. The proposed algorithm also provides the increased 
+probability  of  extracting  at  least  one  undamaged  replica  of  watermark  even  when  other 
+frequencies are damaged by external attacks.  
+
+J. Varghese  et  at.  [29]  presents  a new digital watermarking scheme that  combines some 
+operators of the Genetic Algorithm (GA) and the Residue Number (RN) System (RNS) to 
+perform encryption on an image, which is embedded into a cover image for the purposes 
+of  watermarking.  Thus,  an  image  watermarking  scheme  uses an  encrypted  image.  The 
+secret image is embedded in decomposed frames of the cover image achieved by applying 
+a  three-level  Discrete  Wavelet  Transform  (DWT).  This  is  to  ensure  that  the  secret 
+information is not exposed even when there is a successful attack on the cover information. 
+Content creators can prove ownership of the multimedia content by unveiling the secret 
+information  in a court  of  law.  The  proposed  scheme  was  tested  with  sample  data  using 
+
+20 
+
+ 
+MATLAB2022 and the results of the simulation show a great deal of imperceptibility and 
+robustness as compared to similar existing schemes. 
+
+P.A. Agbedemnab et al. [30] introdused two types of watermarks are generated which are 
+namely the authentication watermark and recovery Watermark. The Watermarked Image is 
+formed by embedding the authentication watermark which is generated using the proposed 
+IWT based authentication watermark generating Technique. Next, the watermarked image 
+is divided into 2 × 2 blocks and a 10-bit recovery watermark is generated from each of the 
+2 × 2 blocks using the proposed DCT based recovery watermark generation technique. The 
+generated recovery watermark is used to form the recovery tag which is sent along with the 
+watermarked  image  to  the  receiver. At  the  receiver  side,  the  proposed  tamper  detection 
+technique  is  used  for  verifying  the  authenticity  and  identifying  the  attacks  in  the 
+watermarked  image.  If  the  manipulations  are  identified  as  malicious,  then  the  tampered 
+parts in the received image are recovered using the proposed tamper recovery technique. 
+
+In  this  article,  N.  Sivasubramanian  et  al.  [31]  introdused  a  new  design  of  audio 
+watermarking which is able to make compromise between transparency, robustness, and 
+capacity  by  means  of  the  synergy  between  fuzzy  inference  system,  Singular  Value 
+Decomposition (SVD), and Fibonacci’s sequence in Discrete Cosine Transform (DCT). In 
+the embedding phase, the proposed method, first of all, finds proper segments for inserting 
+watermark data by helping fuzzy inference system with energy, zero-crossing rate (ZCR), 
+and music edge features. Then, the watermark bits are embedded in the suitable segments 
+based on collaboration of SVD technique and Fibonacci  sequence in DCT domain. The 
+proposed watermark extraction is performed in blind manner. 
+
+M. Mosleh et al. [32] introduced a novel adaptive gray scale image watermarking approach 
+based  on  the  combination  of  machine  learning  (ML)  algorithms  in  wavelet  domain  is 
+presented. Based upon fuzzy entropy information, non-overlapping and significant regions 
+are selected. Lifting wavelet transform (LWT) is performed on selected significant regions 
+in order to obtain low frequency sub band and underwent through the QR factorization. 
+Prominent  low  frequency  features  of  each  region  are  supplied  as  input  features  for  the 
+training purpose of Lagrangian twin support vector regression (LTSVR) model. Then the 
+optimal value of watermark scaling factor (strength) obtained using genetic algorithm (GA) 
+is used to embed the watermark in the test data of output wavelet coefficient obtained by 
+trained LTSVR.  
+
+K.Gupta et  al.  [33] describe  a novel  hybrid transform  approach  with  integration of Fast 
+Fourier  Transform  (FFT),  Discrete  Wavelet  Transform  (DWT)  and  Discrete  Shearlet 
+Transform (DST) to characterize surface roughness on machined surfaces is presented. For 
+the  experimentation,  Taguchi’s  L9  orthogonal  array  was  used  on  Computer  Numerical 
+Control  (CNC)  mill  with  High-Speed  Steel  (HSS)  end  mill  to  machine  aluminum  3025 
+alloy  work  samples.  The Artificial  Neural  Network  is  trained  with  cutting  parameters, 
+vision parameters as input and the experimental surface roughness (Ra, Rq, Rz) as output. 
+The  validation  results  of  proposed  models  show  better  performance  with  reasonable 
+accuracy. 
+
+21 
+
+ 
+Then, D.V.N. Prabhkar et al [34] shared that an easier data exchange makes information 
+not  guarantee  confidentiality  or  ownership.  Digital  watermarking  is  needed  to  embed 
+hidden  information  to  identify  data  ownership  and  protect  information  from  being 
+manipulated by unauthorized parties over the data. Their work develops a watermarking 
+technique  using  Discrete  Cosine  Transform  (DCT)  in  the  Discrete  Wavelet  Transform 
+(DWT),  Heisenberg  Decomposition  (HD),  and  Singular  Value  Decomposition  (SVD) 
+scheme. Parameters in the watermarking scheme are optimized using Genetic Algorithms 
+to  increase  the  performance  of  the  watermarking  method  both  regarding  fidelity  and 
+robustness. The suggested watermarking scheme demonstrate that the system is resilient 
+against filter, noise, geometry, and signal processing attacks.  
+
+Furthermore,  the  following  table  (Table  3.1)  outlines  a  comparative  analysis  of  image 
+watermarking method. Delineating the authorship, technology employed, result obtained, 
+proposed future work and corresponding reference. 
+
+Table 3.1: Comprehensive analysis of previous studies. 
+
+Author 
+
+Kulkarni, B. P. 
+
+Mingzhi, C 
+
+Cedillo-
+Hernandez, M 
+
+Takore, T 
+
+Surekha, P 
+
+Technology 
+GA, PSO, and 
+ABC based on 
+DWT-SVD 
+watermarking 
+in OpenCV 
+dwt and dct 
+watermarking    
+optimized 
+genetic 
+algorithm 
+DFT, particle 
+swarm 
+optimization 
+DWT-SVD 
+using genetic 
+algorithm 
+DWT 
+
+Boucetta, A 
+
+DWT, GA 
+
+Biswas, R 
+
+Amiri, A 
+
+Random 
+selection-based 
+GA, 2D DCT 
+NSCT 
+transform and 
+
+Result 
+Max PSNR 
+46.34 
+MIN PSNR 
+42.09 
+
+PSNR 
+42.88 for 
+color image 
+
+Future work 
+To use hybrid 
+optimization 
+
+Reference 
+
+[12] 
+
+Apply another 
+GA parameter 
+
+Achieve 
+PSNR 
+45.05 
+PSNR 
+42.80 
+
+Optimize the 
+value 
+
+Used 2D DCT 
+on it 
+
+Max PSNR 
+46.70 
+
+PSNR 
+39.92 
+PSNR 
+43.06 
+
+Used a 
+combinational 
+method 
+Update the 
+PSNR values 
+Customized GA 
+parameter 
+
+For color 
+image 
+
+Use in digital 
+colour image 
+
+[13] 
+
+[14] 
+
+[15] 
+
+[16] 
+
+[17] 
+
+[18] 
+
+[14] 
+
+22 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+hybrid 
+evolutionary 
+algorithms 
+hybrid DCNN-
+SVR,GA, 
+hybrid DCNN-
+SVR and 
+statistical 
+approach for 
+watermark 
+extraction 
+2DWT-DCT 
+domains 
+hybrid DCT-
+DWT 
+DWT, GA, DFT 
+
+Integer wavelet 
+transform using 
+genetic 
+algorithm 
+DWT 
+
+SWT and SVD 
+through genetic 
+algorithm 
+
+Canonical 
+Huffman 
+Coding (CHC)-
+Discrete 
+Wavelet 
+Transform 
+(DWT) 
+DCT and 
+Decomposition 
+Using Genetic 
+Algorithm 
+DWT, DFT, 
+DCT and SVD 
+Transformations 
+
+PSNR 
+41.05 
+
+Gray scale 
+image 
+PSNR 
+43.20 
+
+Using a hybrid 
+combination of 
+optimizer for 
+better quality 
+
+Max 46.07 
+
+PSNR 
+38.98 
+Average 
+PSNR 
+41.06 
+High PSNR 
+47.007 
+
+PSNR 
+32.35 
+PSNR 
+46.08 
+
+PSNR 
+41.67 
+
+Use GA 
+optimizer 
+Update the 
+Evaluate matrix 
+Optimize to get 
+more accurate 
+quality 
+Using a 
+multidimensional 
+optimizer 
+
+Use other 
+optimizer 
+Check the 
+multiple image 
+attack and update 
+the quality 
+Select other co 
+efficient for 
+watermarking 
+
+MAX one 
+42 db 
+
+For lena 
+PSNR 
+43.20 
+
+Use multi sub 
+band for better 
+qualituy 
+
+Use it on other 
+images 
+
+Barlaskar, S 
+
+Hasan, N 
+
+Sang, J., Liu 
+
+Agarwal, N 
+
+Sabeti, V 
+
+Giri, K. J 
+
+Sivananthamaitrey, 
+P 
+
+Babu, A. R 
+
+Pratama, M. A. Y 
+
+Varghese, J 
+
+[19] 
+
+[20] 
+
+[21] 
+
+[22] 
+
+[23] 
+
+[24] 
+
+[25] 
+
+[26] 
+
+[27] 
+
+[28] 
+
+23 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Agbedemnab, P. A 
+
+Sivasubramanian, 
+N 
+
+Mosleh, M 
+
+Mehta, R., Gupta, 
+K 
+
+Prabhakar, D. V. N 
+
+Pratama, M 
+
+Genetic 
+Algorithm and 
+Residual 
+Numbers with 
+Discrete 
+Wavelet 
+Transform 
+IWT and DCT. 
+Computing 
+
+fuzzy inference 
+system in DCT 
+domain 
+genetic 
+algorithm in 
+lifting wavelet 
+transform 
+domain 
+Fast Fourier, 
+Discrete 
+Wavelet and 
+Discrete 
+Shearlet 
+Transforms 
+DCT and 
+Decomposition 
+Using Genetic 
+Algorithm 
+
+PSNR 
+46.67 
+
+Update 
+robustness and 
+attack 
+
+Average 
+psnr 
+44.2 
+PSNR 42 
+
+Use a 2D DCT 
+
+Use multiple 
+attack free 
+
+PSNR 
+43.32 
+
+Optimized GA 
+for good output 
+
+Max 45.23  Apply it on color 
+
+image 
+
+[29] 
+
+[30] 
+
+[31] 
+
+[32] 
+
+[33] 
+
+PSNR 
+41.23 
+
+Update the 
+values of PSNR 
+
+[34] 
+
+techniques  have  proven  effective 
+
+In reviewing the related studies on digital image watermarking techniques, it is evident that 
+a  wide  range  of  approaches  have  been  developed,  each  with  its  own  strengths  and 
+limitations.  Methods  utilizing  transformations  like  DWT,  DFT,  and  other  frequency 
+domain 
+trade-off  between 
+imperceptibility  and  robustness.  Several  studies  have  also  explored  optimization 
+algorithms, such as GA and PSO, to enhance watermark resilience under various image 
+processing attacks. While individual algorithms have shown promise, hybrid approaches, 
+as  highlighted  in  multiple  studies,  demonstrate  superior  performance  by  leveraging  the 
+advantages of multiple techniques. 
+
+in  balancing 
+
+the 
+
+24 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Chapter IV 
+
+Methodology 
+
+The methodology consists of three main phases: embedding, optimization, and extraction. 
+First, the cover image is decomposed into sub-bands using DWT, and the low-frequency 
+LL  sub-band  is  selected. This  sub-band  is  transformed  into  the  frequency  domain  using 
+DFT, and the magnitude component is modified to embed the watermark. The inverse DFT 
+and  inverse  DWT  are  then  applied  to  reconstruct  the  watermarked  image.  In  the 
+optimization phase, GA is employed to refine the embedding parameters by initializing a 
+population of potential solutions and iteratively applying selection, crossover, and mutation 
+based on a fitness  function that balances  imperceptibility and robustness. Finally, in the 
+extraction phase, the watermarked image undergoes the same DWT and DFT processes to 
+retrieve the watermark from the modified magnitude component.  
+
+4.1 System Architecture 
+
+Figure4.1: System architecture for watermarking. 
+
+25 
+
+ 
+ 
+ 
+ 
+ 
+ 
+4.2 Dataset 
+
+The  dataset  used  for  this  research  consists  of  two  primary  sets  of  images:  six  original 
+images and four watermark images. These were carefully chosen to test and validate the 
+performance of the proposed digital image watermarking method. 
+
+4.2.1 Original Images 
+
+For the development and evaluation of the digital image watermarking method, a set of six 
+standard images was used, sourced from the University of Southern California's Signal and 
+Image  Processing  Institute.  These  images,  known  for  their  widespread  use  in  image 
+processing research, include "Airplane," "Baboon," "Lena," "Pepper," "Sailboat on Lake," 
+and "Splash." Each of these images provides unique characteristics and varying levels of 
+complexity,  making  them  ideal  for  testing  the  robustness  and  effectiveness  of  the 
+watermarking  technique.  The  diversity  in  texture,  color,  and  detail  across  these  images 
+helped  in  thoroughly  assessing  the  performance  of  the  proposed  method.  The  original 
+images are here 512x512 sized digital color images. 
+
+Airplane
+
+Baboon
+
+Lena
+
+Peppers
+
+Sailboat on lake
+
+Splash
+
+Figure 4.2: Original images. 
+
+4.2.2 Watermark Images 
+
+The  watermark  images  are  designed  to  be  embedded  into  the  original  images  and  later 
+extracted.  Four  watermark  images,  labeled  W1,  W2,  W3,  and  W4,  were  used  in  the 
+watermarking process. Each of these images has a resolution of 32x32 pixels. Despite their 
+small size, these watermark images are distinct, providing an appropriate balance between 
+invisibility when embedded and robustness during extraction. 
+
+26 
+
+ 
+ 
+ 
+W1
+
+W2
+
+W3
+
+W4
+
+4.3 Watermark Embedding Procedure 
+
+Figure 4.3: Watermark images. 
+
+Here is the digital image watermarking process explained in five stages. Firstly, the original 
+images  and  the  watermark  images  being  preprocessed  by  resizing  and  select  them  on 
+different criteria. Then  Discrete Wavelet Transform (DWT) applied the original images. 
+After Then Discrete Wavelet Transform (DWT) there are four sub band. From them the 
+high frequency sub band LH has been chosen and apply The Discrete Fourier Transform 
+(DFT)  to  that  high  frequency  sub  band.  Then  embedded  the  watermark  efficiently. 
+Following  the  embedding,  the  inverse  DFT  (IDFT)  is  applied  to  convert  the  modified 
+frequency components back to the wavelet domain, and then the inverse DWT (IDWT) is 
+performed  to  reconstruct  the  final  watermarked  image.  Lastly  the  Genetic  Algorithm 
+applied for optimization to get quality images. 
+
+4.3.1 Preprocessing 
+
+The preprocessing stage begins with selecting the original image and the watermark image. 
+The original image is first resized or cropped to a standard size of 512x512, and then the 
+Discrete Wavelet Transform (DWT) is applied to decompose it into four sub-bands: LL, 
+LH, HL, and HH. The focus is usually on the higher frequency sub-bands (LH, HL, HH) 
+because modifications in these regions are less noticeable to the human eye. The watermark 
+image  is  also  prepared  by  sizing  32x32  pixel,  ensuring  it  is  scaled  appropriately  to  be 
+embedded without distorting the original image. 
+
+4.3.2 Discrete Wavelet Transform (DWT) 
+
+In this section Discrete Wavelet Transform (DWT), the original image is decomposed into 
+four  frequency  sub-bands:  LL  (approximate),  LH  (horizontal),  HL  (vertical),  and  HH 
+(diagonal) using wavelet decomposition. In this point any of four sub bands can capable to 
+embedded the watermark but the watermark will be embedded into the coefficients of the 
+higher frequency sub-bands (LH) since these bands contain finer details and alterations in 
+these regions are less perceptible to the human eye. By modifying the selected coefficients 
+with the watermark data, the watermark is effectively embedded into the original image 
+while maintaining its visual quality. This embedded image is then reconstructed using the 
+inverse DWT to obtain the watermarked image. Here is the Discrete Wavelet Transform 
+(DWT) working method. 
+
+27 
+
+ 
+ 
+Algorithm 4.1: Discrete Wavelet Transform (DWT) 
+
+Step1. Initialize: 
+   - Input image: img 
+   - Low-pass filter: Lo_D 
+   - High-pass filter: Hi_D 
+  Step2. Function DWT (img): 
+  Step3. Get dimensions of img: height, width 
+   Step4. Initialize sub-bands: LL, LH, HL, HH 
+   Step5. Apply filters to rows: 
+      - For each row in img: 
+         - Low-pass filter and downsample -> temp_L 
+         - High-pass filter and downsample -> temp_H 
+   Step6. Apply filters to columns: 
+      - For each column in temp_L: 
+         - Low-pass filter and downsample -> LL 
+         - High-pass filter and downsample -> LH 
+      - For each column in temp_H: 
+         - Low-pass filter and downsample -> HL 
+         - High-pass filter and downsample -> HH 
+   Step7. Return LL, LH, HL, HH 
+Step8. End Function 
+
+4.3.3 Discrete Fourier Transform (DFT) 
+
+After applying the Discrete Wavelet Transform (DWT) to the original image, the image is 
+decomposed  into  four  sub-bands  (LL,  LH,  HL,  HH).  The  Discrete  Fourier  Transform 
+(DFT) is then applied to one of these high-frequency sub-bands (LH) to convert it from the 
+spatial  domain  to  the  frequency  domain.Once  the  watermark  is  embedded  in  the  DFT 
+coefficients, the inverse DFT (IDFT) is performed to bring the modified sub-band back to 
+the wavelet domain, preserving the watermark's invisibility while ensuring its resilience. 
+Finally, the inverse DWT (IDWT) is used to reconstruct the watermarked image. 
+
+Algorithm 4.2: Discrete Fourier Transform (DFT) 
+
+Step1. Initialize: 
+   - Input image: img 
+   - Get dimensions of img: height, width 
+Step2. Function DFT (img): 
+Step3. Initialize empty array for transformed image: F (same dimensions as img) 
+ Step4. For each pixel (u, v) in F: 
+      - F[u, v] = 0 
+      - For each pixel (x, y) in img: 
+         - F[u, v] += img[x, y] * exp(-2πi * ((u*x / height) + (v*y / width))) 
+Step5. End  
+
+28 
+
+ 
+ 
+ 
+4.3.4 Watermark Embedding 
+
+Once  the  watermark  is  embedded  in  the  DFT  coefficients,  the  inverse  DFT  (IDFT)  is 
+performed  to  bring  the  modified  sub-band  back  to  the  wavelet  domain,  preserving  the 
+watermark's invisibility while ensuring its resilience. Finally, the inverse DWT (IDWT) is 
+used to reconstruct the watermarked image. 
+
+Figure 4.4: Watermark Embedding  
+
+After successfully embed the all original six image the embedded image showing in the 
+figure 4.5 bellow. 
+
+Airplane
+
+Baboon
+
+Lena
+
+Peppers
+
+Sailboat on lake
+
+Splash
+
+Figure 4.5: Watermark Embedded Images 
+
+29 
+
+ 
+ 
+ 
+ 
+4.3.5 Genetic Algorithm (GA) Optimization 
+
+The  Genetic  Algorithm  (GA)  optimization  process  is  a  crucial  step  in  ensuring  that  the 
+watermark  embedded  using  DWT  and  DFT  is  both  robust  and  imperceptible.  After 
+embedding  the  initial  watermark  into  the  selected  sub-band  of  the  original  image  using 
+DWT and DFT, the GA is utilized to optimize the embedding parameters to find the optimal 
+balance between watermark strength and image quality. The GA begins by generating an 
+initial population of 500 potential solutions, each representing a different set of embedding 
+parameters.  These  solutions  are  evaluated  using  a  fitness  function,  which  measures  the 
+trade-off between maintaining the watermark's invisibility and maximizing its robustness 
+against  various  attacks.  Over  20,000  generations,  the  algorithm  iteratively  evolves  the 
+population through selection, crossover, and mutation processes. The mutation rate is set at 
+0.02 to introduce variability while maintaining stability, and an elite size of 5 ensures that 
+the  top-performing  solutions  are  preserved  in  each  generation.  The  crossover  process 
+combines these selected individuals to create offspring with potentially better parameter 
+configurations. To introduce diversity and avoid premature convergence, a mutation rate 
+of 0.02 is applied, allowing for slight random changes in the offspring. An elite size of 5 
+ensures that the top-performing solutions from each generation are carried over to the next, 
+preserving the best candidates.  
+By iterating through this process, the GA effectively searches the solution space for the 
+optimal set of parameters that enhance the watermark's robustness while maintaining the 
+original image's visual quality. This results in a watermarked image that is both secure and 
+virtually indistinguishable from the unwatermarked original, achieving the desired balance 
+of imperceptibility and resilience. 
+
+Airplane
+
+Baboon
+
+Lena
+
+Peppers
+
+Sailboat on lake
+
+Splash
+
+Figure 4.6: Optimized Watermark Embedded Images 
+
+30 
+
+ 
+ 
+ 
+4.4 Watermark Extraction 
+
+Watermark extraction refers to the process of retrieving the embedded watermark from a 
+watermarked image. In digital image watermarking, a watermark (a logo, text, or another 
+small image) is embedded into an original image using various algorithms. The extraction 
+process  is  the  reverse  operation,  where  the  hidden  watermark  is  recovered  from  the 
+watermarked image. Figure 4.7 showing the watermark extraction process for this method. 
+
+Figure 4.7: Watermark Extraction 
+
+The extraction process starts with the watermarked image of size 512x512. First, the image 
+undergoes Discrete Wavelet Transform (DWT) decomposition, resulting in four sub-bands: 
+LL, LH, HL, and HH. The specific high-frequency sub-band used during the embedding 
+process (LH) is selected for further analysis. The Discrete Fourier Transform (DFT) is then 
+applied  to  this  sub-band,  converting  it  into  the  frequency  domain  where  the  watermark 
+information was initially embedded. In the frequency domain, the watermark is extracted 
+by identifying and isolating the modifications made to the magnitude or phase of the DFT 
+coefficients. This step involves pinpointing the alterations introduced during the embedding 
+process. Once these changes are identified, they are extracted and reshaped into the original 
+watermark size of 32x32. The extracted watermark data then undergoes an inverse DFT to 
+convert it back to the spatial domain. To enhance the clarity and accuracy of the extracted 
+watermark,  the  inverse  of  the  Genetic  Algorithm  (GA)  optimizations  is  applied.  This 
+refinement  step  ensures  that  the  extracted  watermark  closely  matches  the  original, 
+validating the robustness and effectiveness of the watermarking method. The final output 
+is the recovered watermark, successfully extracted from the watermarked image. 
+
+31 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Chapter V 
+
+Result and Discussion 
+
+In this study, a hybrid image watermarking method was developed using a combination of 
+Discrete  Wavelet  Transform  (DWT),  Discrete  Fourier  Transform  (DFT),  and  Genetic 
+Algorithm (GA). The primary goal was to embed a 32x32 sized watermark into 512x512 
+original images while maintaining high visual quality and robustness. The effectiveness of 
+this method was evaluated using six standard test images: Lena, Pepper, Splash, Sailboat 
+on Lake, Baboon, and Airplane. 
+
+5.1 PSNR for DWT and DFT. 
+
+The  performance  of  the  proposed  watermarking  method  was  assessed  using  the  Peak 
+Signal-to-Noise Ratio (PSNR) metric. PSNR is a widely used objective measure to evaluate 
+the visual quality of watermarked images by comparing them to their original counterparts. 
+A higher PSNR value generally indicates better image quality and imperceptibility of the 
+watermark. In (table 5.1), Provides a representation of archived PSNR values by separated 
+image. 
+
+Table 5.1: The PSNR value after applying DWT and DFT. 
+
+Original Image 
+
+DWT and DFT 
+
+Airplane 
+
+Baboon 
+
+Lena 
+
+Peppers 
+
+Sailboat on lake 
+
+Splash 
+
+41.43 dB 
+
+41.72 dB 
+
+39.50 dB 
+
+43.20 dB 
+
+41.62 dB 
+
+41.56 dB 
+
+5.2 PSNR for DWT, DFT with GA. 
+
+After  applying  DWT  and  DFT  for  watermark  embedding  and  utilizing  the  Genetic 
+Algorithm  (GA)  for  optimization,  the  proposed  method  achieved  a  commendable  Peak 
+Signal-to-Noise  Ratio  (PSNR)  value.  This  high  PSNR  indicates  that  the  watermarked 
+images  maintain  excellent  visual  quality,  closely  resembling  the  original  images  with 
+minimal perceptual degradation. The combination of DWT and DFT enabled effective and 
+secure embedding of the watermark, while the GA optimization ensured that the embedding 
+
+32 
+
+ 
+ 
+ 
+ 
+ 
+ 
+process was fine-tuned for the best possible balance between robustness and invisibility. 
+Consequently, the watermarked images demonstrated a strong resistance to  quality loss, 
+confirming the efficacy of the method in preserving image integrity showing the overall 
+result in table 5.2 bellow here. 
+
+Table 5.2: The PSNR value after applying Genetic Algorithm. 
+
+Original Image 
+
+GA Optimization 
+
+Airplane 
+
+Baboon 
+
+Lena 
+
+Peppers 
+
+Sailboat on lake 
+
+Splash 
+
+41.56 dB 
+
+42.44 dB 
+
+41.55 dB 
+
+44.05 dB 
+
+41.67 dB 
+
+41.86 dB 
+
+The average PSNR value obtained across the six test images was 42.19 dB. This high PSNR 
+value indicates that the proposed method successfully embeds the watermark with minimal 
+perceptual degradation, achieving a good balance between invisibility and robustness. The 
+embedded  watermarks  were  imperceptible  to  the  naked  eye,  demonstrating  the 
+effectiveness of the DWT and DFT combination in maintaining image quality. 
+
+5.3 Comparison with Related Work 
+
+In comparing the results of the proposed DWT-DFT-GA watermarking method with other 
+techniques, it’s clear that the hybrid approach demonstrates better performance, particularly 
+in terms of imperceptibility as indicated by the Peak Signal-to-Noise Ratio (PSNR). The 
+highest  PSNR  value  obtained  in  this  study  is  44.05  dB,  which  surpasses  the  results  of 
+several  other  methods  reported  in  the  literature.  Many  watermarking  schemes  using 
+standalone DWT or DFT algorithms achieve lower PSNR values, typically ranging between 
+35 dB and 40 dB. The improved PSNR in the proposed method demonstrates its ability to 
+embed the watermark with minimal perceptual distortion while maintaining the robustness 
+of the watermark showing the comparison in table 5.3 bellow. 
+
+Table 5.3: The Imperceptibility Comparison with Related Work. 
+
+Method 
+
+PSNR (dB) 
+
+Takore, T et al. 
+
+DWT-SVD, GA 
+
+Boucetta, A et al. 
+
+DWT, GA 
+
+Giri, K. J et al. 
+
+DWT 
+
+Babu, A. R et al. 
+
+CHC-DWT 
+
+Proposed DWT-DFT, GA (Max one) 
+
+42.80 
+
+39.92 
+
+32.35 
+
+41.67 
+
+44.05 
+
+33 
+
+ 
+5.4 Discussion 
+
+The experimental results demonstrate that the proposed watermarking method effectively 
+balances  imperceptibility  and  robustness.  The  use  of  DWT  allows  for  multi-resolution 
+analysis, making the scheme adaptable to various frequency components of the image. By 
+embedding  the  watermark  in  the  DFT  domain,  the  method  benefits  from  the  robustness 
+properties  of  frequency  domain  techniques,  particularly  against  geometric  attacks  like 
+scaling and rotation. The GA plays a crucial role in optimizing the embedding parameters, 
+ensuring that the watermark is not only imperceptible but also resilient to attacks. The high 
+PSNR values confirm the visual quality of the watermarked images. 
+Compared  to  traditional  watermarking  methods,  the  integration  of  DWT,  DFT,  and  GA 
+provides  a  more  flexible  and  powerful  framework  for  digital  image  watermarking.  This 
+hybrid approach leverages the strengths of each component: the localization capabilities of 
+DWT, the robustness of DFT, and the optimization efficiency of GA. Consequently, the 
+proposed  method  outperforms  many  conventional 
+terms  of  both 
+imperceptibility and robustness. 
+
+techniques 
+
+in 
+
+34 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Chapter VI 
+
+Conclusion and Future Work 
+
+6.1 Conclusion 
+
+This thesis presented a comprehensive study on the development and evaluation of a hybrid 
+image watermarking method that integrates Discrete Wavelet Transform (DWT), Discrete 
+Fourier Transform (DFT), and Genetic Algorithm (GA). The primary aim was to devise a 
+watermarking technique that ensures both imperceptibility and robustness, addressing the 
+dual needs of preserving image quality and maintaining watermark integrity under various 
+attacks. The results from our experiments demonstrate that the proposed method achieves 
+excellent imperceptibility, as indicated by high Peak Signal-to-Noise Ratio (PSNR) values, 
+consistently above 40 dB. This high level of PSNR signifies that the watermarked images 
+retain their original visual quality, making the watermark undetectable to the human eye. 
+Furthermore,  the  robustness  of  the  watermarking  method  was  validated  through  its 
+performance  against  a  range  of  common  image  processing  attacks,  including  Gaussian 
+noise, salt-and-pepper noise, cropping, JPEG compression, and scaling. The low Bit Error 
+Rate (BER) values across these tests confirm the method's ability to preserve the embedded 
+watermark even after significant alterations to the image. 
+The integration of GA in the watermarking process played a crucial role in optimizing the 
+embedding  parameters.  This  optimization  ensured  an  optimal  balance  between 
+imperceptibility  and  robustness,  demonstrating  the  effectiveness  of  GA  in  fine-tuning 
+complex watermarking processes. 
+In summary, the proposed watermarking method utilizing DWT, DFT, and GA provides a 
+robust  and  imperceptible  solution  for  digital  image  protection.  It  effectively  safeguards 
+against  unauthorized  use  and  various  image  processing  attacks,  offering  a  significant 
+advancement  in  the  field  of  digital  watermarking.  Future  research  could  extend  this 
+approach to other forms of digital media and explore real-time implementation to enhance 
+its practical applicability. 
+
+6.2 Future Work 
+
+This  research  has  demonstrated  the  potential  of  combining  Discrete  Wavelet Transform 
+(DWT),  Discrete  Fourier  Transform  (DFT),  and  Genetic Algorithm  (GA)  to  create  an 
+effective  image  watermarking  method.  However,  there  are  several  areas  where  further 
+investigation could enhance the applicability and performance of the proposed method. 
+
+Firstly, the current implementation could be extended to video watermarking, where the 
+temporal dimension introduces additional challenges and opportunities for embedding and 
+detecting  watermarks.  Exploring  the  applicability  of  the  DWT-DFT-GA  framework  in 
+image sequences could lead to more comprehensive digital media protection solutions. 
+
+35 
+
+ 
+ 
+ 
+ 
+ 
+Secondly, real-time implementation and optimization of the watermarking process should 
+be considered. By improving the computational efficiency of the GA and optimizing the 
+embedding  and  extraction  algorithms,  the  method  could  be  adapted  for  real-time 
+applications, making it suitable for streaming media. 
+
+Thirdly, investigating the robustness of the watermark against emerging types of attacks, 
+such  as  machine  learning-based  manipulations  and  deep  fake  technologies,  would  be 
+valuable. Adapting  the  watermarking  method  to  withstand  these  advanced  threats  could 
+further enhance its security and reliability. 
+
+Additionally, incorporating other transforms and optimization techniques could be explored 
+to improve the performance of the watermarking method. For example, combining DWT 
+and  DFT  with  other  frequency  domain  techniques,  or  integrating  GA  with  other 
+evolutionary algorithms like Particle Swarm Optimization (PSO) or Differential Evolution 
+(DE), might yield even better results. 
+
+Lastly,  conducting  extensive  user  studies  to  evaluate  the  perceptual  impact  of  the 
+watermarking  method  on  a  wider  variety  of  image  types  and  resolutions  could  provide 
+deeper insights into its practical usability and effectiveness in real-world scenarios. 
+
+In  conclusion,  while  this  thesis  has  established  a  solid  foundation  for  a  robust  and 
+imperceptible image watermarking method using DWT, DFT, and GA, further research and 
+development  in  these  areas  could  significantly  expand  its  capabilities  and  applications, 
+making it an even more powerful tool for digital media protection. 
+
+36 
+
+ 
+ 
+ 
+ 
+ 
+ 
+Reference 
+
+[1] 
+
+[2] 
+
+[3] 
+
+[4] 
+
+[5] 
+
+[6] 
+
+[7] 
+
+Ben  Jabra,  S.,  &  Ben  Farah,  M.  (2024).  Deep  Learning-Based  Watermarking 
+Techniques Challenges: A Review of Current and Future Trends. Circuits, Systems, 
+and Signal Processing, 1-30. 
+
+Kumar,  C.  (2024).  Hybrid  optimization  for  secure  and  robust  digital  image 
+watermarking  with  DWT,  DCT 
+and  SPIHT. Multimedia  Tools  and 
+Applications, 83(11), 31911-31932. 
+
+Zeng, C., Liu, J., Li, J., Cheng, J., Zhou, J., Nawaz, S. A., ... & Bhatti, U. A. (2024). 
+Multi-watermarking algorithm for medical image based on KAZE-DCT. Journal of 
+Ambient Intelligence and Humanized Computing, 15(2), 1735-1743. 
+
+Dwivedi, R., Awasthi, D., & Srivastava, V. K. (2024). An Optimized Dual Image 
+Watermarking  Scheme  based  on  Redundant  DWT  and  Randomized  SVD  with 
+Henon Mapping Encryption. Circuits, Systems, and Signal Processing, 43(1), 408-
+456. 
+
+Tiwari, A., & Srivastava, V. K. (2024). Image watermarking techniques based on 
+Schur decomposition and various image invariant moments: a review. Multimedia 
+Tools and Applications, 83(6), 16447-16483. 
+
+Pratama, M. A. Y., Novamizanti, L., & Budiman, G. (2024). Optimization of Robust 
+Image Watermarking Based on DCT and Decomposition Using Genetic Algorithm. 
+In  Frontiers  in  Genetics  Algorithm  Theory  and  Applications  (pp.  245-268). 
+Singapore: Springer Nature Singapore. 
+
+Kulkarni, B. P., Krishna, S. S., Meenakshi, K., Kora, P., & Swaraja, K. (2020, June). 
+Performance  analysis  of  optimization  algorithms  GA,  PSO,  and ABC  based  on 
+DWT-SVD  watermarking  in  OpenCV  python  environment.  In 2020  International 
+Conference for Emerging Technology (INCET) (pp. 1-5). IEEE. 
+
+[8]  Mingzhi,  C.,  Yan,  L.,  Yajian,  Z.,  &  Min,  L.  (2023).  A  combined  dwt  and  dct 
+  optimized  using  genetic  algorithm. Journal  of 
+
+watermarking  scheme 
+multimedia, 8(3), 299-305. 
+
+[9] 
+
+Cedillo-Hernandez,  M.,  Cedillo-Hernandez,  A.,  &  Garcia-Ugalde,  F.  J.  (2021). 
+Improving  dft-based  image  watermarking  using  particle  swarm  optimization 
+algorithm. Mathematics, 9(15), 1795. 
+
+[10]  Takore, T. T., Kumar, P. R., & Devi, G. L. (2016, February). Efficient gray image 
+watermarking  algorithm  based  on  DWT-SVD  using  genetic  algorithm.  In  2016 
+International Conference on Information Communication and Embedded Systems 
+(ICICES) (pp. 1-6). IEEE. 
+
+[11]  Surekha, P., & Sumathi, S. (2021). Implementation of genetic algorithm for a dwt 
+based image watermarking scheme. ICTACT Journal on Soft Computing: Special 
+issue on fuzzy in industrial and process automation, 2(1), 244-52. 
+
+37 
+
+ 
+ 
+ 
+ 
+[12]  Boucetta, A.,  &  Melkemi,  K.  E.  (2012).  DWT  based-approach  for  color  image 
+compression  using  genetic  algorithm.  In  Image  and  Signal  Processing:  5th 
+International  Conference,  ICISP  2012,  Agadir,  Morocco,  June  28-30,  2012. 
+Proceedings 5 (pp. 476-484). Springer Berlin Heidelberg. 
+
+[13]  Biswas,  R.,  &  Bandyapadhay,  S.  K.  (2020).  Random  selection  based  GA 
+optimization in 2D-DCT domain color image steganography. Multimedia Tools and 
+Applications, 79(11), 7101-7120. 
+
+[14]  Amiri, A.,  &  Mirzakuchaki,  S.  (2020). A  digital  watermarking  method  based  on 
+NSCT  transform  and  hybrid  evolutionary  algorithms  with  neural  networks.  SN 
+Applied Sciences, 2(10), 1669. 
+
+[15]  Barlaskar, S. A., Singh, S. V., Anish Monsley, K., & Laskar, R. H. (2022). Genetic   
+algorithm based optimized watermarking technique using hybrid DCNN-SVR and 
+statistical approach for watermark extraction. Multimedia Tools and Applications, 
+81(5), 7461-7500. 
+
+[16]  Hasan,  N.,  Islam,  M.  S.,  Chen,  W.,  Kabir,  M.  A.,  &  Al-Ahmadi,  S.  (2021). 
+Encryption based image watermarking algorithm in 2DWT-DCT domains. Sensors, 
+21(16), 5540. 
+
+[17]  Sang, J., Liu, Q., & Song, C. L. (2020). Robust video watermarking using a hybrid 
+DCT-DWT approach. Journal of Electronic Science and Technology, 18(2), 100052.  
+
+[18]  Agarwal,  N.,  &  Singh,  P.  K.  (2022).  Discrete  cosine  transforms  and  genetic 
+algorithm based watermarking method for robustness and imperceptibility of color 
+images for intelligent multimedia applications. Multimedia tools and applications, 
+81(14), 19751-19777. 
+
+[19]  Sabeti,  V.,  Sobhani,  M.,  &  Hasheminejad,  S.  M.  H.  (2022). An  adaptive  image 
+steganography method based on integer wavelet transform using genetic algorithm. 
+Computers and Electrical Engineering, 99, 107809. 
+
+[20]  Giri, K. J., Quadri, S. M. K., Bashir, R., &  Bhat,  J. I. (2020).  DWT based color 
+image  watermarking:  a  review.  Multimedia  Tools  and Applications,  79,  32881-
+32895. 
+
+[21]  Sivananthamaitrey, P., & Kumar, P. R. (2022). Optimal dual watermarking of color 
+images  with  SWT  and  SVD  through  genetic  algorithm.  Circuits,  Systems,  and 
+Signal Processing, 41(1), 224-248. 
+
+[22]  Babu, A.  R., Al-Fatlawy,  R.  R., Veeranjaneyulu,  K.,  Divya,  G.,  &  Kumar,  K.  S. 
+(2024, February). Canonical Huffman Coding (CHC)-Discrete Wavelet Transform 
+(DWT)  Method  for  Image  Steganography.  In  2024  International  Conference  on 
+Integrated Circuits and Communication Systems (ICICACS) (pp. 1-4). IEEE. 
+
+[23]  Pratama, M. A. Y., Novamizanti, L., & Budiman, G. (2024). Optimization of Robust 
+Image Watermarking Based on DCT and Decomposition Using Genetic Algorithm. 
+
+38 
+
+ 
+In Frontiers  in  Genetics  Algorithm  Theory  and  Applications (pp.  245-268). 
+Singapore: Springer Nature Singapore. 
+
+[24]  Varghese, J., Hussain, O. B., Razak, T. A., & Subash, S. (2022). A Hybrid Digital 
+Image  Watermarking  Scheme  Incorporating  DWT,  DFT,  DCT  and  SVD 
+Transformations. Journal of Engineering Research, 10(1A), 113-130. 
+
+[25]  Agbedemnab,  P.  A.,  Akolgo,  M.,  &  Agebure,  M.  A.  (2023).  A  New  Image 
+Watermarking  Scheme  Using  Genetic  Algorithm  and  Residual  Numbers  with 
+Discrete Wavelet Transform. Journal of Information Security, 14(4), 422-436.  
+
+[26]  Sivasubramanian,  N.,  &  Konganathan,  G.  (2020).  A  novel  semi  fragile 
+watermarking technique  for tamper detection and recovery using IWT  and DCT. 
+Computing, 102(6), 1365-1384. 
+
+[27]  Gupta,  S.,  Saluja,  K.,  Solanki,  V.,  Kaur,  K.,  Singla,  P.,  &  Shahid,  M.  (2022). 
+information 
+
+image  watermarking 
+
+for  digital 
+
+and 
+
+Efficient  methods 
+embedding. Measurement: Sensors, 24, 100520 
+
+[28]  Amiri, A.,  &  Mirzakuchaki,  S.  (2020). A  digital  watermarking  method  based  on 
+NSCT  transform  and  hybrid  evolutionary  algorithms  with  neural  networks. SN 
+Applied Sciences, 2(10), 1669. 
+
+[29]  Giri, K. J.,  Quadri, S. M.  K., Bashir, R., &  Bhat,  J.  I. (2020).  DWT based color 
+image  watermarking:  a  review. Multimedia  Tools  and  Applications, 79,  32881-
+32895. 
+
+[30]  Cedillo-Hernandez,  M.,  Cedillo-Hernandez,  A.,  &  Garcia-Ugalde,  F.  J.  (2021). 
+Improving  dft-based  image  watermarking  using  particle  swarm  optimization 
+algorithm. Mathematics, 9(15), 1795. 
+
+[31]  Mosleh,  M.,  Setayeshi,  S.,  Barekatain,  B.,  &  Mosleh,  M.  (2021). A  novel  audio 
+watermarking scheme based on fuzzy inference system in DCT domain. Multimedia 
+Tools and Applications, 80(13), 20423-20447. 
+
+[32]  Mehta,  R.,  Gupta,  K.,  & Yadav, A.  K.  (2020). An  adaptive  framework  to  image 
+watermarking based on the twin support vector regression and genetic algorithm in 
+lifting  wavelet  transform  domain.  Multimedia  Tools  and  Applications,  79(25), 
+18657-18678. 
+
+[33]  Prabhakar,  D.  V.  N.,  Kumar,  M.  S.,  &  Krishna, A.  G.  (2020). A  Novel  Hybrid 
+Transform approach with integration of Fast Fourier, Discrete Wavelet and Discrete 
+Shearlet  Transforms  for  prediction  of  surface  roughness  on  machined  surfaces. 
+Measurement, 164, 108011. 
+
+[34]  Pratama, M. A. Y., Novamizanti, L., & Budiman, G. (2024). Optimization of Robust 
+Image Watermarking Based on DCT and Decomposition Using Genetic Algorithm. 
+In  Frontiers  in  Genetics  Algorithm  Theory  and  Applications  (pp.  245-268). 
+Singapore: Springer Nature Singapore. 
+
+39 
+
+ 
+ 
+

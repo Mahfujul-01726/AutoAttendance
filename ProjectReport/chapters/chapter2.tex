@@ -1,0 +1,139 @@
+\section{Watermarking Techniques}
+
+Image watermarking is a fundamental technique in digital media for embedding imperceptible data into images to ensure authenticity, integrity, and ownership verification. Over the years, various methods have been developed to address the challenges of robustness against attacks such as compression, cropping, and noise addition, while maintaining high perceptual quality.
+
+Early techniques primarily focused on spatial domain methods like Least Significant Bit (LSB) insertion and spread spectrum techniques. LSB embedding directly modifies the least significant bits of pixel values, while spread spectrum techniques spread the watermark signal across the entire image spectrum, enhancing robustness but potentially compromising image quality. In signal processing and transform domains, frequency domain techniques such as Discrete Fourier Transform (DFT), Discrete Cosine Transform (DCT), and Discrete Wavelet Transform (DWT) gained popularity. These transforms allow for embedding watermarks in transformed coefficients, offering advantages in terms of robustness and capacity. DFT-based methods exploit the frequency spectrum of images, while DCT is commonly used in JPEG compression and watermarking applications. DWT provides multi-resolution analysis, allowing watermarks to be embedded in different frequency bands, thereby enhancing resistance to various attacks.
+
+Furthermore, optimization techniques like Genetic Algorithms (GA) and Singular Value Decomposition (SVD) have been integrated into watermarking frameworks to enhance robustness and imperceptibility. GA optimizes watermark embedding parameters dynamically, while SVD-based methods modify singular values or vectors of images to embed watermarks effectively.
+
+Recent research has focused on hybrid approaches that combine multiple transforms and optimization techniques to achieve superior performance in terms of robustness, imperceptibility, and capacity.
+
+\subsection{Discrete Cosine Transform (DCT)}
+
+Discrete Cosine Transform (DCT) is widely used in image compression (e.g., JPEG) and has been adapted for watermarking applications. DCT-based methods embed watermarks in the frequency coefficients of images, exploiting the energy compaction property of DCT.
+
+For an $N \times N$ image block $f(x, y)$ where $x$ and $y$ represent the pixel coordinates, the DCT is defined as:
+
+\begin{equation}
+F(u, v) = \frac{1}{4}\alpha(u)\alpha(v) \sum_{x=0}^{N-1} \sum_{y=0}^{N-1} f(x, y) \cos\left[\frac{(2x + 1)u\pi}{2N}\right] \cos\left[\frac{(2y + 1)v\pi}{2N}\right]
+\end{equation}
+
+where the scaling factors are defined as:
+
+\begin{equation}
+\alpha(u) = \begin{cases} \frac{1}{\sqrt{N}} & \text{if } u = 0 \\ \sqrt{\frac{2}{N}} & \text{if } u > 0 \end{cases}, \quad \alpha(v) = \begin{cases} \frac{1}{\sqrt{N}} & \text{if } v = 0 \\ \sqrt{\frac{2}{N}} & \text{if } v > 0 \end{cases}
+\end{equation}
+
+To reconstruct the original image block from its DCT coefficients, the inverse DCT (IDCT) is used:
+
+\begin{equation}
+f(x, y) = \frac{1}{4} \sum_{u=0}^{N-1} \sum_{v=0}^{N-1} \alpha(u)\alpha(v)F(u, v) \cos\left[\frac{(2x + 1)u\pi}{2N}\right] \cos\left[\frac{(2y + 1)v\pi}{2N}\right]
+\end{equation}
+
+\subsection{Discrete Wavelet Transform (DWT)}
+
+The Discrete Wavelet Transform (DWT) is a widely used technique in signal processing and image analysis. It allows for the decomposition of a signal into its constituent frequency components, enabling the analysis of both time and frequency information simultaneously. This makes it particularly useful for applications where localized frequency information is important, such as image processing, data compression, and feature extraction.
+
+The Discrete Wavelet Transform (DWT) decomposes an image into four frequency sub-bands:
+\begin{itemize}
+    \item LL = Approximation coefficients (Low-frequency)
+    \item LH = Horizontal detail coefficients
+    \item HL = Vertical detail coefficients
+    \item HH = Diagonal detail coefficients
+\end{itemize}
+
+\subsection{Discrete Fourier Transform (DFT)}
+
+Discrete Fourier Transform (DFT) transforms images into their frequency domain representation, offering advantages in watermark embedding through spectral manipulation. For a discrete signal $x[n]$ of length $N$, the DFT is defined as:
+
+\begin{equation}
+X[k] = \sum_{n=0}^{N-1} x[n] \cdot e^{-j\frac{2\pi kn}{N}}
+\end{equation}
+
+where $X[k]$ is the DFT coefficient for the $k$-th frequency component, and the complex exponential function can be expressed using Euler's formula:
+
+\begin{equation}
+e^{-j\frac{2\pi kn}{N}} = \cos\left(\frac{2\pi kn}{N}\right) - j \sin\left(\frac{2\pi kn}{N}\right)
+\end{equation}
+
+\section{Watermark Optimization Techniques}
+
+Digital image watermarking involves embedding hidden information within an image to protect intellectual property, verify authenticity, and ensure content integrity. Optimization algorithms play a critical role in enhancing the performance of watermarking techniques by improving robustness, imperceptibility, and capacity.
+
+\subsection{Singular Value Decomposition (SVD)}
+
+Singular Value Decomposition (SVD) is a linear algebra technique that decomposes a matrix into three other matrices, revealing its intrinsic properties. In digital image watermarking, SVD is used to embed watermarks by modifying the singular values of an image's matrix representation.
+
+Given a matrix $A$ of size $m \times n$, the SVD can be expressed as:
+
+\begin{equation}
+A = U\Sigma V^T
+\end{equation}
+
+where:
+\begin{itemize}
+    \item $U$ is an $m \times m$ orthogonal matrix
+    \item $\Sigma$ is an $m \times n$ diagonal matrix with singular values
+    \item $V^T$ is an $n \times n$ orthogonal matrix
+\end{itemize}
+
+\subsection{Genetic Algorithm (GA)}
+
+Genetic Algorithm (GA) is an evolutionary optimization technique inspired by natural selection and genetics. It is particularly effective in solving complex optimization problems with large search spaces, making it well-suited for digital image watermarking. The primary goal of using GA in watermarking is to find an optimal balance between robustness (resistance to attacks) and imperceptibility (minimal impact on image quality).
+
+A Genetic Algorithm starts with an initial population of candidate solutions, represented as chromosomes. Each chromosome is evaluated using a fitness function. Based on fitness, better solutions are selected to create the next generation through genetic operators:
+
+\begin{description}
+    \item[Fitness Calculation:] Evaluate the fitness $f(x)$ of each chromosome $x$.
+    \item[Selection:] Choose chromosomes based on fitness.
+    \item[Crossover:] Produce offspring from two parents using a crossover point.
+    \item[Mutation:] Randomly alter genes with a mutation probability.
+\end{description}
+
+\subsection{Particle Swarm Optimization (PSO)}
+
+Particle Swarm Optimization (PSO) is an optimization technique inspired by social behaviors of animals, such as birds flocking or fish schooling. The velocity update for each particle is given by:
+
+\begin{equation}
+v_i(t+1) = w \cdot v_i(t) + c_1 \cdot r_1 \cdot (pBest_i - x_i(t)) + c_2 \cdot r_2 \cdot (gBest - x_i(t))
+\end{equation}
+
+where $v_i(t)$ is the velocity of particle $i$ at time $t$, $x_i(t)$ is its position, $w$ is the inertia weight, $c_1$ and $c_2$ are cognitive and social coefficients, and $r_1$ and $r_2$ are random numbers between 0 and 1.
+
+\section{Used Python Libraries}
+
+In this methodology, several Python libraries are utilized to accomplish various computational and visualization tasks:
+
+\begin{description}
+    \item[NumPy] Provides support for large multi-dimensional arrays and matrices, along with mathematical functions.
+    
+    \item[OpenCV] Provides comprehensive tools for image processing, including reading, transforming, and manipulating images.
+    
+    \item[PyWavelets] Enables the application of discrete wavelet transforms for image decomposition.
+    
+    \item[SciPy] Offers advanced mathematical functions and optimization algorithms.
+    
+    \item[Matplotlib] Facilitates visualization and presentation of results through plots and figures.
+\end{description}
+
+\section{Performance Metrics}
+
+Quality is a very important parameter for all objects and their functionalities. In image-based object recognition, image quality is a prime criterion.
+
+\subsection{Mean Squared Error (MSE)}
+
+MSE is the most common estimator of image quality measurement metric. It is a full reference metric and values closer to zero are better. For two images $g(x,y)$ and $\hat{g}(x,y)$:
+
+\begin{equation}
+\text{MSE} = \frac{1}{MN} \sum_{n=0}^{M} \sum_{m=1}^{N} [\hat{g}(n,m) - g(n,m)]^2
+\end{equation}
+
+\subsection{Peak Signal to Noise Ratio (PSNR)}
+
+PSNR is used to calculate the ratio between the maximum possible signal power and the power of the distorting noise which affects the quality of its representation. PSNR is expressed as:
+
+\begin{equation}
+\text{PSNR} = 10\log_{10}\left(\frac{\text{peakval}^2}{\text{MSE}}\right)
+\end{equation}
+
+where peakval (Peak Value) is the maximal value in the image data. For an 8-bit unsigned integer data type, the peakval is 255.

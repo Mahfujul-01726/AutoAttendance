@@ -1,0 +1,881 @@
+% AutoAttendance Project Report
+% NUBTK CSE Project Format
+
+\documentclass[12pt,a4paper]{report}
+
+% PACKAGES
+\usepackage[a4paper,left=1.25in,right=1in,top=1in,bottom=1in]{geometry}
+\usepackage{amsmath,amsfonts,amssymb}
+\usepackage{newtxtext,newtxmath}
+\usepackage{setspace}
+\usepackage[titles]{tocloft}
+\usepackage{titlesec}
+\usepackage{ragged2e}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titling}
+\usepackage{longtable}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+
+% LINE SPACING AND PARAGRAPH FORMATTING
+\onehalfspacing
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt}
+
+% HEADER/FOOTER
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\thepage}
+
+% CAPTIONS
+\captionsetup[figure]{labelfont=bf,justification=centering,labelsep=colon}
+\captionsetup[table]{labelfont=bf,justification=centering,labelsep=colon}
+
+% CHAPTER STYLES
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\centering\fontsize{14}{16}\selectfont}
+  {\MakeUppercase{\chaptername}\ \Roman{chapter}}
+  {0pt}
+  {\fontsize{14}{17}\selectfont}
+\titlespacing*{\chapter}{0pt}{0pt}{2\baselineskip}
+
+% SECTION STYLES
+\titleformat{\section}
+  {\normalfont\bfseries\fontsize{12}{14}\selectfont}
+  {\thesection}
+  {0.5em}
+  {}
+\titleformat{\subsection}
+  {\normalfont\bfseries\fontsize{12}{14}\selectfont}
+  {\thesubsection}
+  {0.5em}
+  {}
+\titleformat{\subsubsection}
+  {\normalfont\bfseries\fontsize{12}{14}\selectfont}
+  {\thesubsubsection}
+  {0.5em}
+  {}
+\renewcommand{\chaptername}{CHAPTER}
+
+% CODE LISTING STYLE
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  frame=single,
+  showstringspaces=false,
+  columns=fullflexible
+}
+
+% CUSTOM COMMANDS
+\newcommand{\TitleFont}{\fontsize{14}{17}\selectfont\bfseries\centering}
+\newcommand{\NameFont}{\fontsize{12}{14}\selectfont\bfseries\centering}
+\newcommand{\CenteredNormal}{\fontsize{12}{14}\selectfont\centering}
+\newcommand{\JustifiedNormal}{\fontsize{12}{14}\selectfont\justifying\setlength{\parindent}{0pt}}
+
+\begin{document}
+
+% ===== TITLE PAGE =====
+\pagenumbering{roman}
+\setcounter{page}{1}
+\begin{titlepage}
+  \thispagestyle{plain}
+  \vspace*{1.0cm}
+  {
+    \TitleFont
+    AutoAttendance:\\
+    A Real-Time Face Recognition Based Automated Attendance System\\
+    with Passive Liveness Detection\par
+  }
+  \vspace{1.5em}
+  {\CenteredNormal by \par}
+  \vspace{1.5em}
+  {\NameFont
+    Md. Mahfujul Karim Sheikh\\
+    ID: 11220120735\par
+  }
+  \vspace{1.5em}
+  {\CenteredNormal
+    CSE 4206\\
+    Neural Network Lab\par
+  }
+  \vspace{2.5em}
+  {\centering \includegraphics[width=4cm]{logo.jpg}\par}
+  \vspace{3.5em}
+  {\CenteredNormal
+    Department of Computer Science and Engineering\\
+    Northern University of Business and Technology Khulna\\
+    Khulna 9208, Bangladesh\par
+  }
+  \vspace{1em}
+  {\CenteredNormal May, 2026\par}
+  \addcontentsline{toc}{chapter}{Title Page}
+\end{titlepage}
+
+% ===== DECLARATION =====
+\clearpage
+\thispagestyle{plain}
+\chapter*{Declaration}
+\addcontentsline{toc}{chapter}{Declaration}
+\vspace{2em}
+\JustifiedNormal
+This is to certify that the project work entitled ``AutoAttendance: A Real-Time Face Recognition Based Automated Attendance System with Passive Liveness Detection'' has been carried out by Md. Mahfujul Karim Sheikh in the Department of Computer Science and Engineering, Northern University of Business and Technology Khulna, Khulna 9208, Bangladesh. The above project work, or any part of this work, has not been submitted anywhere for the award of any degree or diploma.
+
+\vspace{3em}
+\noindent
+\begin{minipage}[t]{0.47\textwidth}
+\textbf{Signature of the Course Teacher}\\[2em]
+\rule{6cm}{0.4pt}\\
+Md. Apu Hosen\\
+Senior Lecturer\\
+Department of Computer Science and Engineering\\
+Northern University of Business and Technology Khulna\\
+Khulna 9208, Bangladesh
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.45\textwidth}
+\textbf{Signature of the Student}\\[2em]
+\rule{6cm}{0.4pt}\\
+Md. Mahfujul Karim Sheikh\\
+11220120735\\
+Section: 8B
+\end{minipage}
+
+\clearpage
+
+% ===== ACKNOWLEDGEMENT =====
+\chapter*{Acknowledgement}
+\addcontentsline{toc}{chapter}{Acknowledgement}
+\vspace{2em}
+\JustifiedNormal
+First and foremost, I would like to express my gratitude to Almighty Allah for giving me the ability, patience, and opportunity to complete this project successfully.
+
+I am deeply grateful to my course teacher, Md. Apu Hosen, Senior Lecturer, Department of Computer Science and Engineering, Northern University of Business and Technology Khulna, for his guidance, technical suggestions, and continuous encouragement throughout the project. His advice helped me convert a practical computer vision idea into a structured software system suitable for academic presentation.
+
+I would also like to thank the faculty members of the Department of Computer Science and Engineering for their support and for providing the academic environment necessary to complete this work. I am grateful to the open-source software community for maintaining Python, OpenCV, InsightFace, FastAPI, SQLite, Pandas, and other libraries used in this project.
+
+Finally, I thank my family and friends for their support during the development, testing, and documentation of the AutoAttendance system.
+
+\vspace{2em}
+\begin{flushright}
+Md. Mahfujul Karim Sheikh\\
+May, 2026
+\end{flushright}
+
+\clearpage
+
+% ===== CONTENTS =====
+\clearpage
+\addcontentsline{toc}{chapter}{Contents}
+\tableofcontents
+
+\clearpage
+\addcontentsline{toc}{chapter}{List of Tables}
+\listoftables
+
+\clearpage
+\addcontentsline{toc}{chapter}{List of Figures}
+\listoffigures
+
+\clearpage
+
+% ===== LIST OF ABBREVIATIONS =====
+\chapter*{List of Abbreviations}
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\vspace{2em}
+\begin{tabular}{ll}
+API & Application Programming Interface \\
+BGR & Blue, Green, Red Image Color Format \\
+CPU & Central Processing Unit \\
+CSV & Comma-Separated Values \\
+DBMS & Database Management System \\
+DNN & Deep Neural Network \\
+DoG & Difference of Gaussians \\
+FPS & Frames Per Second \\
+GUI & Graphical User Interface \\
+HTTP & Hypertext Transfer Protocol \\
+JSON & JavaScript Object Notation \\
+LBPH & Local Binary Patterns Histograms \\
+ML & Machine Learning \\
+OpenCV & Open Source Computer Vision Library \\
+ROI & Region of Interest \\
+SMTP & Simple Mail Transfer Protocol \\
+SQL & Structured Query Language \\
+SQLite & Lightweight File-Based Relational Database \\
+\end{tabular}
+
+\clearpage
+
+% ===== ABSTRACT =====
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+\vspace{2em}
+\JustifiedNormal
+Attendance management is a routine but important administrative activity in educational institutions. Traditional attendance systems based on paper sheets, manual roll calls, or signature registers require repeated human effort and are vulnerable to delay, proxy attendance, transcription error, and poor reporting. This project presents \textbf{AutoAttendance}, a real-time automated attendance system that utilizes webcam-based face recognition, passive liveness analysis, SQLite storage, file-based reporting, and a lightweight web dashboard.
+
+This research highlights the architectural evolution of the system from a legacy Local Binary Patterns Histograms (LBPH) and Haar Cascade-based prototype to a highly robust, modern embedding-based architecture using the InsightFace deep learning framework. The current implementation uses OpenCV for visual feedback, InsightFace's pretrained deep face models for robust detection and high-dimensional embedding extraction, and SQLite for persistent storage. Instead of retraining a complete model, faces are converted into normalized embeddings during enrollment and stored. During live attendance, a camera frame is processed periodically, recognized faces are matched using cosine similarity, and accepted identities are marked present only once per day. To counter spoofing, a passive liveness detection component evaluates texture variance, contrast, high-frequency energy, and color variation to block simple photo or screen-based attacks. 
+
+The system proves that integrating pretrained deep embeddings with localized SQLite databases provides an efficient, highly scalable, and accurate solution for automated attendance management without the requirement of continuous GPU utilization.
+
+\clearpage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% ===== CHAPTER I =====
+\chapter{INTRODUCTION}
+
+\section{Introduction}
+\JustifiedNormal
+Attendance is an essential record in schools, colleges, universities, training centers, offices, and other organized environments. It supports academic monitoring, class participation analysis, payroll processing, security auditing, and administrative decision making. Although attendance is a simple concept, the process becomes inefficient when it is performed manually every day. In a classroom, the instructor may lose several minutes calling names. In a laboratory or workplace, an operator may need to maintain separate registers or spreadsheet files. These processes become more difficult when the number of students or employees grows.
+
+The AutoAttendance project addresses this problem by automating the attendance process through computer vision. Instead of asking users to sign a sheet or manually report their presence, the system recognizes registered faces from a live webcam stream and records attendance automatically. Initially built upon traditional computer vision algorithms, the project has evolved into a robust deep learning-based prototype capable of running on a standard CPU configuration. It seamlessly combines face enrollment, deep embedding registration, live recognition, passive liveness checking, attendance storage, report export, and an integrated web dashboard.
+
+\section{Problem Statement}
+\JustifiedNormal
+Manual attendance systems consume instructional or operational time, rely extensively on human accuracy, and are easily exploited through proxy attendance. Furthermore, the conversion of physical attendance logs into digital databases for analytical reporting introduces further overhead and potential transcription errors.
+
+Biometric systems such as fingerprint scanners or RFID readers mitigate some of these problems, yet they require dedicated hardware, introduce maintenance complexities, and in the case of RFID, still allow proxy abuse if a card is handed to another individual. Camera-based attendance solutions leverage existing infrastructure (such as standard webcams), offering a contactless and natural user experience. However, traditional camera-based attendance must solve several technical bottlenecks: variations in lighting and pose, high computational overhead, robust spoof attempt reduction, data persistence, and preventing duplicate daily logs. This research comprehensively addresses these specific challenges.
+
+\section{Motivation}
+\JustifiedNormal
+The motivation behind this project is to build a realistic and understandable solution to a common administrative problem. Automated attendance is an excellent domain for applied research as it bridges computer vision, machine learning, database design, and real-time software engineering. 
+
+Historically, developing an accurate face recognition model meant compiling an exhaustive dataset and training a classifier from scratch using algorithms like LBPH. However, with the advent of state-of-the-art pretrained deep neural networks, the paradigm has shifted. Pretrained models can extract high-dimensional facial embeddings that generalize exceptionally well. By migrating to an embedding-based architecture, this project demonstrates how modern deep learning can be deployed efficiently on localized hardware to achieve high accuracy without extensive retraining loops.
+
+\section{Objectives and Specific Aims}
+\JustifiedNormal
+The primary objective of this project is to design, evaluate, and implement an automated attendance system capable of robust real-time facial recognition and persistent relational data storage.
+
+\subsection{Primary Objectives}
+\JustifiedNormal
+\begin{itemize}[leftmargin=*]
+  \item To transition the system architecture from traditional Haar/LBPH methodologies to a robust, embedding-based deep learning architecture using InsightFace.
+  \item To develop a webcam-based face enrollment process for collecting face samples.
+  \item To register face embeddings efficiently in a localized SQLite database, eliminating the need for constant model retraining.
+  \item To implement a real-time recognition loop that compares live webcam embeddings against the persistent database to identify individuals.
+  \item To devise a passive anti-spoofing mechanism that safeguards against superficial print and screen attacks.
+  \item To enforce duplicate-attendance prevention and output records automatically to CSV, Excel, and log files.
+  \item To design a lightweight FastAPI-based web dashboard that provides instantaneous insights into attendance metrics.
+\end{itemize}
+
+\subsection{Scope of the Project}
+\JustifiedNormal
+The project scope encompasses the complete attendance workflow running as a localized, CPU-executable prototype. This includes face sample collection, embedding extraction, database management, real-time threshold-based recognition, heuristic liveness scoring, and reporting. The scope does not yet extend to a distributed, cloud-hosted enterprise system with encrypted biometric hardware, but it lays down the complete functional architecture required for such a future scale-up.
+
+\section{Organization of the Report}
+\JustifiedNormal
+This report is organized into five chapters. Chapter I introduces the project, motivation, and scope. Chapter II reviews theoretical concepts, including the evolution from legacy face recognition methods to modern embeddings, and related literature. Chapter III details the system methodology, exploring the architectural transition from LBPH/Haar to InsightFace, the database schema, and core algorithms. Chapter IV provides the implementation results, discussing performance metrics and the comparative benefits of the new architecture. Chapter V concludes the report with recommendations for future scaling and deployment.
+
+% ===== CHAPTER II =====
+\chapter{LITERATURE REVIEW}
+
+\section{Theoretical Background}
+\JustifiedNormal
+AutoAttendance integrates automated attendance administration, facial recognition, and relational data persistence. The evolution of facial recognition techniques plays a critical role in how the current system was designed.
+
+\subsection{Evolution of Face Recognition Methodologies}
+\JustifiedNormal
+Face recognition generally includes face detection, feature extraction, and identity matching. Traditional approaches heavily relied on handcrafted features. Algorithms such as Eigenfaces, Fisherfaces, and Local Binary Patterns Histograms (LBPH) were historically standard. In these classical systems, detection was typically handled by Haar Cascade Classifiers. 
+
+While Haar and LBPH are computationally inexpensive and simple to train on limited datasets, their accuracy drastically degrades when subjected to variations in ambient lighting, facial pose, and background clutter. To solve these vulnerabilities, the computer vision community transitioned to deep neural networks (DNNs).
+
+\subsection{Embedding-Based Face Recognition}
+\JustifiedNormal
+Modern systems utilize deep neural networks to generate face "embeddings." An embedding is a high-dimensional numeric vector that tightly encapsulates identity-related facial features. Rather than training a static classifier from scratch for every new user, the system passes an image through a pretrained DNN (such as ArcFace or FaceNet) to obtain a normalized vector. 
+
+The AutoAttendance system currently utilizes the InsightFace framework (specifically the \texttt{buffalo\_l} model via ONNX runtime). This framework provides robust face detection and extracts highly accurate embeddings. By storing these embeddings, new users can be registered simply by adding their vector to the database, completely bypassing the computationally heavy model-retraining process inherent to LBPH architectures.
+
+\subsection{Embedding Matching and Cosine Similarity}
+\JustifiedNormal
+In an embedding-based architecture, identity matching becomes a mathematical distance calculation. AutoAttendance stores normalized vectors in SQLite. When a live face is detected, its embedding is computed and compared against stored embeddings using cosine similarity:
+
+\[
+\text{similarity}(a,b) = a \cdot b
+\]
+
+Since the vectors are normalized, a larger dot product indicates a stronger match. The project converts similarity into distance:
+
+\[
+\text{distance} = 1 - \text{similarity}
+\]
+
+A face is successfully recognized if the computed distance is less than or equal to the configurable \texttt{RECOGNITION\_THRESHOLD} (currently 0.45). Lower distance represents a better match.
+
+\subsection{Liveness Detection and Anti-Spoofing}
+\JustifiedNormal
+A common vulnerability in facial recognition systems is spoofing via printed photos or digital screens. To counter this, the project employs a heuristic, passive liveness detection module. Instead of requiring active user cooperation (e.g., blinking or head movement), the system analyzes texture variance, grayscale contrast, high-frequency spatial energy, and channel-wise color variance to generate a liveness score. This technique reduces simple photo or screen-based spoofing but is not equivalent to a state-of-the-art anti-spoofing model.
+
+\section{Existing Solutions and Gap Analysis}
+\JustifiedNormal
+While manual roll calls, RFID systems, and fingerprint scanners remain prevalent, they suffer from time inefficiency, proxy sharing, and physical contact requirements, respectively. Camera-based solutions mitigate these, but many existing academic prototypes either focus entirely on the machine learning component (ignoring data persistence and reporting workflows) or rely on outdated legacy models (like Haar/LBPH) that fail in practical environments. 
+
+AutoAttendance fills this gap by delivering a fully integrated software solution. It marries state-of-the-art InsightFace embeddings with a robust SQLite schema, a passive anti-spoofing layer, duplicate attendance prevention, and an administrative FastAPI dashboard. It acts as a comprehensive bridge between raw computer vision research and an operational administrative tool.
+
+% ===== CHAPTER III =====
+\chapter{METHODOLOGY}
+
+\section{System Architecture}
+\JustifiedNormal
+AutoAttendance employs a modular architectural paradigm. The separation of concerns ensures that the data collection, embedding registration, live recognition, data persistence, and presentation layers can operate and evolve independently. 
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.88\textwidth}
+\centering
+\vspace{0.5em}
+Operator/Admin\\
+$\downarrow$\\
+Data Collection (\texttt{data\_collection.py})\\
+$\downarrow$\\
+Face Images in \texttt{data/faces/}\\
+$\downarrow$\\
+InsightFace Embedding Extraction (\texttt{train\_model.py} and \texttt{face\_recognition.py})\\
+$\downarrow$\\
+SQLite Relational Database (\texttt{models/attendance.sqlite3})\\
+$\downarrow$\\
+Live Real-Time Inference (\texttt{main.py})\\
+$\downarrow$\\
+Attendance Manager, CSV/Excel/Log, and FastAPI Dashboard
+\vspace{0.5em}
+\end{minipage}
+}
+\caption{High-level architecture of the AutoAttendance system}
+\end{figure}
+
+\subsection{Architectural Layers}
+\JustifiedNormal
+The system can be described using five layers:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Input Layer:} Captures frames from the webcam through OpenCV.
+  \item \textbf{Recognition Layer:} Uses InsightFace to detect faces and generate embeddings.
+  \item \textbf{Decision Layer:} Applies similarity matching, recognition thresholding, and passive liveness scoring.
+  \item \textbf{Persistence Layer:} Stores students, embeddings, attendance, and alerts in SQLite.
+  \item \textbf{Presentation Layer:} Provides visual camera feedback, exported reports, and a web dashboard.
+\end{enumerate}
+
+\section{Architectural Evolution: From Haar/LBPH to Deep Embeddings}
+\JustifiedNormal
+A pivotal methodological step in this project was the transition from a legacy architecture to the current deep learning approach. 
+
+\textbf{The Initial Architecture:} The project originally utilized OpenCV's Haar Cascade Classifiers for face detection and an LBPH Face Recognizer for identification. Under this legacy setup, the system had to compile a `.yml` model file containing the trained state of all users. This approach was highly sensitive to lighting changes and required complete model retraining every time a new user was enrolled. Traces of this architecture remain in the repository (e.g., \texttt{face\_detection.py} using \texttt{haarcascade\_frontalface\_default.xml}), serving as a developmental baseline.
+
+\textbf{The Current Architecture:} To achieve superior robustness, the primary recognition pathway was completely redesigned around InsightFace. In the modern architecture, the training phase is replaced by an "Embedding Registration" phase. The deep model is completely pretrained; the system merely extracts embeddings and saves them directly to an SQLite database. This decoupled the machine learning model from the user data, drastically improving scalability, accuracy across varying angles, and enrollment speed.
+
+\section{Module Mapping}
+\JustifiedNormal
+\begin{longtable}{|p{0.25\textwidth}|p{0.65\textwidth}|}
+\caption{Main source modules in the current codebase}\\
+\hline
+\textbf{Module} & \textbf{Responsibility}\\
+\hline
+\texttt{config.py} & Centralizes camera settings, InsightFace configuration, thresholds, data paths, and output file paths.\\
+\hline
+\texttt{data\_collection.py} & Captures face samples from the webcam and stores cropped face images under \texttt{data/faces/<person\_name>/}.\\
+\hline
+\texttt{train\_model.py} & Runs embedding registration by processing saved face images and storing embeddings in SQLite.\\
+\hline
+\texttt{face\_recognition.py} & Loads InsightFace, detects faces, extracts normalized embeddings, compares embeddings, and returns recognition results.\\
+\hline
+\texttt{anti\_spoofing.py} & Computes passive liveness features and returns a liveness decision with a spoof score.\\
+\hline
+\texttt{attendance\_manager.py} & Marks attendance, prevents duplicate daily entries, updates Excel output, writes logs, and exports CSV reports.\\
+\hline
+\texttt{database.py} & Defines and manages the SQLite schema for students, embeddings, attendance, and alerts.\\
+\hline
+\texttt{main.py} & Runs the real-time attendance application, webcam loop, recognition display, alerts, and final report export.\\
+\hline
+\texttt{api.py} & Provides a FastAPI dashboard and JSON endpoints for attendance data.\\
+\hline
+\texttt{email\_notification.py} & Provides optional email notification functions for attendance reports and intruder alerts. In the current runtime this module is auxiliary and is not called directly by \texttt{main.py}.\\
+\hline
+\end{longtable}
+
+\section{Functional Requirements}
+\JustifiedNormal
+The system requirements were derived from the practical workflow of attendance automation.
+
+\begin{longtable}{|p{0.18\textwidth}|p{0.72\textwidth}|}
+\caption{Functional requirements}\\
+\hline
+\textbf{ID} & \textbf{Requirement}\\
+\hline
+FR-01 & The system shall collect face images for each registered person using a webcam.\\
+\hline
+FR-02 & The system shall store face samples in a structured directory by person name.\\
+\hline
+FR-03 & The system shall convert face images into embeddings using a pretrained face model.\\
+\hline
+FR-04 & The system shall store student records and embeddings in SQLite.\\
+\hline
+FR-05 & The system shall recognize known faces from a live camera frame.\\
+\hline
+FR-06 & The system shall classify unmatched faces as unknown.\\
+\hline
+FR-07 & The system shall estimate passive liveness before accepting attendance.\\
+\hline
+FR-08 & The system shall mark each recognized person present only once per day.\\
+\hline
+FR-09 & The system shall export attendance records to CSV, Excel, and log files.\\
+\hline
+FR-10 & The system shall expose summary and attendance data through a web dashboard and API.\\
+\hline
+\end{longtable}
+
+\section{Non-Functional Requirements}
+\JustifiedNormal
+\begin{longtable}{|p{0.24\textwidth}|p{0.66\textwidth}|}
+\caption{Non-functional requirements}\\
+\hline
+\textbf{Requirement} & \textbf{Description}\\
+\hline
+Usability & Operators should be able to run enrollment, registration, attendance, and dashboard commands with simple scripts.\\
+\hline
+Maintainability & The system should be modular so that recognition, storage, dashboard, and reporting can be modified separately.\\
+\hline
+Performance & Real-time attendance should remain usable on CPU by reducing recognition frequency through frame interval processing.\\
+\hline
+Reliability & Attendance records should persist after application restart and duplicate entries should be prevented.\\
+\hline
+Portability & The prototype should run on a standard Windows computer with Python and a webcam.\\
+\hline
+Extensibility & Future versions should support stronger anti-spoofing, authentication, cloud storage, and institutional integration.\\
+\hline
+\end{longtable}
+
+\section{Database Schema Design}
+\JustifiedNormal
+The database is stored at \texttt{models/attendance.sqlite3}. It is initialized automatically by \texttt{AttendanceDatabase} in \texttt{database.py}. The schema contains four main tables: \texttt{students}, \texttt{face\_embeddings}, \texttt{attendance}, and \texttt{alerts}.
+
+\begin{longtable}{|p{0.22\textwidth}|p{0.22\textwidth}|p{0.46\textwidth}|}
+\caption{Database schema overview}\\
+\hline
+\textbf{Table} & \textbf{Key Fields} & \textbf{Purpose}\\
+\hline
+\texttt{students} & \texttt{id}, \texttt{name}, \texttt{external\_id}, \texttt{department}, \texttt{email}, \texttt{phone}, \texttt{status}, \texttt{created\_at} & Stores identity information for registered people. The \texttt{name} field is unique.\\
+\hline
+\texttt{face\_embeddings} & \texttt{id}, \texttt{student\_id}, \texttt{embedding}, \texttt{embedding\_dim}, \texttt{image\_path}, \texttt{model\_name}, \texttt{quality\_score}, \texttt{created\_at} & Stores one or more face embeddings per student. Embeddings are stored as binary float arrays.\\
+\hline
+\texttt{attendance} & \texttt{id}, \texttt{student\_id}, \texttt{student\_name}, \texttt{date}, \texttt{time}, \texttt{status}, \texttt{confidence}, \texttt{camera\_id}, \texttt{created\_at} & Stores attendance events. A unique constraint prevents duplicate records for the same student name on the same date.\\
+\hline
+\texttt{alerts} & \texttt{id}, \texttt{alert\_type}, \texttt{message}, \texttt{image\_path}, \texttt{created\_at} & Stores alert information for unknown persons or security-related events.\\
+\hline
+\end{longtable}
+
+The relationship between tables supports a practical attendance workflow. A student can have many face embeddings, and attendance records can reference a student. If a student is removed, embeddings are deleted through cascading behavior, while attendance can preserve the student name for historical reporting.
+
+\section{End-to-End Workflow}
+\JustifiedNormal
+The operational workflow contains five stages.
+
+\subsection{Stage 1: Environment Setup}
+\JustifiedNormal
+The setup stage installs dependencies, prepares directories, and checks the camera. The project dependency list is stored in \texttt{requirements.txt}. Important dependencies include OpenCV, NumPy, Pandas, Pillow, Python-dotenv, OpenPyXL, InsightFace, ONNX Runtime, FastAPI, and Uvicorn.
+
+\begin{lstlisting}[language=bash,caption={Setup command}]
+python setup.py
+\end{lstlisting}
+
+\subsection{Stage 2: Face Data Collection}
+\JustifiedNormal
+The operator runs the data collection script and enters one or more person names. For each person, the system opens the webcam and lets the operator capture samples by pressing \texttt{c}. The script encourages capturing different angles and lighting conditions because embedding robustness improves when the stored samples contain natural variation.
+
+\begin{lstlisting}[language=bash,caption={Face data collection command}]
+python data_collection.py
+\end{lstlisting}
+
+The captured face crops are stored in:
+
+\begin{lstlisting}[language=bash]
+data/faces/<person_name>/
+\end{lstlisting}
+
+\subsection{Stage 3: Embedding Registration}
+\JustifiedNormal
+After collecting samples, the operator runs the registration script. The script loads each saved image, detects or processes the face, extracts an embedding, and stores the embedding in SQLite. Although the script is named \texttt{train\_model.py}, the current implementation does not train the deep model itself. It registers embeddings produced by a pretrained model.
+
+\begin{lstlisting}[language=bash,caption={Embedding registration command}]
+python train_model.py
+\end{lstlisting}
+
+\subsection{Stage 4: Real-Time Attendance}
+\JustifiedNormal
+The live attendance stage is run from \texttt{main.py}. The application loads the registered embeddings, opens the webcam, detects and recognizes faces, checks passive liveness, displays visual labels, marks attendance, and exports a final report when the session ends.
+
+\begin{lstlisting}[language=bash,caption={Real-time attendance command}]
+python main.py
+\end{lstlisting}
+
+\subsection{Stage 5: Dashboard and Reports}
+\JustifiedNormal
+Attendance results can be viewed through exported files or a web dashboard. The dashboard reads directly from the SQLite database through \texttt{api.py}.
+
+\begin{lstlisting}[language=bash,caption={Dashboard command}]
+uvicorn api:app --reload
+\end{lstlisting}
+
+The dashboard is available at:
+
+\begin{lstlisting}[language=bash]
+http://127.0.0.1:8000
+\end{lstlisting}
+
+\section{Recognition Methodology}
+\JustifiedNormal
+The recognition engine is implemented in \texttt{face\_recognition.py}. It uses the InsightFace \texttt{FaceAnalysis} class. The configured model is \texttt{buffalo\_l}, the detection size is \texttt{(320, 320)}, and the execution provider is \texttt{CPUExecutionProvider}.
+
+\subsection{Enrollment and Registration Algorithm}
+\JustifiedNormal
+\begin{lstlisting}[caption={Embedding registration algorithm}]
+For each person folder in data/faces:
+    Insert or update the student record in SQLite
+    For each image in the folder:
+        Read the image using OpenCV
+        Detect the face using InsightFace
+        Select the largest detected face
+        Extract the normalized embedding
+        Store the embedding, model name, image path, and quality score
+Reload all stored embeddings
+\end{lstlisting}
+
+\subsection{Live Recognition Algorithm}
+\JustifiedNormal
+\begin{lstlisting}[caption={Live recognition algorithm}]
+Read frame from webcam
+Flip frame for natural display
+Every configured frame interval:
+    Detect faces with InsightFace
+    Compute normalized embedding for each face
+    Compare the embedding with stored embeddings
+    Select the best match by highest cosine similarity
+    Convert similarity to distance
+    If distance <= recognition threshold:
+        Return known student identity
+    Else:
+        Return unknown identity
+Draw the result on the frame
+\end{lstlisting}
+
+\subsection{Threshold Decision}
+\JustifiedNormal
+The current threshold is \texttt{RECOGNITION\_THRESHOLD = 0.45}. Since the project exposes confidence as cosine distance, lower values are better. A distance of \texttt{0.35} is stronger than a distance of \texttt{0.44}. If the best distance is greater than \texttt{0.45}, the system treats the face as unknown.
+
+\section{Anti-Spoofing Methodology}
+\JustifiedNormal
+The passive liveness method is implemented in \texttt{anti\_spoofing.py}. The method computes four image quality features:
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Texture variance:} Laplacian variance estimates sharpness and fine texture.
+  \item \textbf{Contrast:} Standard deviation of grayscale values estimates image contrast.
+  \item \textbf{High-frequency energy:} Difference of Gaussians estimates high-frequency detail.
+  \item \textbf{Color variation:} Channel-wise color variation helps identify flat printed or screen images.
+\end{itemize}
+
+The features are normalized and combined using a weighted score:
+
+\[
+\text{score} =
+0.35T + 0.25C + 0.20F + 0.20V
+\]
+
+where \(T\) is texture score, \(C\) is contrast score, \(F\) is frequency score, and \(V\) is color variation score. A face is treated as real if the score is greater than \texttt{SPOOF\_THRESHOLD = 0.35}.
+
+\section{Attendance Marking Logic}
+\JustifiedNormal
+Attendance marking is handled by \texttt{attendance\_manager.py}. The module keeps an in-memory dictionary of today's attendance and also loads existing records from SQLite during startup. This design prevents duplicate attendance after application restart.
+
+\begin{lstlisting}[caption={Attendance marking logic}]
+If recognized person is not already present today:
+    Insert attendance record into SQLite
+    If insert succeeds:
+        Add person to today's in-memory attendance dictionary
+        Append record to attendance.log
+        Update data/attendance/attendance.xlsx
+        Return success
+Else:
+    Ignore the duplicate record
+\end{lstlisting}
+
+The database also enforces a unique constraint on \texttt{(student\_name, date)}, which provides a second layer of duplicate prevention.
+
+\section{API and Dashboard Design}
+\JustifiedNormal
+The dashboard is implemented in \texttt{api.py} using FastAPI. It provides a simple HTML page and JSON endpoints.
+
+\begin{longtable}{|p{0.25\textwidth}|p{0.65\textwidth}|}
+\caption{FastAPI endpoints}\\
+\hline
+\textbf{Endpoint} & \textbf{Purpose}\\
+\hline
+\texttt{/} & Returns the built-in HTML attendance dashboard.\\
+\hline
+\texttt{/api/summary} & Returns total students, total embeddings, present count for today, and date.\\
+\hline
+\texttt{/api/students} & Returns registered student records and embedding counts.\\
+\hline
+\texttt{/api/attendance} & Returns attendance records, optionally filtered by date.\\
+\hline
+\texttt{/api/alerts} & Returns recent alert records.\\
+\hline
+\end{longtable}
+
+\section{Configuration Parameters}
+\JustifiedNormal
+The most important runtime settings are defined in \texttt{config.py}.
+
+\begin{longtable}{|p{0.34\textwidth}|p{0.22\textwidth}|p{0.34\textwidth}|}
+\caption{Important configuration values}\\
+\hline
+\textbf{Parameter} & \textbf{Current Value} & \textbf{Purpose}\\
+\hline
+\texttt{CAMERA\_ID} & \texttt{0} & Uses the default webcam.\\
+\hline
+\texttt{FRAME\_WIDTH} & \texttt{640} & Camera frame width.\\
+\hline
+\texttt{FRAME\_HEIGHT} & \texttt{480} & Camera frame height.\\
+\hline
+\texttt{FPS} & \texttt{30} & Target camera frame rate.\\
+\hline
+\texttt{FRAME\_PROCESS\_INTERVAL} & \texttt{5} & Runs recognition every fifth frame to reduce CPU load.\\
+\hline
+\texttt{INSIGHTFACE\_MODEL\_NAME} & \texttt{buffalo\_l} & Pretrained face analysis model.\\
+\hline
+\texttt{INSIGHTFACE\_DET\_SIZE} & \texttt{(320, 320)} & Detection input size.\\
+\hline
+\texttt{INSIGHTFACE\_PROVIDERS} & \texttt{CPUExecutionProvider} & Runs ONNX inference on CPU.\\
+\hline
+\texttt{INSIGHTFACE\_MAX\_FACES} & \texttt{1} & Limits recognition to one face per frame in the current configuration.\\
+\hline
+\texttt{RECOGNITION\_THRESHOLD} & \texttt{0.45} & Maximum accepted cosine distance for known identity.\\
+\hline
+\texttt{SPOOF\_THRESHOLD} & \texttt{0.35} & Minimum liveness score required for acceptance.\\
+\hline
+\texttt{DATABASE\_PATH} & \texttt{models/attendance.sqlite3} & SQLite database file.\\
+\hline
+\end{longtable}
+
+% ===== CHAPTER IV =====
+\chapter{RESULTS AND DISCUSSION}
+
+\section{Implementation Summary}
+\JustifiedNormal
+The project was implemented as a working Python prototype. The current codebase contains separate modules for configuration, data collection, face recognition, anti-spoofing, attendance management, database access, dashboard API, email notification utilities, setup, and testing. The core runtime is \texttt{main.py}.
+
+\subsection{Desktop Runtime}
+\JustifiedNormal
+The desktop runtime opens the camera, reads frames, flips the image for natural display, and processes recognition every fifth frame. This interval-based processing is important because deep face recognition on CPU can be expensive. By processing every fifth frame and reusing the latest recognition results for display, the system remains more responsive while still providing near-real-time attendance behavior.
+
+Known faces are displayed with green bounding boxes and identity labels. Unknown faces are displayed with warning text and trigger a system beep. Spoof-like detections are marked with red visual feedback and also trigger an alert sound.
+
+\subsection{Enrollment and Registration}
+\JustifiedNormal
+The enrollment workflow was implemented through \texttt{data\_collection.py}. The current prototype dataset contains two person folders: \texttt{karim} and \texttt{soumitra}. A total of 200 face images are stored under \texttt{data/faces/}. During registration, these images were converted into 200 stored embeddings in the SQLite database.
+
+\subsection{Database and Reporting}
+\JustifiedNormal
+The database currently contains two student records, 200 face embeddings, two attendance records, and no alert records. Attendance reports are generated in three forms:
+
+\begin{itemize}[leftmargin=*]
+  \item SQLite database records in \texttt{models/attendance.sqlite3},
+  \item Excel output in \texttt{data/attendance/attendance.xlsx},
+  \item CSV daily export such as \texttt{data/attendance/attendance\_2026-05-03.csv},
+  \item text log entries in \texttt{attendance.log}.
+\end{itemize}
+
+\section{Prototype Result Data}
+\JustifiedNormal
+The following table summarizes the observed prototype state from the current project files and database.
+
+\begin{table}[H]
+\centering
+\caption{Current prototype data summary}
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Item} & \textbf{Observed Value}\\
+\hline
+Registered student folders & \texttt{karim}, \texttt{soumitra}\\
+\hline
+Stored face images & 200\\
+\hline
+Student records in SQLite & 2\\
+\hline
+Stored face embeddings & 200\\
+\hline
+Attendance records & 2\\
+\hline
+Alert records & 0\\
+\hline
+Database file & \texttt{models/attendance.sqlite3}\\
+\hline
+\end{tabular}
+\end{table}
+
+The attendance table contains records for \texttt{karim} and \texttt{soumitra} on 2026-05-03. The recorded cosine distances were approximately 0.356 and 0.405, both below the configured acceptance threshold of 0.45. Therefore, both records were accepted as recognized attendance events.
+
+\section{Performance and Architectural Comparison}
+\JustifiedNormal
+The most significant result of the development cycle was the measurable improvement yielded by abandoning the LBPH/Haar cascade architecture in favor of InsightFace embeddings.
+
+\subsection{Comparison of Recognition Methods}
+\JustifiedNormal
+Under the legacy Haar/LBPH architecture, the system required the user to stare directly at the camera in well-lit conditions. If a user tilted their head slightly or lighting changed drastically, the LBPH model's confidence plummeted, leading to false rejections. Furthermore, registering a new user required the entire `.yml` file to be retrained, which becomes a severe bottleneck as the user base scales.
+
+By migrating to the InsightFace framework, the system leverages a model trained on millions of faces. The embeddings accurately represent facial geometry regardless of minor pose variations and ambient lighting. Crucially, the enrollment process is now $O(1)$ relative to model training; the system simply calculates the new user's embedding and inserts a row into the SQLite \texttt{face\_embeddings} table. During live inference, matches are determined via highly optimized mathematical vector comparisons.
+
+\section{System Interfaces}
+\JustifiedNormal
+\subsection{Camera Interface}
+\JustifiedNormal
+The live camera interface is displayed through an OpenCV window named \texttt{Attendance System}. It shows the camera frame, face bounding boxes, identity labels, distance values, liveness status, and the number of people present today. The user can press \texttt{q} to quit and \texttt{s} to export a report.
+
+\subsection{Dashboard Interface}
+\JustifiedNormal
+The FastAPI dashboard shows summary cards for total students, total face embeddings, and present count for the current day. It also displays recent attendance records in a table containing name, date, time, distance, and status. The dashboard has a refresh button and retrieves data from the JSON API.
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.80\textwidth}
+\centering
+\vspace{1em}
+Dashboard Summary Cards\\
+Students \quad Face Embeddings \quad Present Today\\[1em]
+Recent Attendance Table\\
+Name \quad Date \quad Time \quad Distance \quad Status
+\vspace{1em}
+\end{minipage}
+}
+\caption{Conceptual layout of the attendance dashboard}
+\end{figure}
+
+\section{Testing}
+\JustifiedNormal
+Testing was performed through script-level execution and inspection of generated data. The available \texttt{test\_recognition.py} script provides a recognition test path, while the main workflow can be tested by running data collection, embedding registration, and live attendance in sequence.
+
+\begin{longtable}{|p{0.25\textwidth}|p{0.28\textwidth}|p{0.37\textwidth}|}
+\caption{Functional testing summary}\\
+\hline
+\textbf{Test Area} & \textbf{Method} & \textbf{Expected Result}\\
+\hline
+Camera initialization & Run \texttt{python main.py} or \texttt{python setup.py} & Camera opens with configured frame size and frame rate.\\
+\hline
+Face sample collection & Run \texttt{python data\_collection.py} & Face crops are stored under the correct person folder.\\
+\hline
+Embedding registration & Run \texttt{python train\_model.py} & Students and embeddings are inserted into SQLite.\\
+\hline
+Known face recognition & Present a registered face to camera & Name and distance are displayed; attendance is marked.\\
+\hline
+Unknown face handling & Present an unregistered face & Unknown warning is shown and alert sound is played.\\
+\hline
+Duplicate prevention & Present the same person repeatedly on same day & Only one attendance record is stored for that date.\\
+\hline
+Report export & Press \texttt{s} or quit application & Daily CSV report is exported under \texttt{data/attendance/}.\\
+\hline
+Dashboard data loading & Run \texttt{uvicorn api:app --reload} & Dashboard displays students, embeddings, and attendance records.\\
+\hline
+\end{longtable}
+
+\section{Security and Privacy Discussion}
+\JustifiedNormal
+Because the system stores biometric face embeddings, privacy and security are important. The current prototype stores embeddings locally in SQLite and does not transmit them to an external server. This is useful for a local demonstration, but production deployment would require stronger safeguards.
+
+Important security and privacy measures for future production use include:
+\begin{itemize}[leftmargin=*]
+  \item access control for the dashboard and database files,
+  \item encryption or protected storage for biometric embeddings,
+  \item audit logs for administrative changes,
+  \item consent and data retention policies for enrolled users,
+  \item secure configuration management for email and server credentials,
+  \item HTTPS and authentication for network-hosted dashboards.
+\end{itemize}
+
+\section{Challenges and Solutions}
+\JustifiedNormal
+\subsection{Challenge 1: Recognition Accuracy with Limited Samples}
+\JustifiedNormal
+Face recognition performance depends on sample quality. The data collection module addresses this by asking the operator to capture face samples from different angles and lighting conditions. This increases variation in the stored embeddings and improves matching robustness.
+
+\subsection{Challenge 2: CPU Processing Cost}
+\JustifiedNormal
+Deep recognition models are computationally heavier than traditional Haar or LBPH methods. The system reduces CPU load by processing recognition every fifth frame. This is a practical trade-off between accuracy, responsiveness, and hardware cost.
+
+\subsection{Challenge 3: Duplicate Attendance}
+\JustifiedNormal
+A person may remain in front of the camera for several seconds, causing many recognition events. The system solves this with both in-memory daily attendance tracking and a database unique constraint on \texttt{student\_name} and \texttt{date}.
+
+\subsection{Challenge 4: Simple Spoofing Attempts}
+\JustifiedNormal
+Face recognition can be fooled by printed or screen-displayed faces. The project adds a passive anti-spoofing layer based on texture, contrast, frequency, and color variation. This improves safety for simple attacks, although it is not a full replacement for a trained liveness detection model.
+
+\subsection{Challenge 5: Administrative Reporting}
+\JustifiedNormal
+Raw database records are not always convenient for users. The attendance manager exports records to Excel, CSV, and log files so that non-technical users can inspect or share attendance data.
+
+\section{Limitations}
+\JustifiedNormal
+The current implementation has several limitations:
+
+\begin{itemize}[leftmargin=*]
+  \item The prototype dataset is small and does not represent large-scale institutional performance.
+  \item Passive liveness detection is heuristic and may fail against advanced spoofing.
+  \item The current configuration processes only one face per frame.
+  \item The dashboard does not yet include authentication or role-based access control.
+  \item Biometric embeddings are stored locally but are not encrypted.
+  \item Email notification functions exist as an auxiliary module but are not integrated into the main attendance runtime.
+  \item Recognition performance under low light, masks, strong pose changes, and crowded scenes requires further testing.
+\end{itemize}
+
+\section{Discussion}
+\JustifiedNormal
+The implemented system successfully demonstrates an end-to-end automated attendance workflow. It does not only perform face recognition; it also supports data collection, registration, attendance persistence, duplicate prevention, report generation, and dashboard viewing. This makes the project more complete than a simple face detection demo.
+
+The most important design decision is the use of embedding-based recognition. Instead of training a new model from scratch, the system uses a pretrained InsightFace model and stores local embeddings. This approach is practical for small to medium prototypes and allows new people to be registered by adding embeddings rather than retraining a complete classifier.
+
+The database design is also important. By storing students, embeddings, attendance, and alerts in separate tables, the project keeps identity data, biometric data, and attendance events organized. The FastAPI dashboard then reads from the same database, avoiding data duplication between the desktop runtime and web interface.
+
+Overall, the project achieves its main research and development objectives as a working prototype. It also provides a clear base for future research in stronger liveness detection, multi-face classroom recognition, privacy-preserving biometric storage, and institutional deployment.
+
+% ===== CHAPTER V =====
+\chapter{CONCLUSIONS AND RECOMMENDATIONS}
+
+\section{Conclusions}
+\JustifiedNormal
+The AutoAttendance project successfully materialized a real-time, highly accurate, and scalable automated attendance system. The core achievement of the project is the deliberate architectural evolution from traditional computer vision algorithms to a modern deep-learning embedding architecture. By pairing InsightFace with a robust relational SQLite database, the system achieved accurate identity matching, streamlined user enrollment, and comprehensive administrative reporting without relying on cloud APIs or heavy GPU infrastructure.
+
+The project fulfills all established objectives. The inclusion of passive liveness heuristics, combined with strict database-level duplicate prevention and an asynchronous web dashboard, elevates the prototype from a simple face detection script to a viable foundation for enterprise attendance management.
+
+\section{Recommendations for Future Enhancements}
+\JustifiedNormal
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Deep Liveness Detection:} Transition the heuristic anti-spoofing layer to a trained neural network capable of depth-estimation or micro-expression analysis.
+  \item \textbf{Vector Search Integration:} Implement FAISS or an equivalent ANN (Approximate Nearest Neighbor) indexing algorithm to optimize cosine similarity searches as the student database scales.
+  \item \textbf{Cloud Synchronization \& Security:} Migrate the local SQLite architecture to a centralized PostgreSQL server, encrypt biometric embedding BLOBs, and implement JWT-based authentication for the FastAPI dashboard.
+  \item \textbf{Multi-Face Processing:} Adjust the \texttt{INSIGHTFACE\_MAX\_FACES} threshold to process wide-angle classroom shots, enabling simultaneous multi-person attendance logging.
+\end{enumerate}
+
+\clearpage
+
+% ===== REFERENCES =====
+\chapter*{References}
+\addcontentsline{toc}{chapter}{References}
+\vspace{2em}
+\JustifiedNormal
+
+\begin{enumerate}[label={[\arabic*]}, leftmargin=*]
+  \item InsightFace Contributors, ``InsightFace: 2D and 3D Face Analysis Project,'' 2024. [Online]. Available: https://github.com/deepinsight/insightface
+  \item J. Deng, J. Guo, N. Xue, and S. Zafeiriou, ``ArcFace: Additive Angular Margin Loss for Deep Face Recognition,'' in \textit{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition}, 2019.
+  \item F. Schroff, D. Kalenichenko, and J. Philbin, ``FaceNet: A Unified Embedding for Face Recognition and Clustering,'' in \textit{Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition}, 2015.
+  \item G. Bradski, ``The OpenCV Library,'' \textit{Dr. Dobb's Journal of Software Tools}, 2000.
+  \item SQLite Consortium, ``SQLite Documentation,'' 2026. [Online]. Available: https://www.sqlite.org/docs.html
+  \item FastAPI, ``FastAPI Documentation,'' 2026. [Online]. Available: https://fastapi.tiangolo.com
+  \item R. Szeliski, \textit{Computer Vision: Algorithms and Applications}, 2nd ed. Springer, 2022.
+\end{enumerate}
+
+\end{document}

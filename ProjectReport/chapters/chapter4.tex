@@ -1,0 +1,144 @@
+The methodology consists of three main phases: embedding, optimization, and extraction. First, the cover image is decomposed into sub-bands using DWT, and the low-frequency LL sub-band is selected. This sub-band is transformed into the frequency domain using DFT, and the magnitude component is modified to embed the watermark. The inverse DFT and inverse DWT are then applied to reconstruct the watermarked image. In the optimization phase, GA is employed to refine the embedding parameters by initializing a population of potential solutions and iteratively applying selection, crossover, and mutation based on a fitness function that balances imperceptibility and robustness. Finally, in the extraction phase, the watermarked image undergoes the same DWT and DFT processes to retrieve the watermark from the modified magnitude component.
+
+\section{System Architecture}
+
+\begin{figure}[H]
+\centering
+\fbox{\begin{minipage}{\textwidth}
+\textbf{System Architecture Description:}
+\begin{enumerate}
+    \item Start with original image and watermark
+    \item Pre-processing: Resize and prepare images
+    \item Apply DWT to decompose image into sub-bands
+    \item Apply DFT to DWT sub-bands
+    \item Initialize Genetic Algorithm
+    \item Evaluate fitness and check termination conditions
+    \item If not met: Perform Selection, Crossover, Mutation
+    \item Embed watermark using best solution
+    \item Apply inverse DFT to sub-bands
+    \item Apply inverse DWT to reconstruct watermarked image
+    \item Output watermarked image
+\end{enumerate}
+\end{minipage}}
+\caption{System Architecture for Watermarking}
+\label{fig:architecture}
+\end{figure}
+
+\section{Dataset}
+
+The dataset used for this research consists of two primary sets of images: six original images and four watermark images. These were carefully chosen to test and validate the performance of the proposed digital image watermarking method.
+
+\subsection{Original Images}
+
+For the development and evaluation of the digital image watermarking method, a set of six standard images was used, sourced from the University of Southern California's Signal and Image Processing Institute. These images, known for their widespread use in image processing research, include:
+
+\begin{itemize}
+    \item Airplane
+    \item Baboon
+    \item Lena
+    \item Pepper
+    \item Sailboat on Lake
+    \item Splash
+\end{itemize}
+
+Each of these images provides unique characteristics and varying levels of complexity, making them ideal for testing the robustness and effectiveness of the watermarking technique. The original images are 512$\times$512 sized digital color images.
+
+\subsection{Watermark Images}
+
+The watermark images are designed to be embedded into the original images and later extracted. Four watermark images, labeled W1, W2, W3, and W4, were used in the watermarking process. Each of these images has a resolution of 32$\times$32 pixels. Despite their small size, these watermark images are distinct, providing an appropriate balance between invisibility when embedded and robustness during extraction.
+
+\section{Watermark Embedding Procedure}
+
+Here is the digital image watermarking process explained in five stages. Firstly, the original images and the watermark images being preprocessed by resizing and selecting them on different criteria. Then Discrete Wavelet Transform (DWT) is applied to the original images. After applying DWT there are four sub-bands. From them the high frequency sub-band LH has been chosen and DFT is applied to that high frequency sub-band. Then the watermark is embedded efficiently. Following the embedding, the inverse DFT (IDFT) is applied to convert the modified frequency components back to the wavelet domain, and then the inverse DWT (IDWT) is performed to reconstruct the final watermarked image. Lastly the Genetic Algorithm is applied for optimization to get quality images.
+
+\subsection{Preprocessing}
+
+The preprocessing stage begins with selecting the original image and the watermark image. The original image is first resized or cropped to a standard size of 512$\times$512, and then the Discrete Wavelet Transform (DWT) is applied to decompose it into four sub-bands: LL, LH, HL, and HH. The focus is usually on the higher frequency sub-bands (LH, HL, HH) because modifications in these regions are less noticeable to the human eye. The watermark image is also prepared by sizing to 32$\times$32 pixels, ensuring it is scaled appropriately to be embedded without distorting the original image.
+
+\subsection{Discrete Wavelet Transform (DWT)}
+
+In this section, the original image is decomposed into four frequency sub-bands: LL (approximate), LH (horizontal), HL (vertical), and HH (diagonal) using wavelet decomposition. The watermark will be embedded into the coefficients of the higher frequency sub-bands (LH) since these bands contain finer details and alterations in these regions are less perceptible to the human eye. By modifying the selected coefficients with the watermark data, the watermark is effectively embedded into the original image while maintaining its visual quality.
+
+\begin{algorithm}
+\caption{Discrete Wavelet Transform (DWT)}
+\begin{algorithmic}[1]
+\State Initialize: Input image $img$, Low-pass filter $Lo\_D$, High-pass filter $Hi\_D$
+\Function{DWT}{$img$}
+\State Get dimensions of $img$: $height, width$
+\State Initialize sub-bands: $LL, LH, HL, HH$
+\State Apply filters to rows:
+\For{each row in $img$}
+\State Low-pass filter and downsample $\rightarrow temp\_L$
+\State High-pass filter and downsample $\rightarrow temp\_H$
+\EndFor
+\State Apply filters to columns:
+\For{each column in $temp\_L$}
+\State Low-pass filter and downsample $\rightarrow LL$
+\State High-pass filter and downsample $\rightarrow LH$
+\EndFor
+\For{each column in $temp\_H$}
+\State Low-pass filter and downsample $\rightarrow HL$
+\State High-pass filter and downsample $\rightarrow HH$
+\EndFor
+\State Return $LL, LH, HL, HH$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Discrete Fourier Transform (DFT)}
+
+After applying the Discrete Wavelet Transform (DWT) to the original image, the image is decomposed into four sub-bands (LL, LH, HL, HH). The Discrete Fourier Transform (DFT) is then applied to one of these high-frequency sub-bands (LH) to convert it from the spatial domain to the frequency domain. Once the watermark is embedded in the DFT coefficients, the inverse DFT (IDFT) is performed to bring the modified sub-band back to the wavelet domain, preserving the watermark's invisibility while ensuring its resilience. Finally, the inverse DWT (IDWT) is used to reconstruct the watermarked image.
+
+\begin{algorithm}
+\caption{Discrete Fourier Transform (DFT)}
+\begin{algorithmic}[1]
+\State Initialize: Input image $img$, Get dimensions: $height, width$
+\Function{DFT}{$img$}
+\State Initialize empty array for transformed image: $F$
+\For{each pixel $(u, v)$ in $F$}
+\State $F[u, v] = 0$
+\For{each pixel $(x, y)$ in $img$}
+\State $F[u, v] += img[x, y] \cdot \exp\left(-2\pi i \cdot \left(\frac{u \cdot x}{height} + \frac{v \cdot y}{width}\right)\right)$
+\EndFor
+\EndFor
+\State Return $F$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Watermark Embedding}
+
+Once the watermark is embedded in the DFT coefficients, the inverse DFT (IDFT) is performed to bring the modified sub-band back to the wavelet domain, preserving the watermark's invisibility while ensuring its resilience. Finally, the inverse DWT (IDWT) is used to reconstruct the watermarked image.
+
+The embedding process involves:
+\begin{enumerate}
+    \item Converting grayscale watermark to ensure compatibility
+    \item Applying DWT and DFT transformations to extract frequency components
+    \item Modifying magnitude components based on embedding strength parameter
+    \item Applying inverse transforms to reconstruct watermarked image
+    \item Initializing GA for parameter optimization
+\end{enumerate}
+
+\subsection{Genetic Algorithm (GA) Optimization}
+
+The Genetic Algorithm (GA) optimization process is a crucial step in ensuring that the watermark embedded using DWT and DFT is both robust and imperceptible. After embedding the initial watermark into the selected sub-band of the original image using DWT and DFT, the GA is utilized to optimize the embedding parameters to find the optimal balance between watermark strength and image quality.
+
+The GA begins by generating an initial population of 500 potential solutions, each representing a different set of embedding parameters. These solutions are evaluated using a fitness function, which measures the trade-off between maintaining the watermark's invisibility and maximizing its robustness against various attacks. Over 20,000 generations, the algorithm iteratively evolves the population through selection, crossover, and mutation processes. 
+
+Key parameters:
+\begin{itemize}
+    \item Initial population size: 500
+    \item Number of generations: 20,000
+    \item Mutation rate: 0.02
+    \item Elite size: 5
+\end{itemize}
+
+The mutation rate of 0.02 introduces variability while maintaining stability, and an elite size of 5 ensures that the top-performing solutions are preserved in each generation. The crossover process combines selected individuals to create offspring with potentially better parameter configurations. By iterating through this process, the GA effectively searches the solution space for the optimal set of parameters that enhance the watermark's robustness while maintaining the original image's visual quality.
+
+\section{Watermark Extraction}
+
+Watermark extraction refers to the process of retrieving the embedded watermark from a watermarked image. The extraction process is the reverse operation, where the hidden watermark is recovered from the watermarked image.
+
+The extraction process starts with the watermarked image of size 512$\times$512. First, the image undergoes Discrete Wavelet Transform (DWT) decomposition, resulting in four sub-bands: LL, LH, HL, and HH. The specific high-frequency sub-band used during the embedding process (LH) is selected for further analysis. The Discrete Fourier Transform (DFT) is then applied to this sub-band, converting it into the frequency domain where the watermark information was initially embedded. 
+
+In the frequency domain, the watermark is extracted by identifying and isolating the modifications made to the magnitude or phase of the DFT coefficients. Once these changes are identified, they are extracted and reshaped into the original watermark size of 32$\times$32. The extracted watermark data then undergoes an inverse DFT to convert it back to the spatial domain. To enhance the clarity and accuracy of the extracted watermark, the inverse of the Genetic Algorithm (GA) optimizations is applied. This refinement step ensures that the extracted watermark closely matches the original, validating the robustness and effectiveness of the watermarking method. The final output is the recovered watermark, successfully extracted from the watermarked image.

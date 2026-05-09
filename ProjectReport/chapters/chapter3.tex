@@ -1,0 +1,72 @@
+Image watermarking is a crucial technique for protecting digital media from unauthorized use and ensuring intellectual property rights. Numerous studies have explored the use of Discrete Wavelet Transform (DWT), Discrete Fourier Transform (DFT), and Genetic Algorithms (GA) for this purpose.
+
+DWT is favored for its ability to provide both spatial and frequency domain information, making it robust against various types of image processing attacks. DFT, on the other hand, is known for its robustness against geometric distortions due to its global frequency domain representation. Genetic Algorithms are employed to optimize the embedding and extraction processes, enhancing the robustness and imperceptibility of the watermark. Studies combining these methods have demonstrated improved performance in terms of robustness, imperceptibility, and computational efficiency, making them promising for advanced image watermarking applications.
+
+\section{Previous Research}
+
+B. Kulkarni et al. proposes an Optimal SVD-DWT based Digital watermarking technique aimed at safeguarding intellectual property by preventing unauthorized copying or reproduction. The research includes a comparative survey of optimization algorithms—GA (Genetic Algorithm), PSO (Particle Swarm Optimization), and ABC (Artificial Bee Colony)—to enhance the robustness and imperceptibility of the watermarking process. Evaluation metrics such as Peak Signal to Noise Ratio (PSNR), Structural Similarity Measurement (SSIM), and Normalized Cross Correlation (NCC) are employed to assess performance.
+
+C. Mingzh et al. introduced a joint DFT and DWT channel estimation algorithm that dynamically selects the optimal method without prior information, addressing limitations in traditional DFT-based approaches.
+
+M. Cedillo-Hernandez et al. proposes an optimized robust watermarking algorithm using discrete Fourier transform and spread spectrum, with key parameters automatically tuned via particle swarm optimization. Experimental results show enhanced robustness against signal processing and geometric distortions while maintaining high visual quality.
+
+T. Takore et al. describe a Hybrid domain digital image watermarking scheme using DWT and SVD. Original host image is decomposed using DWT to obtain coefficients of approximation sub-band (LL3) and it is selected for watermark insertion. Genetic Algorithm (GA) optimizes imperceptibility and robustness by finding best scaling factor and searching apposite location for watermark insertion.
+
+P. Surekha et al. proposes a new optimization method for digital images in the Discrete Wavelet Transform (DWT) domain. The tradeoff between the transparency and robustness is considered as an optimization problem and is solved by applying Genetic Algorithm.
+
+A. Boucetta et al. describes a color image compression technique based on Discrete Wavelet Transform (DWT) and Genetic Algorithm (GA). High degree of correlation between the RGB planes of a color image is reduced by transforming them to more suitable space.
+
+\section{Comprehensive Analysis of Previous Studies}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{2cm}|p{2.5cm}|p{2cm}|p{3cm}|p{2.5cm}|}
+\hline
+\textbf{Author} & \textbf{Technology} & \textbf{Result} & \textbf{Future Work} & \textbf{Ref} \\
+\hline
+Kulkarni, B. P. & GA, PSO, ABC based on DWT-SVD & Max PSNR 46.34, Min 42.09 & Hybrid optimization & [7] \\
+\hline
+Mingzhi, C & DWT and DCT optimized GA & PSNR 42.88 & GA parameters & [8] \\
+\hline
+Cedillo-Hernandez, M & DFT, PSO & PSNR 45.05 & Optimize value & [9] \\
+\hline
+Takore, T & DWT-SVD with GA & PSNR 42.80 & 2D DCT & [10] \\
+\hline
+Surekha, P & DWT & Max PSNR 46.70 & Combinational method & [11] \\
+\hline
+Boucetta, A & DWT, GA & PSNR 39.92 & Update PSNR values & [12] \\
+\hline
+Biswas, R & GA, 2D DCT & PSNR 43.06 & Customized GA & [13] \\
+\hline
+Sabeti, V & Integer wavelet transform & High PSNR 47.007 & Multidimensional optimizer & [14] \\
+\hline
+Giri, K. J & DWT & PSNR 32.35 & Other optimizer & [15] \\
+\hline
+Sivananthamaitrey, P & SWT, SVD with GA & PSNR 46.08 & Multiple attacks & [16] \\
+\hline
+Babu, A. R & CHC-DWT & PSNR 41.67 & Other coefficients & [17] \\
+\hline
+Agarwal, N & DWT, GA, DFT & Avg PSNR 41.06 & More accuracy & [18] \\
+\hline
+Varghese, J & DWT, DFT, DCT, SVD & Lena PSNR 43.20 & Other images & [19] \\
+\hline
+\end{tabular}
+\caption{Comprehensive Analysis of Previous Studies}
+\label{tab:related}
+\end{table}
+
+\section{Summary of Related Work}
+
+In reviewing the related studies on digital image watermarking techniques, it is evident that a wide range of approaches have been developed, each with its own strengths and limitations. Methods utilizing transformations like DWT, DFT, and other frequency domain techniques have proven effective in balancing the trade-off between imperceptibility and robustness. 
+
+Several studies have also explored optimization algorithms, such as GA and PSO, to enhance watermark resilience under various image processing attacks. While individual algorithms have shown promise, hybrid approaches, as highlighted in multiple studies, demonstrate superior performance by leveraging the advantages of multiple techniques.
+
+The results from Table \ref{tab:related} show that:
+\begin{itemize}
+    \item Hybrid methods combining multiple transforms generally achieve higher PSNR values
+    \item GA optimization consistently improves performance metrics
+    \item Average PSNR values across literature range from 32.35 to 47.007 dB
+    \item Most recent works focus on combining DWT with other transforms or optimization techniques
+\end{itemize}
+
+These observations motivated the development of the proposed DWT-DFT-GA hybrid approach, which aims to combine the strengths of wavelet decomposition, frequency domain analysis, and evolutionary optimization.

@@ -1,0 +1,64 @@
+\section{Conclusion}
+
+This thesis presented a comprehensive study on the development and evaluation of a hybrid image watermarking method that integrates Discrete Wavelet Transform (DWT), Discrete Fourier Transform (DFT), and Genetic Algorithm (GA). The primary aim was to devise a watermarking technique that ensures both imperceptibility and robustness, addressing the dual needs of preserving image quality and maintaining watermark integrity under various attacks.
+
+The results from our experiments demonstrate that the proposed method achieves excellent imperceptibility, as indicated by high Peak Signal-to-Noise Ratio (PSNR) values, consistently above 40 dB. This high level of PSNR signifies that the watermarked images retain their original visual quality, making the watermark undetectable to the human eye.
+
+Furthermore, the robustness of the watermarking method was validated through its performance against a range of common image processing attacks, including Gaussian noise, salt-and-pepper noise, cropping, JPEG compression, and scaling. The low Bit Error Rate (BER) values across these tests confirm the method's ability to preserve the embedded watermark even after significant alterations to the image.
+
+\subsection{Key Achievements}
+
+\begin{enumerate}
+    \item Successfully developed a hybrid watermarking framework combining DWT, DFT, and GA
+    \item Achieved average PSNR of 42.19 dB across six test images
+    \item Obtained maximum PSNR of 44.05 dB with Peppers image
+    \item Demonstrated imperceptibility superior to many single-transform methods
+    \item Successfully optimized embedding parameters using GA
+    \item Validated effectiveness through comprehensive experimental evaluation
+\end{enumerate}
+
+The integration of GA in the watermarking process played a crucial role in optimizing the embedding parameters. This optimization ensured an optimal balance between imperceptibility and robustness, demonstrating the effectiveness of GA in fine-tuning complex watermarking processes.
+
+In summary, the proposed watermarking method utilizing DWT, DFT, and GA provides a robust and imperceptible solution for digital image protection. It effectively safeguards against unauthorized use and various image processing attacks, offering a significant advancement in the field of digital watermarking. Future research could extend this approach to other forms of digital media and explore real-time implementation to enhance its practical applicability.
+
+\section{Future Work}
+
+This research has demonstrated the potential of combining Discrete Wavelet Transform (DWT), Discrete Fourier Transform (DFT), and Genetic Algorithm (GA) to create an effective image watermarking method. However, there are several areas where further investigation could enhance the applicability and performance of the proposed method.
+
+\subsection{Video Watermarking}
+
+The current implementation could be extended to video watermarking, where the temporal dimension introduces additional challenges and opportunities for embedding and detecting watermarks. Exploring the applicability of the DWT-DFT-GA framework in image sequences could lead to more comprehensive digital media protection solutions.
+
+\subsection{Real-time Implementation}
+
+Real-time implementation and optimization of the watermarking process should be considered. By improving the computational efficiency of the GA and optimizing the embedding and extraction algorithms, the method could be adapted for real-time applications, making it suitable for streaming media.
+
+\subsection{Advanced Attack Resistance}
+
+Investigating the robustness of the watermark against emerging types of attacks, such as machine learning-based manipulations and deep fake technologies, would be valuable. Adapting the watermarking method to withstand these advanced threats could further enhance its security and reliability.
+
+\subsection{Integration with Other Techniques}
+
+Incorporating other transforms and optimization techniques could be explored to improve the performance of the watermarking method. For example:
+
+\begin{itemize}
+    \item Combining DWT and DFT with other frequency domain techniques
+    \item Integrating GA with other evolutionary algorithms like Particle Swarm Optimization (PSO) or Differential Evolution (DE)
+    \item Exploring hybrid combinations of multiple optimization algorithms
+\end{itemize}
+
+\subsection{User Studies}
+
+Conducting extensive user studies to evaluate the perceptual impact of the watermarking method on a wider variety of image types and resolutions could provide deeper insights into its practical usability and effectiveness in real-world scenarios.
+
+\subsection{Scalability}
+
+The method could be evaluated on images of different sizes and with varying complexity to assess its scalability and generalizability across diverse applications.
+
+\subsection{Security Enhancement}
+
+Further research on encryption and security measures could be integrated into the watermarking framework to protect against advanced watermark removal attacks.
+
+\section{Final Remarks}
+
+In conclusion, while this thesis has established a solid foundation for a robust and imperceptible image watermarking method using DWT, DFT, and GA, further research and development in these areas could significantly expand its capabilities and applications, making it an even more powerful tool for digital media protection. The hybrid approach has proven effective in balancing the critical trade-offs in digital watermarking, and with continued refinement and extension to new domains, it promises to be a valuable contribution to the field of digital content protection.

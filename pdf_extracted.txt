@@ -1,0 +1,897 @@
+Methods and means of image processing  
+ 119 
+UDC  004.93’ 12.056.523   doi: 10.32620/ reks.2023.2.10 
+ 
+Md. Apu HOSEN1,2, Shahadat Hoshen MOZ1,2, Md. Mahamudul Hasan KHALID1,2,  
+Sk. Shalauddin KABIR1, Dr. Syed Md. GALIB1 
+ 
+1 Jashore University of Science and Technology,  Jashore -7408,  Bangladesh  
+2 Northern University of Business and Technology Khulna, Khulna -9100 , Bangladesh  
+ 
+FACE RECOGNITION -BASED  ATTENDANCE SYSTEM WITH ANTI -SPOOFING , 
+SYSTEM ALERT , AND EMAIL AUTOMATION  
+The subject matter  of the article is the design of an attendance system based on face recognition with anti -
+spoofing, system alarm, and Email Automation to improve accuracy and efficiency, highlighting its potential to 
+revolutionize traditional attendance tracking methods. The administration of attendance might be a tremendous 
+load on the authority if it is done manually. Therefore, the goal  of this study is to design a reliable and efficient 
+attendance system that can replace traditional manual approaches while also detecti ng and preventing spoofing 
+attempts. Without the manual approach, attendance may be collected using many kinds of technologies, includ-
+ing biometric systems, radiofrequency card systems, and facial recognition systems. The face recognition at-
+tendance system  stands out among the rest as a great alternative to the traditional attendance system used in 
+offices and classrooms. The tasks to be  accomplished include selecting appropriate facial detection and recog-
+nition technologies, implementing anti -spoofing meas ures to prevent intruders from exploiting the system, and 
+integrating system alarms and email automation to improve accuracy and efficiency. The methods used  include 
+selecting the Haar cascade for facial detection and the LBPH algorithm for facial recognit ion, using DoG fil-
+tering with Haar for anti -spoofing, and implementing a speech system alarm for detecting intruders. The result  
+of the system is a face recognition rate of 87  % and a false positive rate of 15  %. However, since the recognition 
+rate is not 100 %, attendance will also be informed through email automation in case someone is present but is 
+not detected by the system. In conclusion , the designed attendance system offers an effective and efficient alter-
+native to the traditional attendance system used in offices and classrooms, providing accurate attendance rec-
+ords while also preventing spoofing attempts and notifying authorities of any intruders . 
+ 
+Keywords : Face Recognition ; Attendance System ; Anti-spoofing ; DoG filtering ; System Alert ; E-mail Aut oma-
+tion. 
+ 
+Introduction  
+ 
+Our daily lives depend heavily on human faces, es-
+pecially for identifying people. The process of extracting 
+the features of a person's face and storing them as a one -
+of-a-kind face print enables face recognition, which is a 
+subset of biometric identification, to be used to uniquely 
+identify a person. Face recognition technology is better 
+than other biometrically based recognition methods such 
+as fingerprints, palm prints, and iris scans because th e 
+scanning process does not involve any physical contact . 
+Face recognition technology has recently gained a 
+lot of interest due to the ex panding number of business 
+and law enforcement applications that require precise hu-
+man recognition. The attendance system is one of them. 
+Attendance is not merely recording the presence of peo-
+ple participating. An effective and precise attendance 
+system he lps establish better work atmosphere. It also 
+fosters openness and responsibility in everyone’s activi-
+ties that influence the company. It is vital to guarantee 
+that all elements of an organization accomplish their 
+tasks . It is challenging to manually gener ate and analyze statistical data representing a record of attendance  [1]. 
+Additionally, these systems are more vulnerable to false 
+proxies or attendance. On the other hand, face recogni-
+tion-based attendance systems are faster, more accurate, 
+and more secur e than manual systems, making them a 
+better choice for organizations that want to streamline 
+their attendance tracking processes while also improving 
+accuracy and security [ 2]. 
+The effectiveness of face recognition technology is 
+gauged by how well it can identify authorized individuals 
+and reject those who are not. The feature extraction and 
+classification stages are included in the primary perfor-
+mance criteria [3]. Numerous studies on facial recogni-
+tion-based attendance systems have mostly focused on 
+the accuracy of student recognition  [4]. The current face 
+recognition study has centered on the “image matching” 
+element of the system regardless of whether the linked 
+face is real or fake [5], whereas this paper concentrates 
+on decreasing the false positive r ate and bases its system 
+on a static photo of a face that secures against spoofs. If 
+the system detects an intruder, it will also issue a warn-
+ing. 
+ Md. Apu Hosen, Shahadat Hoshen Moz, Md. Mahamudul Hasan Khalid,  
+ Sk. Shalauddin Kabir, Dr. Syed Md. Galib , 2023 
+ ISSN 1814 -4225 (print)  
+Radioelectronic and Computer Systems , 202 3, no. 2(106)               ISSN 2663 -2012 (online)  120 
+1. Related Work  
+ 
+Research on face recognition has been carried out 
+for a substantial amount of time, and this  field of study is 
+still actively being developed today. Among the previous 
+responsibilities are the following:  
+V. Chaudhari et al. [6] created a video -based facial 
+recognition system to efficiently and accurately mark 
+participant attendance by combining f acial recognition 
+and facial recognition algorithms. Using FaceNet to ex-
+tract characteristics and MTCNN to detect the image of 
+the student for recognition are both used in this process. 
+In the final step, the results are fed into a Support Vector 
+Machine ( SVM), which is tasked with identifying the 
+person of interest depicted in the image. When they used 
+their own self -generated dataset, they were able to deter-
+mine the accuracy of their method to be 94.8  %. 
+M. Ramasane et al. [7] suggested a real -time face 
+recognition system that is both effective and real -time, 
+with low image resolution fluctuations and a variety of 
+angular positions of the face. For training and classifica-
+tion, they used a dataset that they had previously prepared 
+themselves. After the faci al photographs have been taken 
+with an HD 1080p camera, they are then subjected to pre-
+processing with CLAHE, which is followed by noise re-
+duction involving the application of median filtering. 
+When it comes to capture faces for the recognition pro-
+cess, gau ssian filtering has also been used in some cases. 
+This technology is also capable of accurately recognizing 
+faces in environments with various levels of illumination. 
+In the proposed system, accuracy improves with increas-
+ing pixel resolution but deteriorat es with increasing face 
+deviation angle . They applied the LBPH approach to the 
+process of feature extraction.  
+V Rohini  et al. [8] suggested a face -recognition –
+based automated attendance system as a solution to the 
+challenges presented by manual and other types of tradi-
+tional attendance systems. Face recognition would be 
+used to verify a person's identity. The work that wa s 
+planned was accomplished using face recognition and 
+machine learning. Both the Haar cascade classifier and 
+the LBPH method will be able to identify a face after it 
+has been detected by the former. The experiment gener-
+ates real -time facial data as part of  its procedures. Face 
+detection and recognition are carried out using a web 
+camera that is attached to the computer. Recognized 
+faces are then marked as having attended the event. It is 
+possible to monitor attendance using various functions 
+that are provid ed in both the admin module and the in-
+structor module. Through using of the Haar cascade clas-
+sifier and the LBPH algorithm, they are able to achieve 
+an accuracy of 94.5  % in face detection and 98.5  % in 
+face recognition .   
+R Valarmathi et al. [ 9] created a  model to track stu-
+dent attendance that uses a series of constraints, such as the local binary pattern histogram approach, to identify 
+distinct personalities ’ faces from a collected image. Each 
+cell’s binary pattern histograms are first computed, and 
+the results  are then concatenated to produce the final fea-
+ture vector. Following this, the training data set vector 
+and the final vector are compared using the k -nearest 
+neighbor method. Using this method, the classification 
+results are used to determine the va lue closest to the final 
+vector. The database is updated with the individual's at-
+tendance after the person's name is obtained . 
+B. Tej Chinimilli et al.  [10] proposed an automated 
+attendance management system that uses the Haar  cas-
+cade and LBPH algorithm to identify and recognize 
+faces.  Situations such as facial recognition rates, false 
+positives rates, and false positives rates with and without 
+the use of a threshold to identify obscure individuals are 
+studied to assess the system. The facial recognition rate 
+for students was found to be 77  % by the inventor, while 
+the false positive rate was found to be 28  %. In any case, 
+the system perceived the students as if they were wearing 
+glasses or developing facial auditory growth. The recog-
+nition of the face of an obscure individual is roughly 
+60 % without and with imposing restricting esteem. The 
+rate of false positives is 30  % and 14  % without and with 
+applying the limit separately . 
+A. Singh et al. [11] presented a real -time syste m that 
+uses deep learning and face recognition algorithms such 
+as Convolution Neural Networks (CNN) to locate and 
+identify individuals in live or recorded surveillance 
+streams. The system may be used to monitor either live 
+or recorded feeds. The VGGFace de ep learning neural ar-
+chitecture serves as the foundation for the proposed inte-
+grated real -time database system. Transfer learning is 
+used to retrain the model on an original tailored dataset 
+that is more compact and consists of 7500 pictures of 26 
+unique i ndividuals. Details regarding the generation of 
+original tailored datasets as well as brief testing using a 
+variety of machine learning and deep learning algorithms 
+are also presented in order to examine and improve the 
+recognition accuracy of the proposed  system. The sug-
+gested technique successfully identified each of the 26 
+individuals with a confidence level ranging from 78.54  % 
+to 100  %, with a mean average of 96 percent on real -time 
+inputs, demonstrating the highest level of recognition ac-
+curacy . 
+A sys tem for managing  visual attendance was pro-
+posed by Harikrishnan J et al. [ 12] and includes 4 crucial 
+steps: face detection and the data gathering that goes 
+along with it, training of the recognition process, face 
+recognition, and attendance management. The system 
+used Haar cascade classifiers and Local Binary Patterns 
+Histograms (LBPH) for face detection and face recogni-
+tion. A CCTV camera and a Raspberry Pi may be used to 
+power this setup. Because the system uses picture pre -
+processing techniques, it may b e used in classrooms and Methods and means of image processing  
+ 121 
+lab facilities for real -time monitoring or routine attend-
+ance even when the lighting is poor. This enables the sys-
+tem to accommodate both normal and emergency attend-
+ance needs. Because attendance is immediately main-
+tained on the on board attendance server and online, this 
+solution is user -friendly and time -saving . 
+The concept of face detection and identification 
+through open computer vision is used in N. Gupta et al. 
+[13] used a centralized server structure to handle the stu-
+dents cla ss attendance documentation. For the face detec-
+tion system, the manufacturer employed Haar cascade 
+and for face recognition LBPH model. Part of the python 
+bundles/modules employed in the endeavor is Numpy, 
+Tkinter, OpenCv, PIL, and Pandas. The manufacturer  
+employed a facial recognition library using KNN algo-
+rithm, which yields a precision rate 97.35  %.  
+Kim et al. [14] offer a method employing machine 
+learning that can classify face expressions and then fur-
+ther categorize them in many layers. This is identi fied by 
+Haar like characteristics. The face is initially identified 
+using ROI configurations. The facial expression is then 
+matched using SVM classified as HOG to match the per-
+son’s expression. The phrases were then compared to as-
+sess the amount of correct ness. The trials that were per-
+formed resulted in greater accuracy than the standard ap-
+proaches. The ROI process participating in the FER ma-
+chine might result in an excellent and appropriate alter-
+native as it delivers greater and better input than the 
+stand ard methods. The original dataset scores establish 
+an excellent example to be used in schools, traffic sys-
+tems . 
+Sanchez -Moreno et al. [15] proposed a face recog-
+nition system that might work in unrestricted environ-
+ments. It would make use of a mixture of de ep learning 
+techniques such as FaceNet and certain standard classifi-
+ers such as SVM, KNN and RF together with moderate 
+computer power. For face detection, the system uses 
+YOLO -Face, which is a high -speed real -time detector 
+based on YOLOv3. For face classif ication, the system 
+uses FaceNet , which employs supervised learning algo-
+rithms such as the support vector machine (SVM).  The 
+face detector achieved an accuracy of greater than 
+89.6 %. The experimental results of the system demon-
+strated that the accuracy of  the FaceNet+SVM model is 
+99.7 %, the FaceNet+KNN model is 99.5  % and the 
+FaceNet+RF model is 85.1  %. on the other hand, FaceNet 
+was able to achieve 99.6  % accuracy.  
+Various studies have showcased the superior accu-
+racy of face recognition systems over trad itional attend-
+ance systems, particularly when it comes to handling 
+challenges such as varying lighting conditions, the pres-
+ence of noise and distortions, occlusions, and partial face 
+views. However, it is important to note that these studies 
+often focus on  relatively small datasets.  Despite promising results in smaller -scale experi-
+ments , limitations have been identified when scaling up 
+face recognition systems to handle a substantial number 
+of individuals. These limitations primarily revolve 
+around issues o f scalability and performance. As the da-
+taset size increases, the efficiency and effectiveness of 
+the system can be compromised, leading to reduced 
+recognition accuracy and overall system performance.  
+Therefore, while face recognition systems have 
+shown immense potential in addressing attendance -re-
+lated challenges, it is crucial to further explore and ad-
+dress the scalability concerns associated with large da-
+tasets. This includes optimizing algorithms, developing 
+robust feature extraction techniques, and i mplementing 
+efficient models to ensure accurate and efficient recogni-
+tion even when dealing with a significant number of in-
+dividuals in the system. By overcoming these scalability 
+and performance limitations, face recognition -based at-
+tendance systems can o ffer more reliable and practical 
+solutions for attendance management in various settings.  
+ 
+2. Motivation for research  
+ 
+In face recognition -based attendance systems  deep 
+learning is very popular. Deep learning techniques have 
+shown great success in facial r ecognition tasks, particu-
+larly in recent years with the development of more ad-
+vanced deep neural networks. It has enabled the develop-
+ment of highly accurate and efficient face recognition 
+systems, which can recognize faces in a wide range of 
+conditions, su ch as varying lighting, facial expressions, 
+and head poses. Deep learning models require large 
+amounts of training data to be trained effectively. Acquir-
+ing and labeling large datasets can be a time -consuming 
+and resource -intensive process, which can invol ve signif-
+icant costs for data collection, annotation, and storage., 
+and if the dataset is small or biased, the accuracy of the 
+system may suffer.  
+However, Haar cascade and LBPH -based systems 
+are simple and computationally efficient. These methods 
+are based  on traditional computer vision techniques, 
+which are computationally less demanding than deep 
+learning -based methods. As a result, they can be de-
+ployed on devices with limited computing resources, 
+such as low -end computers or embedded systems . 
+Another adv antage of Haar cascade and LBPH -
+based systems is their robustness to variations in lighting 
+conditions, facial expressions, and pose. These tech-
+niques are based on handcrafted features that are de-
+signed to be invariant to such variations, whereas neural 
+network -based systems typically require large amounts 
+of annotated data to achieve similar robustness.  
+ ISSN 1814 -4225 (print)  
+Radioelectronic and Computer Systems , 202 3, no. 2(106)               ISSN 2663 -2012 (online)  122 
+3. Purpose and objectives of the study  
+ 
+Face recognition -based attendance systems have 
+demonstrated higher accuracy compared with traditional 
+manual attendance systems. However, several studies 
+have highlighted certain challenges that need to be ad-
+dressed for these systems to be more effective in various 
+scenarios. These challenges include handling large da-
+tasets, addressing anti -spoofing measures, rec ognizing 
+unknown individuals, and enhancing overall functional-
+ity. 
+To address these challenges, ongoing research and 
+development efforts focus on implementing advanced al-
+gorithms, leveraging deep learning techniques, and inte-
+grating additional technologies . These advancements im-
+prove the accuracy, reliability, and usability of face 
+recognition -based attendance systems in diverse scenar-
+ios. Additionally, the deployment of multifactor authen-
+tication can further enhance system security and overall 
+effectivenes s. 
+The primary objective of the proposed study is to 
+develop an effective automated attendance system using 
+facial recognition. Special emphasis is placed on address-
+ing issues related to large datasets, anti -spoofing 
+measures, and unknown person recognitio n. Further-
+more, the study enhances system functionality by incor-
+porating features such as automated email notifications, 
+system alerts, and streamlined attendance management 
+processes. By addressing these challenges, the study 
+seeks to improve the overall performance and usability of 
+facial recognition -based attendance systems, making them more robust and reliable in practical applications . 
+ 
+4. Proposed System  
+ 
+The procedure kicks off with the taking of a picture 
+of the subject's face with the use of a camera. Then, in the 
+pre-processing stage, we use DoG filtering, and in the 
+subsequent section, we use a strategy based on HAAR 
+cascades. The Cascading classifier uses all of the attrib-
+utes of the captured image to iteratively search through 
+all of the images in the dataset, one at a time, in order to 
+determine whether or not the face in question is authentic. 
+If it finds the original face, it will use LBPH to recog nize 
+the face; based on this, the attendance sheet will be up-
+dated, and a report of attendance will be sent out through 
+an automated e -mail system. On the other hand, if it finds 
+a bogus image, it triggers a system alert that notifies you 
+that an intruder has been found. The suggested system 
+architecture is illustrated in Fig. 1, which may be found 
+here. The details of each stage of implementation are pre-
+sented in the next section . 
+ 
+5. Dataset and methodology  
+ 
+To evaluate the effectiveness of the proposed s ys-
+tem, a data set consisting of ninety different people was 
+built. A total of 80 photographs were taken of each indi-
+vidual. The images are then changed to grayscale and 
+normalized when the preprocessing step has been com-
+pleted. Fig. 2 displays some images of the dataset after 
+converting in grayscale .   
+ 
+Fig. 1. System Architecture  
+Methods and means of image processing  
+ 123 
+ 
+ 
+Fig. 2.  Extracted images in the dataset  
+ 
+5.1. Preprocessing  
+ 
+Face photos that are captured have better image 
+quality than recovered face photos, therefore the recap-
+tured photo contains fewer high -frequency materials  
+[16]. By comparing the 2D Fourier spectra of the genuine 
+and fake faces, this situation can be found. Thus, the 
+frame is f irst converted from color to grayscale before 
+DoG filtering is used.  
+The use of DoG filtering allows for the preservation 
+of high -frequency processes such as image boundaries 
+while removing noise [17]. Instead of examining all high -
+frequency bands, this me thod investigates the frequency 
+spectrum of the high -middle band. A bit more outer 
+Gaussian can be applied to eliminate erroneous low spa-
+tial frequency data. By lowering false information and 
+noise, this pre -processing technique enhances the focus 
+on the p ortion of the range that provides crucial infor-
+mation  [18], to distinguish between authentic and fake 
+face images that can then be seen.  
+ 
+5.1.1. Difference of Gaussians ( DoG)  
+ 
+To improve the edge characteristics of an input im-
+age, the Difference of Gaussians (DoG) algorithm sub-
+tracts one blurry version of the original image from an-
+other less blurry version of the original [19]. The original 
+photos are convolved with two Gaussian kernels of dif-
+ferent standard deviations to produce blurred images 
+[20].  By convolutional blending two Gaussian kernels of 
+differing widths,  σ1 and σ2 where σ2 is higher than 
+σ1 with the original image F, the smoothed images g1 and 
+g2 are produced.  
+ 
+g1(x,y) = 1
+√2πσ12exp (−x2−y2
+2σ12)∗F(x,y), 
+ 
+g2(x,y) = 1
+√2πσ22exp (−x2−y2
+2σ22)∗F(x,y). 
+ The DoG operation is then performed by subtracting the 
+two smoothed images:  
+ 
+DoG (x,y)= g1(x,y)− g2(x,y)= 
+= (1
+√2πσ12exp (−x2−y2
+2σ12)−
+− 1
+√2πσ22exp (−x2−y2
+2σ22))*F(x,y). 
+ 
+The resulting image, denoted as D, is then obtained by 
+multiplying the DoG  operation by the original image F:  
+ 
+D(x,y) = DoG(x,y) * F(x,y) . 
+ 
+The resulting image D has enhanced edge characteristics 
+compared to the original input image F. This is because 
+the DoG operation produces an image that highlights the 
+difference in pixel va lues between the two blurred im-
+ages, which tends to correspond to edges and other high -
+frequency details in the original image.  
+ 
+5.2. Face detection  
+ 
+After preprocessing, the Haar Cascade classifier is 
+used to identify the face that the viola has suggested  [21]. 
+In Haar Cascade, a trained cascade function hunts for 
+traits in other images. It can be broken down into four 
+steps . 
+ 
+5.2.1. Haar feature calculation  
+ 
+A Haar  feature is created by performing a sequence 
+of calculations on the successive rectangular sections of 
+a detection window. This is the only thing that constitutes 
+a Haar feature. In order to complete the process, the first 
+step is to add up the pixel inten sities at each point, and 
+then the next step is to subtract the sums. The following 
+equation, developed by Lienhart [22], can be used to de-
+termine each Haar -like feature within a W x H pixel de-
+tection window:  
+ 
+Feature =∑ωi RecSum (ri),n
+i=1 
+ 
+where RecSum(r i) is the total intensity across each up-
+right or rotating rectangle that has been placed inside a 
+detection window, and ωi is an arbitrarily chosen 
+weighting factor. Fig . 3 illustrates prototypes of the Haar 
+characteristic.  
+ 
+ 
+ 
+ISSN 1814 -4225 (print)  
+Radioelectronic and Computer Systems , 202 3, no. 2(106)               ISSN 2663 -2012 (online)  124 
+Line Features:  
+ 
+ 
+ 
+ 
+Edge Features:  
+ 
+ 
+Center -surround Features:  
+ 
+ 
+Fig. 3. Haar like features  
+ 
+5.2.2. Integral image creation  
+ 
+When integral images are used, computation of 
+these Haar  characteristics is completed at a substantially 
+faster rate. Calculations are not performed on each indi-
+vidual pixel; rather, sub -rectangles and array references 
+are constructed for each sub -rectangle. After this, the 
+Haar properties can be computed using  this information.  
+ 
+5.2.3. Adaboost Training  
+ 
+How do we determine which of the hundreds of 
+thousands of Haar features best reflect a particular item 
+when there are so many to choose from? Adaboost finally 
+makes his appearance at this juncture of the action . Ada-
+boost is used to select the most useful characteristics, and 
+then instructs classifiers to use those characteristics . The 
+"strong classifier" that the algorithm generates may be 
+utilized in the process of recognition by combining 
+"weak classifiers."  
+ 
+5.2.4. Implementing Cascading Classifiers  
+ 
+The cascade classifier is made up of numerous 
+stages, each of which has a group of poor students. The 
+technique of "boosting" is used to train weak learners and builds a classifier incredibly accurate on the average pre-
+diction of all weak learners. On the basis of this predic-
+tion, the classifier decides whether to report the discovery 
+of an object (positively) or to proceed to the subsequent 
+region (negative). Stages are created to quickly reject un-
+desirable s amples because most windows contain noth-
+ing of relevance . 
+ 
+5.3. Face Recognition  
+ 
+There are several facial recognition algorithms, 
+among these LBPH has superiority over others because 
+of its resilience, and ability to distinguish both front and 
+side faces , which is why the LBPH algorithm is chosen 
+for face recognition [23]. It is used to locate qualities in 
+a picture that best characterize a face. This technique is 
+simpler by describing the image within the local dataset, 
+when a supersession unknown image t ranspires, an iden-
+tical procedure is run and the output is compared to each 
+of the images in the dataset. Rather than other algorithms, 
+it performs better in various locations and lighting condi-
+tions. The Local Binary Pattern (LBP) procedure gener-
+ates a pi cture that highlights the qualities of an image 
+more effectively. It employs the sliding window idea and 
+the parameters radius and neighbors [24].  Fig. 4 illus-
+trates it . 
+First, transform the frame into 3X3 pixel matrices. 
+Put value 1 at that pixel positio n if a neighboring pixel in 
+a matrix is larger than the matrix median pixel otherwise 
+set value 0. Now, generate a binary number by adding the 
+values of the pixels in a line adjacent to one another. This 
+creates a new value. As can be seen in Figure 5, the  bi-
+nary integer should be replaced with the pixel value that 
+corresponds to the matrix's median . 
+ 
+ 
+ 
+Fig. 5 . LBP process on a 3x3 matrix  
+Fig. 4 Process of LBPH algorithm  
+Methods and means of image processing  
+ 125 
+After the image has been transformed into the LBP 
+format, the histograms from each grid are extracted and 
+combined to generate a brand new, more comprehensive 
+histogram. The concatenated histogram indicates the 
+characteristics  that were present in the image that was 
+first captured.  
+Each histogram illustrates a different face from the 
+database. The steps that came before are repeated for the 
+new picture, and a new histogram is produced as a result . 
+ 
+5.4. Anti-spoofing Checking  
+and System Alert  
+ 
+After recognizing the face, the input image will be 
+compared to every image in the dataset to determine 
+whether or not the face in question is a fake one by pass-
+ing each characteristic individually. This will be done to 
+determine whether the face in question is real. If it is de-
+termined that the face is fake, the technology will flag it 
+as an intruder and send out a warning. If, on the other 
+hand, it is an actual face, it will recognize it and carry on 
+with the processing . 
+ 
+5.5. Post Proce ssing  
+ 
+Using Euclidean distance, the new histogram is 
+compared to the training dataset histograms. Because 
+lower confidences are more effective at identifying the 
+subject of the image, the histogram with the lowest con-
+fidence or the smallest distance is ch osen. It also extracts 
+the ID that goes with that histogram. If the level of con-
+fidence becomes less than 50, the names are updated in 
+an excel sheet and the extracted data is displayed on the 
+frame [25], as seen in Fig. 6. To avoid the duplication, 
+the st udent's name is added only to an Excel sheet if it is 
+not already there, as seen in Fig. 7. The person's image is 
+saved in a different folder if confidence exceeds the 
+threshold, which has a value of 95. This makes it easier 
+to spot any trespassers in the classroom and prevents pu-
+pils from being mistakenly labeled as strangers . 
+ 
+ 
+ 
+Fig. 6 Recognizing  Faces  
+ 
+  
+ 
+Fig. 7 Attendance Sheet  
+ 
+5.6 Attendance Report through E -mail  
+ 
+At the end of the day, the daily attendance report is 
+sent to the particular student  through e -mail. So, if some-
+one is there but is discovered to be absent, they may no-
+tify the organization and take the corrective action . 
+ 
+6. Results and Discussion  
+ 
+This system initially proposed a method for detect-
+ing fakes that involved DoG  filtering and a classifier 
+known as the Haar -Cascade. The accuracy of the method 
+can be evaluated based on the ratio between the number 
+of false positives and false negatives. The accuracy, as 
+well as the false rejection and acceptance rates, for 
+liveness  recognition of faces on the test sets included in 
+the dataset are displayed in Table 1.  The findings show 
+that the proposed system works better at spoof detection 
+and is effective at detecting intruders . 
+ 
+Table  1  
+Performance of DoG-Haar -Cascade  
+in face detection on the dataset  
+Performance  Result  
+Accuracy  98.36  % 
+False acceptance rate  0.72 % 
+False rejection Rate  0.92 % 
+ 
+Here the system recognizes the face using the 
+LBPH algorithm from varying distance with different ex-
+pressions. The results mentioned in Table 2, show that 
+the LBPH algorithm gives 8 7 % recognition rate varying 
+distances up to 100  cm with different facial e xpressions.  
+ 
+Table  2  
+Performance evaluation of face recognition  
+Performance  Result  
+Recognition Rate  87 % 
+False Positive  Rate(FPR)  15 % 
+Unknown  People Recognition Rate  68 % 
+ 
+ISSN 1814 -4225 (print)  
+Radioelectronic and Computer Systems , 202 3, no. 2(106)               ISSN 2663 -2012 (online)  126 
+Conclusions  
+ 
+This study describes an automatic facial recogni-
+tion-based attendance system that identifies face -check-
+ing anti -spoofing. For a better result in face detection and 
+recognition, DoG filtering is used in the preprocessing 
+stage, and then the Haar Cascade cla ssifier is applied for 
+the detection of faces with anti -spoofing. Anti -spoofing 
+is done by comparing the contrast and textures of the 
+original and fake photos and using the DoG filtering 
+method. Here, the database comprises photos of diverse 
+facial express ions. This system correctly detects a kid 
+with inadvertent modifications such as wearing glasses 
+or growing a beard. Based on the comparative analysis 
+with other studies, the system under investigation exhib-
+its commendable detection and identification rate  with 
+superior performance in spoof detection. Notably, this 
+higher identification rate is achieved by leveraging a rel-
+atively large dataset compared to the datasets used in 
+other studies. This finding highlights the importance of 
+dataset size in achieving  robust and accurate face identi-
+fication outcomes. By employing a larger dataset, the 
+proposed system demonstrated superior performance in 
+terms of identification accuracy, further solidifying its ef-
+fectiveness in face recognition tasks. As the recognition  
+rate is not 100  %, the system provides the report of the 
+individual student so that if someone is present but is de-
+termined to be missing, they may alert the organization 
+and take corrective action.  
+The proposed facial recognition system faces chal-
+lenges in effectively recognizing faces when there are 
+rapid changes in frame rates. When individuals are mov-
+ing quickly or when the video feed is captured by cam-
+eras with high frame rates. In such cases, the system may 
+struggle to accurately detect and recognize  faces, leading 
+to reduced performance and lower recognition accuracy. 
+This limitation suggests a potential area of improvement 
+and future scope for the system, which involves adapting 
+it to handle high frame rate changes . 
+ 
+Contribution of authors : Md. Apu  Hosen  was the 
+author of the research proposal, the coding analysis, and 
+the manuscript draft ; Shahadat Hoshen Moz completed 
+the coding, analysis, and drafting of the manuscript ;  
+by Md. Mahamudul Hasan Khalid , the manuscript's 
+coding, analysis, and drafti ng were completed ;  
+Sk. Shalauddin Kabir  was in charge of the overall mon-
+itoring, revision, and drafting of the document ;  
+Dr. Syed Md. Galib  completed the whole supervision, 
+editing, and mentoring of the article.  
+All the authors have read and agreed to the pub-
+lished version of the manuscript.  
+ References  
+ 
+1. Arjun Raj,  A., Shoheb,  M., Arvind,  K. & Che-
+than,  K. S. Face Recognition Based Smart Attendance 
+System.  International Conference on Intelligent Engi-
+neering and Management (ICIEM) , 17–19 June 2020, 
+London, United Kingdom , 2020, pp. 354 -357. DOI: 
+10.1109/iciem48762.2020.9160184 .  
+2. Adjabi, I., Ouahabi, A., Benzaoui, A.  & Taleb -
+Ahmed, A.  Past, present, and future of face recognition: 
+A review.  Electronics , 2020,  vol.  9, iss. 8, article no. 
+1188. DOI: 10.3390/electronics9081188.  
+3. Surekha,  B., Nazare,  K. J., Viswanadha Raju,  S. 
+& Dey,  N. Attendance Recording System Using Partial 
+Face Recognition Algorithm. Intelligent Techniques in 
+Signal Processing for Multimedia Security.  Studies in 
+Computational Intell igence , vol. 660, Springer, Cham, 
+2017, pp.  293-319. DOI : 10.1007/978 -3-319-44790 -
+2_14 . 
+4. Kortli, Y., Jridi, M., Al Falou, A.  & Atri, M. 
+Face recognition systems: A survey.  Sensors , 2020 , vol. 
+20, iss. 2, article no.  342. DOI: 10.3390/s20020342.  
+5. Jingade, R.  R. & Kunte, R.  S. DOG -ADTCP: A 
+new feature descriptor for protection of face identifica-
+tion system.  Expert Systems with Applications , 2022, 
+vol.  201, article no. 117207. DOI: 
+10.1016/j.eswa.2022.117207.  
+6. Chaudhari,  V., Jain, S., Chaudhari, R., Chavan , 
+T. & Shahane, P. Real Time Face Recognition Based At-
+tendance System using Multi Task Cascaded Convolu-
+tional Neural Network . International Conference on 
+Emerging Smart Computing and Informatics (ESCI) , 
+Pune, India, 2023, pp. 1 -6. DOI: 
+10.1109/ESCI56872.2023.1 0099879.  
+7. Ramasane, M., Nadaf, S., Shah, K., Ramdasi , P. 
+& Golande, A. An Enhanced Student Attendance Moni-
+toring System at Low Resolution and Various Angled 
+Face Positions based on LBPH and CLAHE . Interna-
+tional Conference for Advancement in Technology 
+(ICONAT) , Goa, India, 2023, pp. 1 -6. DOI: 
+10.1109/ICONAT57137.2023.10080356.  
+8. Rohini, V., Sobhana, M.  & Chowdary, C.  S. At-
+tendance Monitoring System Design Based on Face Seg-
+mentation and Recognition.  Recent Patents on Engineer-
+ing, 2023, vol.  17, iss. 2, pp. 81-91. DOI: 
+10.2174/1872212116666220401154639.   
+9. Valarmathi,  R., Uma,  R., Brinda , C. & Vashika , 
+R. Facial Detection Attendance System using LBPH and 
+KNN. International Conference on Communication, 
+Computing and Internet of Things (IC3IoT) , 10-11 March 
+2022, Chennai, India , 2022 , pp. 1 -5. DOI: 
+10.1109/ic3iot53935.2022.9767943 . 
+10. Chinimilli, B.  T., Anjali, T., Kotturi, A., Kaipu, 
+V. R. & Mandapati, J.  V. Face recognition based attend-
+ance system using haar cascade and local binary pattern Methods and means of image processing  
+ 127 
+histogram algorithm. 4th international conference on 
+trends in electronics and informatics (ICOEI)(48184) , 
+Tirunelveli, India, 2020 , pp. 701 -704. DOI: 
+10.1109/ICOEI48184.2020.9143046 . 
+11. Singh, A., Bhatt, S., Nayak, V.  & Shah, M.  
+Automation of surveillance systems using deep learning 
+and facial recognition.   International Journal of System 
+Assurance Engineering and Management , 2023, vol. 14, 
+Suppl. 1, pp. 236 -245. DOI: 10.1007/s13198 -022- 
+01844 -6.  
+12. Harikrishnan, J., Sudarsan, A., Sadashiv, A.  & 
+Ajai, R.  A. S. Vision -face recognition attendance moni-
+toring system for surveillance using deep learning tech-
+nology and computer vision.  International conference on 
+vision towards emerging trends in communication and 
+networking (ViTECoN) , Vellore, India, 2019 ,  
+pp. 1 -5.  DOI: 10.1109/ViTECoN.2019.8899418.  
+13. Gupta, N., Sharma, P., Deep, V.  & Shukla, V.  
+K. Automated attendance system using OpenCV. 8th In-
+ternational Conference on Reliability . Infocom  Technol-
+ogies and Optimization (Trends and Future Direc-
+tions)(ICRITO) , Noida, India, 2020, pp. 1226 -1230 . 
+DOI: 10.1109/ICRITO48877.2020.9197936 .  
+14. Kim, S., An, G.  H. & Kang, S.  J. Facial expres-
+sion recognition system using machine learning. Interna-
+tional  SoC design conference (ISOCC) , Seoul, Korea 
+(South), 2017, pp. 266 -267. DOI:  
+10.1109/ISOCC.2017.8368887 .  
+15. Sanchez -Moreno, A.  S., Olivares -Mercado, J., 
+Hernandez -Suarez, A., Toscano -Medina, K., Sanchez -
+Perez, G.  & Benitez -Garcia, G.  Efficient face recognition 
+system for operating in unconstrained environ-
+ments.  Journal of Imaging , 2021, vol. 7, iss. 9,  article no. 
+161. DOI: 10.3390/jimaging7090161 .  
+16. Hasan, M.  R., Mahmud, S.  H. & Li, X.  Y. Face 
+anti-spoofing using texture -based techniques and filter-
+ing methods . Journal of Physics: Conference Series , 
+2019, May, vol. 1229, iss. 1, article no . 012044. DOI: 
+10.1088/1742 -6596/1229/1/012044.  
+17. Rubel, O. & Lukin, V.  Analiz i prognoziro-
+vaniye effektivnosti fil'tratsii s ispol'zovaniyem 
+bezetalonnykh mer vizual'nogo kachestva izobrazheniy  
+[Analysis and prediction of filtering efficiency using no -
+reference image vis ual quality metrics ]. Radioelectronic and Computer Systems , 2018, no. 1 , pp.  4-14. DOI: 
+10.32620/reks.2018.1.01 . 
+18. Dergachov, K., Кrasnov, L., Bilozerskyi, V.  & 
+Zymovin , A. Data pre -processing to increase the quality 
+of optical text recognition systems. Radioelectronic and 
+Computer Systems , 2021, no. 4, pp. 183 -198. DOI: 
+10.32620/reks.2021.4.15.  
+19. Marr, D.  & Hildreth, E.  Theory of edge detec-
+tion. Proceedings of the Royal S ociety of London.  Series 
+B. Biological Sciences , 1980, vol. 207, article no. 1167, 
+pp. 187-217. DOI:  10.1098/rspb.1980.0020 .  
+20. Tran, C.  K., Ngo, T.-H., Nguyen , C.-N. & Ngu-
+yen, L.  A. SVM -based face recognition through differ-
+ence of Gaussians and local phase quantization.  Interna-
+tional Journal of Computer Theory and Engineering , 
+2021, vol. 13 , no. 1, pp.  1-8. DOI: 
+10.7763/IJCTE.2021.V13.1282.   
+21. Viola, P.  & Jones, M. Rapid object detection us-
+ing a boosted cascade of simple features. Proceedings of 
+the 2001 IEEE computer society conference on computer 
+vision and pattern recognition. CVPR 2001 , Kauai, HI, 
+USA, 2001 , Vol. 1, pp.  I-511 – I-518. DOI: 
+10.1109/CVPR.2001.990517 .  
+22. Lienhart, R., Kuranov, A.  & Pisarevsky, V. Em-
+pirical analysis of detection cascades of boosted classifi-
+ers for rapid object detection. Pattern Recognition. 
+DAGM 2 003. Lecture Notes in Computer Science , 
+Springer, Berlin, Heidelberg , 2003, vol. 2781 , pp. 297 -
+304. DOI: 10.1007/978 -3-540-45243 -0_39 .  
+23. Özdil, A.  & Özbilen, M.  M. A survey on com-
+parison of face recognition algorithms. IEEE 8th Interna-
+tional Conference on Application of Information and 
+Communication Technologies (AICT) , Astana, Kazakh-
+stan, 2014,  pp. 1 -3. DOI:  10.1109/ICAICT.  
+2014.7035956 .  
+24. Bhavikatti, S.  & Bhairannawar, S. Efficient Re-
+configurable Architecture to Extract Image Features us-
+ing Local Binary Pattern for Face Recognition . Research 
+Square , 2023,  PREPRINT, Version 1. DOI: 
+10.21203/rs.3.rs -1573522/v1.  
+25.Samet, R.  & Tanriverdi, M. September. Face 
+recognition -based mobile automatic classroom attend-
+ance management system.  International conference on 
+cyberworlds (CW) , Chester, UK, 2017, pp. 253 -256. 
+DOI:  10.1109/CW.2017.34 .  
+ 
+Received  01.04.2023, Accepted 20.05.2022 
+ 
+СИСТЕМА ОБСЛУГОВУВАННЯ НА ОСНОВІ РОЗПІЗНАВАННЯ ОБЛИЧЧЯ  
+З АНТИСПУФІНГОМ, СИСТЕМНИМ ПОВІДОМЛЕННЯМ  
+ТА АВТОМАТИЗАЦІЄЮ ЕЛЕКТРОННОЇ ПОШТИ  
+Mд. Апу Х oceн, Шахадат Хошен Моз, Mд. Махамудул Хасан Халід ,  
+Ск. Шалауддін Кабір, Д р. Саїд Мd. Галіб  
+Предметом статті є розробка системи відвідуваності на основі розпізнавання обличчя з антиспуфінгом, 
+системною сигналізацією та автоматизацією електронної пошти для підвищення точності та ефективності, ISSN 1814 -4225 (print)  
+Radioelectronic and Computer Systems , 202 3, no. 2(106)               ISSN 2663 -2012 (online)  128 
+підкреслюючи її потенціал для  революції в традиційних методах відстеження відвідуваності. Адміністру-
+вання відвідуваності може стати величезним навантаженням на органи влади, якщо це робити вручну. Отже, 
+мета дослідження полягає в тому, щоб розробити надійну та ефективну систему відвід ування, яка може замі-
+нити традиційні ручні підходи, а також виявляти та запобігати спробам спуфінгу. Без ручного підходу відві-
+дуваність може бути зібрана за допомогою багатьох видів технологій, включаючи біометричну систему, сис-
+тему радіочастотних карток і  систему розпізнавання обличчя. Система відвідування з розпізнаванням обличчя 
+виділяється серед інших як чудова альтернатива традиційній системі відвідування, яка використовується в 
+офісах і аудиторіях. Завдання, які необхідно виконати, включають вибір від повідних технологій виявлення та 
+розпізнавання обличчя, впровадження заходів проти спуфінгу, щоб запобігти використанню системи зловми-
+сниками, а також інтеграцію системної сигналізації та автоматизації електронної пошти для підвищення точ-
+ності та ефективно сті. Використовувані методи включають вибір каскаду Хаара для виявлення обличчя та 
+алгоритму LBPH для розпізнавання обличчя, використання DoG -фільтрації з Хааром для захисту від спуфінгу 
+та впровадження мовної сигналізації системи для виявлення зловмисникі в. Результатом роботи системи є рі-
+вень розпізнавання обличчя 87  % і рівень хибнопозитивних результатів 15  %. Однак, оскільки коефіцієнт роз-
+пізнавання не є 100  %, присутність також буде проінформована через автоматизовану електронну пошту, 
+якщо хтось присут ній, але не виявлений системою. Підсумовуючи, розроблена система відвідуваності пропо-
+нує ефективну альтернативу традиційній системі відвідуваності, що використовується в офісах і аудиторіях, 
+забезпечуючи точні записи відвідуваності, а також запобігаючи спр обам підробки та сповіщаючи органи 
+влади про будь -яких зловмисників.  
+Ключові слова : розпізнавання обличчя ; система відвідуваності ; захист від спуфінгу ; фільтрація DoG ; 
+системне сповіщення ; автоматизація електронної пошти.  
+ 
+ 
+Mд. Апу Хoce н – магістр ант з комп’ютерних наук та інженерії, Науково -технічний університет Джашор,  
+Бангладеш ; викладач комп’ютерних наук та інженерії, Північний університет бізнесу та технологій  Хульна , 
+Бангладеш.  
+Шахадат Хошен Моз  – магістра нт з комп’ютерних наук та інженерії, Науково -технічний університет 
+Джашор, Бангладеш ;  викладач комп’ютерних наук та інженерії, Північний університет бізнесу та технологій  
+Хульна , Бангладеш.  
+Mд. Махамудул Хасан  Халід  – магістра нт з комп’ютерних наук та інженері ї, Науково -технічний уні-
+верситет Джашор, Бангладеш ; викладач комп’ютерних наук та інженерії, Північний університет бізнесу та 
+технологій  Хульна , Бангладеш.  
+Ск. Шалауддін Кабір  – магістр з комп’ютерних наук та інженерії, викладач комп’ютерних наук та ін-
+женерії, Джашорський університет науки та технологій, Бангладеш.  
+Др. Саїд Мd. Галіб  – PhD з інформаційних комунікаційних технологій, проф. комп'ютерних наук та 
+інженерії, Джашорський університет науки та технологій, Бангладеш . 
+ 
+Md. Apu Hosen  – MSc Student of Computer Science and Engineering, Jashore University of Science  
+and Technology, Bangladesh ; Lecturer of Computer Science and Engineering, Northern University of Business and 
+Technology  Khulna , Bangladesh ,  
+e-mail:  apu.cse.just@gmail.com , ORCID: 0000 -0003 -1192 -9133 . 
+Shahadat Hoshen Moz  – MSc Student of Computer Science and Engineering, Jashore University of Science 
+and Technology, Bangladesh ; Lecturer of Computer Science and Engineering, Northern University of Business and 
+Technology  Khulna , Bangladesh ,  
+e-mail: shahadat .cse.just@gmail.com , ORCID: 0000 -0002 -3023 -5703 . 
+Md. Mahamudul Hasan Khalid  – MSc Student of Computer Science and Engineering , Jashore University  
+of Science and Technology, Bangladesh ; Lecturer of Computer Science and Engineering, Northern University of 
+Business and Technology  Khulna , Bangladesh ,  
+e-mail: khalid.just .cse@gmail.com , ORCID: 0000 -0002 -1651 -3981 . 
+Sk. Shalauddin Kabir  – M.Sc. in Computer Science and Engineering,  Lecturer of Computer Science  
+and Engineering, Jashore University of Science and Technology, Bangladesh , 
+e-mail: sks.kabir@just.edu.bd, ORCID: 0000 -0002 -0031 -8807.  
+Dr. Syed Md. Galib  – PhD in Information C ommunication Technology , Professor of Computer Science  
+and Engineering, Jashore University of Science and Technology, Bangladesh ,  
+e-mail: galib.cse@just.edu.bd, ORCID: 0000 -0002 -5708 -727X.  
