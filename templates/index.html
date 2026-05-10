@@ -57,6 +57,24 @@
         </div>
     </div>
 
+    <!-- Camera Feed (shown when attendance is running) -->
+    <div id="cameraSection" class="section" style="display: none;">
+        <div class="section-header">
+            <h2>📹 Live Camera Feed</h2>
+            <button class="link-text" onclick="stopAttendance()" style="color: #EF4444; cursor: pointer;">Stop
+                ⏹️</button>
+        </div>
+        <div style="width: 100%; display: flex; justify-content: center; margin-bottom: 1.5rem;">
+            <img id="cameraFeed" src="/api/camera/feed" alt="Camera Feed"
+                style="max-width: 100%; border-radius: 8px; border: 2px solid #0F766E; background: #000;">
+        </div>
+        <div style="text-align: center; padding: 1rem; background: #f0f9f8; border-radius: 8px;">
+            <div style="color: #0F766E; font-size: 14px;">🔍 Detecting faces in real-time...</div>
+            <div style="color: #666; font-size: 12px; margin-top: 0.5rem;">Recognized faces: <span
+                    id="recognizedCount">0</span></div>
+        </div>
+    </div>
+
     <!-- Recent Activity -->
     <div class="section">
         <div class="section-header">
@@ -119,7 +137,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         loadDashboardData();
         // Refresh data every 5 seconds
-        setInterval(loadDashboardData, 5000);
+        window.dashboardInterval = setInterval(loadDashboardData, 5000);
     });
 
     function loadDashboardData() {
@@ -130,8 +148,24 @@
                 document.getElementById('totalEmbeddings').textContent = data.total_embeddings;
                 document.getElementById('presentToday').textContent = data.present_today;
                 updateSystemStatus(data.system_status);
+
+                // Show camera if attendance is running
+                if (data.system_status === 'running') {
+                    document.getElementById('cameraSection').style.display = 'block';
+                } else {
+                    document.getElementById('cameraSection').style.display = 'none';
+                }
             })
             .catch(error => console.error('Error loading stats:', error));
+
+        // Get live recognized faces count
+        fetch('/api/attendance/status')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Attendance status:', data);  // Debug log
+                document.getElementById('recognizedCount').textContent = data.recognized_faces || 0;
+            })
+            .catch(error => console.error('Error loading attendance status:', error));
 
         fetch('/api/recent-attendance?days=7')
             .then(response => response.json())
@@ -173,7 +207,12 @@
                 .then(data => {
                     if (data.success) {
                         showToast(data.message, 'success');
+                        // Show camera feed section
+                        document.getElementById('cameraSection').style.display = 'block';
                         loadDashboardData();
+                        // Refresh data more frequently during attendance
+                        if (window.dashboardInterval) clearInterval(window.dashboardInterval);
+                        window.dashboardInterval = setInterval(loadDashboardData, 3000);
                     } else {
                         showToast(data.message, 'error');
                     }
@@ -181,6 +220,30 @@
                 .catch(error => {
                     console.error('Error:', error);
                     showToast('Failed to start attendance', 'error');
+                });
+        }
+    }
+
+    function stopAttendance() {
+        if (confirm('Stop attendance tracking?')) {
+            fetch('/api/attendance/stop', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        // Hide camera feed section
+                        document.getElementById('cameraSection').style.display = 'none';
+                        loadDashboardData();
+                        // Reset to normal refresh rate
+                        if (window.dashboardInterval) clearInterval(window.dashboardInterval);
+                        window.dashboardInterval = setInterval(loadDashboardData, 5000);
+                    } else {
+                        showToast(data.message, 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Failed to stop attendance', 'error');
                 });
         }
     }

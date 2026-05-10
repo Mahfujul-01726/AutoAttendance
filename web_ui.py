@@ -8,11 +8,12 @@ import os
 import json
 from datetime import datetime, timedelta
 from pathlib import Path
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, Response
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import threading
 import cv2
+import numpy as np
 
 from database import AttendanceDatabase
 from face_recognition import FaceRecognitionModule
@@ -40,7 +41,15 @@ system_state = {
     'current_person': None,
     'total_frames': 0,
     'collected_samples': 0,
+    'camera_thread': None,
+    'camera_running': False,
+    'recognized_faces_count': 0,  # Track faces recognized in current session
 }
+
+# Global camera variables
+camera = None
+frame_buffer = None
+frame_lock = threading.Lock()
 
 # Initialize system components
 db = AttendanceDatabase()
@@ -51,8 +60,13 @@ attendance_manager = AttendanceManager()
 # Load model on startup
 try:
     recognizer.load_model()
+    if recognizer.label_count == 0:
+        logger.warning("No face embeddings loaded! Run: python train_model.py")
+    else:
+        logger.info(f"Loaded {recognizer.label_count} registered faces")
 except Exception as e:
     logger.error(f"Failed to load model: {e}")
+    logger.error("Face recognition will not work. Check embeddings with: python train_model.py")
 
 
 # ============================================================================
@@ -114,6 +128,139 @@ def get_person_list():
     except Exception as e:
         logger.error(f"Error getting person list: {e}")
         return []
+
+
+def camera_worker():
+    """Background thread for camera processing."""
+    global camera, frame_buffer
+    
+    try:
+        camera = cv2.VideoCapture(CAMERA_ID)
+        camera.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
+        camera.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
+        camera.set(cv2.CAP_PROP_FPS, FPS)
+        
+        if not camera.isOpened():
+            logger.error("Could not open camera")
+            return
+        
+        logger.info(f"Camera opened successfully: {CAMERA_ID}")
+        system_state['camera_running'] = True
+        
+        recognized_people = {}  # Track people recognized in this session
+        
+        while system_state['camera_running']:
+            ret, frame = camera.read()
+            if not ret:
+                logger.error("Failed to read frame from camera")
+                break
+            
+            try:
+                # Flip frame for mirror effect
+                frame = cv2.flip(frame, 1)
+                system_state['total_frames'] += 1
+                
+                # Process frame based on mode
+                if system_state['mode'] == 'attendance':
+                    # Detect and recognize faces using the built-in method
+                    results = recognizer.recognize_frame(frame)
+                    
+                    if not results:
+                        # No faces detected - this is normal, just continue
+                        pass
+                    
+                    for result in results:
+                        x1, y1 = result['bbox'][0], result['bbox'][1]
+                        w, h = result['bbox'][2], result['bbox'][3]
+                        x2, y2 = x1 + w, y1 + h
+                        
+                        # Ensure bbox is within frame bounds
+                        y1 = max(0, y1)
+                        x1 = max(0, x1)
+                        y2 = min(frame.shape[0], y2)
+                        x2 = min(frame.shape[1], x2)
+                        
+                        # Check anti-spoofing on the face crop
+                        face_crop = frame[y1:y2, x1:x2]
+                        if face_crop.size > 0:  # Ensure crop is not empty
+                            is_real, spoof_score = anti_spoofing.analyze(face_crop)
+                        else:
+                            is_real = False
+                        
+                        if not is_real:
+                            # Spoofing detected - draw orange box
+                            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 165, 255), 2)
+                            cv2.putText(frame, "SPOOF", (int(x1), int(y1) - 10),
+                                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 165, 255), 2)
+                        elif result['is_known']:
+                            # Known person - draw green box
+                            person_name = result['name']
+                            
+                            # Mark attendance only once per session
+                            if person_name not in recognized_people:
+                                db.mark_attendance(
+                                    None, 
+                                    person_name, 
+                                    result.get('confidence', 0),
+                                    CAMERA_ID,
+                                    'Present'
+                                )
+                                recognized_people[person_name] = True
+                                system_state['recognized_faces_count'] += 1  # Update counter
+                                logger.info(f"Marked attendance for {person_name}")
+                            
+                            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+                            cv2.putText(frame, f"{person_name}", (int(x1), int(y1) - 10),
+                                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                        else:
+                            # Unknown person - draw red box
+                            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 2)
+                            cv2.putText(frame, "Unknown", (int(x1), int(y1) - 10),
+                                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                
+                elif system_state['mode'] == 'collection':
+                    # Face collection mode
+                    faces = recognizer.detect_faces(frame)
+                    for face in faces:
+                        # Convert InsightFace face object to bbox coordinates
+                        x1, y1, x2, y2 = recognizer._bbox_to_int(face.bbox, frame.shape)
+                        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                
+                # Update frame buffer
+                with frame_lock:
+                    frame_buffer = frame.copy()
+                    
+            except Exception as e:
+                logger.error(f"Error processing frame: {e}")
+                continue
+        
+        logger.info("Camera worker thread stopped")
+        
+    except Exception as e:
+        logger.error(f"Camera worker error: {e}")
+    finally:
+        if camera is not None:
+            camera.release()
+            logger.info("Camera released")
+        system_state['camera_running'] = False
+
+
+def generate_frames():
+    """Generator for streaming video frames."""
+    while system_state['camera_running']:
+        with frame_lock:
+            if frame_buffer is not None:
+                ret, jpeg = cv2.imencode('.jpg', frame_buffer)
+                if ret:
+                    frame_bytes = jpeg.tobytes()
+                    yield (b'--frame\r\n'
+                           b'Content-Type: image/jpeg\r\n'
+                           b'Content-Length: ' + str(len(frame_bytes)).encode() + b'\r\n\r\n'
+                           + frame_bytes + b'\r\n')
+        
+        # Small delay to avoid overwhelming the client
+        import time
+        time.sleep(0.033)  # ~30 FPS
 
 
 # ============================================================================
@@ -318,12 +465,20 @@ def api_attendance_start():
     try:
         system_state['mode'] = 'attendance'
         system_state['is_running'] = True
+        system_state['recognized_faces_count'] = 0  # Reset counter for new session
         
         # Start camera feed processing in background
+        if not system_state['camera_running']:
+            system_state['camera_running'] = True
+            camera_thread = threading.Thread(target=camera_worker, daemon=True)
+            camera_thread.start()
+            system_state['camera_thread'] = camera_thread
+            logger.info("Camera thread started")
+        
         logger.info("Started attendance tracking")
         return jsonify({
             'success': True,
-            'message': 'Attendance tracking started',
+            'message': 'Attendance tracking started - Camera is now active',
         })
     except Exception as e:
         logger.error(f"Error starting attendance: {e}")
@@ -336,6 +491,12 @@ def api_attendance_stop():
     try:
         system_state['mode'] = None
         system_state['is_running'] = False
+        system_state['camera_running'] = False
+        
+        # Wait for camera thread to finish
+        if system_state['camera_thread'] is not None:
+            system_state['camera_thread'].join(timeout=2)
+            system_state['camera_thread'] = None
         
         logger.info("Stopped attendance tracking")
         return jsonify({
@@ -353,7 +514,19 @@ def api_attendance_status():
     return jsonify({
         'is_running': system_state['is_running'],
         'mode': system_state['mode'],
+        'camera_running': system_state['camera_running'],
+        'recognized_faces': system_state['recognized_faces_count'],
     })
+
+
+@app.route('/api/camera/feed')
+def api_camera_feed():
+    """Stream camera feed as video/mjpeg."""
+    return Response(
+        generate_frames(),
+        mimetype='multipart/x-mixed-replace; boundary=frame',
+        headers={'Cache-Control': 'no-cache, no-store, must-revalidate'}
+    )
 
 
 # ============================================================================
