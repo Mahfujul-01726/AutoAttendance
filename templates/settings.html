@@ -3,235 +3,223 @@
 {% block page_title %}Settings{% endblock %}
 
 {% block content %}
-<div class="settings-container">
+<div class="settings-container" style="max-width: 1200px; margin: 0 auto;">
+    
     <!-- System Settings -->
-    <div class="section">
-        <h2>System Settings</h2>
-
-        <div class="settings-group">
+    <div class="settings-section">
+        <div class="settings-sidebar">
+            <h3>System Settings</h3>
+            <p>Manage core recognition parameters and camera configuration.</p>
+        </div>
+        <div class="settings-content">
             <div class="setting-item">
                 <div class="setting-label">
                     <label>Camera Device</label>
-                    <p class="setting-hint">Select which camera to use for face recognition</p>
+                    <div class="form-hint">Select which camera to use for face recognition</div>
                 </div>
-                <select class="form-input" style="width: 300px;">
-                    <option>Camera 0 (Default)</option>
-                    <option>Camera 1</option>
-                    <option>Camera 2</option>
-                </select>
+                <div class="setting-control">
+                    <select class="form-select">
+                        <option>Camera 0 (Default)</option>
+                        <option>Camera 1</option>
+                        <option>Camera 2</option>
+                    </select>
+                </div>
             </div>
 
             <div class="setting-item">
                 <div class="setting-label">
                     <label>Recognition Confidence</label>
-                    <p class="setting-hint">Higher values are more strict (0.0 - 1.0)</p>
+                    <div class="form-hint">Higher values are more strict (0.0 - 1.0)</div>
                 </div>
-                <input type="range" min="0" max="1" step="0.05" value="0.5" class="form-range">
-                <span class="range-value">0.5</span>
+                <div class="setting-control">
+                    <input type="range" min="0" max="1" step="0.05" value="0.5" class="form-range" id="confidenceRange" oninput="document.getElementById('confValue').innerText = this.value">
+                    <span class="range-value-display" id="confValue">0.5</span>
+                </div>
             </div>
 
             <div class="setting-item">
                 <div class="setting-label">
                     <label>Frame Processing Rate</label>
-                    <p class="setting-hint">Process every N frames (higher = better performance)</p>
+                    <div class="form-hint">Process every N frames (higher = better performance)</div>
                 </div>
-                <select class="form-input" style="width: 300px;">
-                    <option>Every frame (slowest, most accurate)</option>
-                    <option selected>Every 5 frames (balanced)</option>
-                    <option>Every 10 frames (faster, less accurate)</option>
-                </select>
+                <div class="setting-control">
+                    <select class="form-select">
+                        <option>Every frame (slowest)</option>
+                        <option selected>Every 5 frames (balanced)</option>
+                        <option>Every 10 frames (fastest)</option>
+                    </select>
+                </div>
             </div>
-
-            <button class="btn btn-primary" onclick="saveSystemSettings()">
-                💾 Save Settings
-            </button>
+            
+            <div style="margin-top: 1.5rem; text-align: right;">
+                <button class="btn btn-primary" onclick="saveSystemSettings()">Save System Settings</button>
+            </div>
         </div>
     </div>
 
     <!-- Attendance Settings -->
-    <div class="section">
-        <h2>Attendance Settings</h2>
-
-        <div class="settings-group">
-            <div class="setting-item checkbox">
-                <input type="checkbox" id="enableNotifications" checked>
-                <label for="enableNotifications">
-                    <span class="checkbox-label">Enable Notifications</span>
-                    <p class="setting-hint">Show alerts for unrecognized faces</p>
-                </label>
+    <div class="settings-section">
+        <div class="settings-sidebar">
+            <h3>Attendance Policies</h3>
+            <p>Configure automated behaviors, notifications, and alerts.</p>
+        </div>
+        <div class="settings-content">
+            <div class="setting-item">
+                <div class="setting-label">
+                    <label>Enable Notifications</label>
+                    <div class="form-hint">Show on-screen alerts for unrecognized faces</div>
+                </div>
+                <div class="setting-control">
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
             </div>
 
-            <div class="setting-item checkbox">
-                <input type="checkbox" id="enableSoundAlerts" checked>
-                <label for="enableSoundAlerts">
-                    <span class="checkbox-label">Enable Sound Alerts</span>
-                    <p class="setting-hint">Play sound when attendance is marked</p>
-                </label>
+            <div class="setting-item">
+                <div class="setting-label">
+                    <label>Enable Sound Alerts</label>
+                    <div class="form-hint">Play sound when attendance is marked</div>
+                </div>
+                <div class="setting-control">
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
             </div>
 
-            <div class="setting-item checkbox">
-                <input type="checkbox" id="autoBackup" checked>
-                <label for="autoBackup">
-                    <span class="checkbox-label">Auto Backup</span>
-                    <p class="setting-hint">Automatically backup data daily</p>
-                </label>
+            <div class="setting-item">
+                <div class="setting-label">
+                    <label>Auto Backup</label>
+                    <div class="form-hint">Automatically backup database daily</div>
+                </div>
+                <div class="setting-control">
+                    <label class="toggle-switch">
+                        <input type="checkbox" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
             </div>
-
-            <button class="btn btn-primary" onclick="saveAttendanceSettings()">
-                💾 Save Settings
-            </button>
         </div>
     </div>
 
     <!-- Email Notifications -->
-    <div class="section">
-        <h2>Email Notifications</h2>
-
-        <div class="settings-group">
+    <div class="settings-section">
+        <div class="settings-sidebar">
+            <h3>Email Reports</h3>
+            <p>Set up automated email reporting for administrators.</p>
+        </div>
+        <div class="settings-content">
             <div class="setting-item">
                 <div class="setting-label">
-                    <label>Enable Email</label>
-                    <p class="setting-hint">Send email reports and alerts</p>
+                    <label>Enable Email Reports</label>
+                    <div class="form-hint">Send periodic email reports and critical alerts</div>
                 </div>
-                <input type="checkbox" class="checkbox-toggle">
+                <div class="setting-control">
+                    <label class="toggle-switch">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
             </div>
 
             <div class="setting-item">
                 <div class="setting-label">
                     <label>Email Address</label>
-                    <p class="setting-hint">Where to send notifications</p>
+                    <div class="form-hint">Where to send notifications</div>
                 </div>
-                <input type="email" class="form-input" placeholder="admin@example.com" style="width: 300px;">
+                <div class="setting-control">
+                    <input type="email" class="form-input" placeholder="admin@example.com">
+                </div>
             </div>
 
             <div class="setting-item">
                 <div class="setting-label">
                     <label>Report Frequency</label>
-                    <p class="setting-hint">How often to send reports</p>
+                    <div class="form-hint">How often to send reports</div>
                 </div>
-                <select class="form-input" style="width: 300px;">
-                    <option>Daily</option>
-                    <option>Weekly</option>
-                    <option>Monthly</option>
-                </select>
+                <div class="setting-control">
+                    <select class="form-select">
+                        <option>Daily</option>
+                        <option>Weekly</option>
+                        <option>Monthly</option>
+                    </select>
+                </div>
             </div>
 
-            <button class="btn btn-secondary" onclick="testEmail()">
-                📧 Test Email
-            </button>
+            <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 1rem;">
+                <button class="btn btn-secondary" onclick="testEmail()">Test Email</button>
+                <button class="btn btn-primary" onclick="showToast('Email settings saved', 'success')">Save Email Settings</button>
+            </div>
         </div>
     </div>
 
     <!-- Data Management -->
-    <div class="section">
-        <h2>Data Management</h2>
-
-        <div class="settings-group">
-            <div class="alert alert-warning">
-                <span class="alert-icon">⚠️</span>
-                <strong>Backup and Export:</strong> Create backups before making changes
+    <div class="settings-section">
+        <div class="settings-sidebar">
+            <h3>Data Management</h3>
+            <p>Backup, export, and maintain your database.</p>
+        </div>
+        <div class="settings-content">
+            <div class="alert alert-info" style="margin-top: 0;">
+                <span class="alert-icon">ℹ️</span>
+                <span><strong>Recommendation:</strong> Create regular backups before running database rebuilds.</span>
             </div>
 
-            <div class="button-group">
+            <div class="button-group" style="margin-top: 1.5rem;">
                 <button class="btn btn-secondary" onclick="backupData()">
-                    💾 Backup Data
+                    <span>💾</span> Backup Data
                 </button>
                 <button class="btn btn-secondary" onclick="exportSettings()">
-                    📥 Export Settings
+                    <span>📥</span> Export Config
                 </button>
                 <button class="btn btn-secondary" onclick="importSettings()">
-                    📤 Import Settings
+                    <span>📤</span> Import Config
+                </button>
+                <div style="flex: 1;"></div>
+                <button class="btn btn-danger" onclick="rebuildDatabase()">
+                    <span>🔧</span> Rebuild Database
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Maintenance -->
-    <div class="section">
-        <h2>Maintenance</h2>
-
-        <div class="settings-group">
-            <button class="btn btn-secondary" onclick="clearCache()">
-                🗑️ Clear Cache
-            </button>
-            <button class="btn btn-secondary" onclick="rebuildDatabase()">
-                🔧 Rebuild Database
-            </button>
-            <button class="btn btn-secondary" onclick="viewLogs()">
-                📋 View Logs
-            </button>
-        </div>
-    </div>
-
-    <!-- About -->
-    <div class="section">
-        <h2>About</h2>
-
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="info-label">Version</div>
-                <div class="info-value">2.0.0</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Last Updated</div>
-                <div class="info-value">May 9, 2026</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Database Size</div>
-                <div class="info-value">~2.5 MB</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Backup</div>
-                <div class="info-value">
-                    <span class="badge badge-success">Latest</span>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 
 <script>
     function saveSystemSettings() {
-        showToast('System settings saved', 'success');
+        showToast('System settings saved successfully', 'success');
     }
 
     function saveAttendanceSettings() {
-        showToast('Attendance settings saved', 'success');
+        showToast('Attendance settings saved successfully', 'success');
     }
 
     function testEmail() {
-        showToast('Test email sent to your inbox', 'success');
+        showToast('Test email sent to your inbox', 'info');
     }
 
     function backupData() {
-        showToast('Backup started in background...', 'success');
+        showToast('Backup started in background...', 'info');
         setTimeout(() => {
             showToast('Backup completed successfully', 'success');
         }, 2000);
     }
 
     function exportSettings() {
-        showToast('Settings exported', 'success');
+        showToast('Configuration exported', 'success');
     }
 
     function importSettings() {
-        showToast('Select a settings file to import', 'info');
-    }
-
-    function clearCache() {
-        if (confirm('Clear all cache? This may affect performance briefly.')) {
-            showToast('Cache cleared', 'success');
-        }
+        showToast('Select a configuration file to import', 'info');
     }
 
     function rebuildDatabase() {
-        if (confirm('Rebuild database? This may take a few minutes.')) {
-            showToast('Database rebuild started...', 'success');
+        if (confirm('Rebuild database? This may take a few minutes and requires a restart.')) {
+            showToast('Database rebuild started...', 'info');
         }
-    }
-
-    function viewLogs() {
-        showToast('Opening system logs...', 'info');
     }
 </script>
 {% endblock %}
