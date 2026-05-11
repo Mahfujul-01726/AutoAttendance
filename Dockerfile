@@ -43,8 +43,14 @@ RUN pip install --no-cache /wheels/*
 # Copy application code
 COPY . /app
 
-# Create necessary directories
-RUN mkdir -p /app/data/faces /app/data/attendance /app/data/training /app/data/unknown_faces /app/models /app/logs
+# Create necessary directories and set permissions for Hugging Face Spaces (UID 1000)
+RUN mkdir -p /app/data/faces /app/data/attendance /app/data/training /app/data/unknown_faces /app/models /app/logs \
+    && useradd -m -u 1000 user \
+    && chown -R user:user /app \
+    && chmod -R 777 /app/data /app/models /app/logs
+
+# Switch to the non-root user
+USER user
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
