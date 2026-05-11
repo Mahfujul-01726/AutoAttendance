@@ -614,6 +614,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* =====================================================================
+   Filters & Header Actions
+   ===================================================================== */
+.filter-bar, .header-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    align-items: center;
+}
+
+/* =====================================================================
    Forms
    ===================================================================== */
 
@@ -1203,4 +1214,193 @@ input:checked + .toggle-slider:before {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #94A3B8;
+}
+
+/* =====================================================================
+   Responsive Design & Media Queries
+   ===================================================================== */
+
+/* Desktop & Large Devices */
+@media (max-width: 1200px) {
+    .page-content {
+        padding: var(--spacing-xl);
+    }
+}
+
+/* Tablets & Smaller Laptops */
+@media (max-width: 992px) {
+    .settings-section {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-lg);
+    }
+    
+    .setting-control {
+        justify-content: flex-start;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile & Small Tablets */
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    /* Sidebar transforms into a sliding mobile menu */
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform var(--transition-base);
+        box-shadow: var(--shadow-xl);
+    }
+    
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(4px);
+        z-index: 95;
+        opacity: 0;
+        transition: opacity var(--transition-base);
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+        opacity: 1;
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    /* Top bar adjustments */
+    .top-bar {
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+
+    .top-bar-left {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+    }
+
+    .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        color: var(--text-heading);
+        cursor: pointer;
+        padding: var(--spacing-xs);
+        border-radius: var(--radius-sm);
+        transition: background var(--transition-fast);
+    }
+
+    .mobile-menu-btn:hover {
+        background: var(--bg-secondary);
+    }
+
+    .top-bar-left h1 {
+        font-size: var(--font-size-xl);
+    }
+
+    .search-input {
+        width: 180px;
+    }
+    
+    .search-input:focus {
+        width: 200px;
+    }
+
+    /* Content adjustments */
+    .page-content {
+        padding: var(--spacing-md);
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .persons-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    .actions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Hide mobile menu button on desktop */
+@media (min-width: 769px) {
+    .mobile-menu-btn {
+        display: none !important;
+    }
+    .sidebar-overlay {
+        display: none !important;
+    }
+}
+
+/* Small Mobile Devices */
+@media (max-width: 480px) {
+    .top-bar-right {
+        gap: var(--spacing-sm);
+    }
+
+    .user-label {
+        display: none;
+    }
+
+    .search-input {
+        width: 140px;
+    }
+    
+    .search-input:focus {
+        width: 160px;
+    }
+
+    .action-button {
+        padding: 1rem var(--spacing-md);
+    }
+
+    .person-card {
+        padding: var(--spacing-lg);
+    }
+
+    .dynamic-steps {
+        flex-direction: column;
+        align-items: center;
+        gap: var(--spacing-lg);
+        padding: 0;
+    }
+
+    .dynamic-steps::before {
+        display: none;
+    }
+
+    .glass-panel {
+        padding: var(--spacing-lg);
+    }
+
+    .camera-hud {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+    }
+
+    .hud-box {
+        text-align: center;
+    }
 }
