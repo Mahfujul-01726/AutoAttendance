@@ -1,8 +1,20 @@
+---
+title: AutoAttendance
+emoji: 🏢
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+---
 # 🎯 AutoAttendance - Professional Face Recognition Attendance System
 
 > **Enterprise-grade attendance management using AI-powered face recognition with anti-spoofing protection**
 
 <div align="center">
+
+[![Live Demo](https://img.shields.io/badge/🔴_Live_Demo-HuggingFace_Space-FF9D00?style=for-the-badge&logo=huggingface&logoColor=white)](https://huggingface.co/spaces/mahfuj735/AutoAttendance)
+
+### ✨ Test the live stream directly from your browser! ✨
 
 ![Python Version](https://img.shields.io/badge/Python-3.9%2B-blue?style=flat-square&logo=python)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
@@ -12,7 +24,7 @@
 ![Status](https://img.shields.io/badge/Status-Production%20Ready-success?style=flat-square)
 ![Downloads](https://img.shields.io/badge/Downloads-1K%2B-brightblue?style=flat-square)
 
-[Quick Start](#-quick-start) • [Documentation](https://github.com/Mahfujul-01726/AutoAttendance/wiki) • [API Docs](./API.md) • [Contributing](./CONTRIBUTING.md) • [Report Issue](https://github.com/Mahfujul-01726/AutoAttendance/issues)
+[Quick Start](#-quick-start) • [Live Demo](https://huggingface.co/spaces/mahfuj735/AutoAttendance) • [Documentation](https://github.com/Mahfujul-01726/AutoAttendance/wiki) • [API Docs](./API.md) • [Contributing](./CONTRIBUTING.md) • [Report Issue](https://github.com/Mahfujul-01726/AutoAttendance/issues)
 
 </div>
 

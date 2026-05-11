@@ -65,8 +65,10 @@
                 ⏹️</button>
         </div>
         <div style="width: 100%; display: flex; justify-content: center; margin-bottom: 1.5rem;">
-            <img id="cameraFeed" src="/api/camera/feed" alt="Camera Feed"
-                style="max-width: 100%; border-radius: 8px; border: 2px solid #0F766E; background: #000;">
+            <video id="webcamVideo" autoplay playsinline style="display:none;"></video>
+            <canvas id="captureCanvas" style="display:none;"></canvas>
+            <img id="cameraFeed" src="" alt="Camera Feed"
+                style="max-width: 100%; border-radius: 8px; border: 2px solid #0F766E; background: #000; min-width: 640px; min-height: 480px;">
         </div>
         <div style="text-align: center; padding: 1rem; background: #f0f9f8; border-radius: 8px;">
             <div style="color: #0F766E; font-size: 14px;">🔍 Detecting faces in real-time...</div>
@@ -200,8 +202,73 @@
         }
     }
 
+    let webcamStream = null;
+    let processFrameInterval = null;
+    let isProcessing = false;
+
+    async function startWebcam() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+            const video = document.getElementById('webcamVideo');
+            video.srcObject = stream;
+            webcamStream = stream;
+            
+            processFrameInterval = setInterval(processFrame, 150); // ~6.6 FPS
+        } catch (err) {
+            console.error("Error accessing webcam:", err);
+            showToast("Could not access webcam. Please allow permissions.", "error");
+            stopAttendance();
+        }
+    }
+
+    function stopWebcam() {
+        if (processFrameInterval) clearInterval(processFrameInterval);
+        if (webcamStream) {
+            webcamStream.getTracks().forEach(track => track.stop());
+        }
+        webcamStream = null;
+        document.getElementById('cameraFeed').src = "";
+        isProcessing = false;
+    }
+
+    function processFrame() {
+        if (isProcessing) return;
+        const video = document.getElementById('webcamVideo');
+        const canvas = document.getElementById('captureCanvas');
+        if (!video.videoWidth) return;
+        
+        isProcessing = true;
+        
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        // Flip horizontally to match a mirror
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const base64Image = canvas.toDataURL('image/jpeg', 0.7);
+        
+        fetch('/api/frame/process', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64Image })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.image) {
+                document.getElementById('cameraFeed').src = data.image;
+                document.getElementById('recognizedCount').textContent = data.recognized || 0;
+            }
+        })
+        .catch(err => console.error("Error processing frame:", err))
+        .finally(() => {
+            isProcessing = false;
+        });
+    }
+
     function startAttendance() {
-        if (confirm('Start attendance tracking? The system will process camera feed.')) {
+        if (confirm('Start attendance tracking? The system will request access to your web camera.')) {
             fetch('/api/attendance/start', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
@@ -209,6 +276,7 @@
                         showToast(data.message, 'success');
                         // Show camera feed section
                         document.getElementById('cameraSection').style.display = 'block';
+                        startWebcam(); // Start the browser camera
                         loadDashboardData();
                         // Refresh data more frequently during attendance
                         if (window.dashboardInterval) clearInterval(window.dashboardInterval);
@@ -233,6 +301,7 @@
                         showToast(data.message, 'success');
                         // Hide camera feed section
                         document.getElementById('cameraSection').style.display = 'none';
+                        stopWebcam(); // Stop browser camera
                         loadDashboardData();
                         // Reset to normal refresh rate
                         if (window.dashboardInterval) clearInterval(window.dashboardInterval);

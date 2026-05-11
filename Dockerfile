@@ -25,11 +25,12 @@ WORKDIR /app
 
 # Install runtime dependencies
 RUN apt-get update && apt-get install -y \
-    libopencv-core4.5 \
-    libopencv-imgproc4.5 \
+    libgl1 \
+    libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender-dev \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy wheels from builder
@@ -58,6 +59,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD python -c "import cv2; print('OK')" || exit 1
 
 # Default command
-CMD ["python", "api.py"]
+CMD ["python", "web_ui.py"]
 
-EXPOSE 8000
+EXPOSE 7860

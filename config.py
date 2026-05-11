@@ -5,8 +5,15 @@ Supports environment variable overrides via .env file.
 """
 
 import os
+import time
 from pathlib import Path
 from dotenv import load_dotenv
+
+# Set timezone globally for Hugging Face Spaces (which default to UTC)
+TIMEZONE = os.getenv("TIMEZONE", "Asia/Dhaka")
+os.environ['TZ'] = TIMEZONE
+if hasattr(time, 'tzset'):
+    time.tzset()
 
 # Load environment variables from .env file
 load_dotenv()

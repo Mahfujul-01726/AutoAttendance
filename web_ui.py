@@ -14,6 +14,7 @@ from werkzeug.utils import secure_filename
 import threading
 import cv2
 import numpy as np
+import base64
 
 from database import AttendanceDatabase
 from face_recognition import FaceRecognitionModule
@@ -128,139 +129,6 @@ def get_person_list():
     except Exception as e:
         logger.error(f"Error getting person list: {e}")
         return []
-
-
-def camera_worker():
-    """Background thread for camera processing."""
-    global camera, frame_buffer
-    
-    try:
-        camera = cv2.VideoCapture(CAMERA_ID)
-        camera.set(cv2.CAP_PROP_FRAME_WIDTH, FRAME_WIDTH)
-        camera.set(cv2.CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT)
-        camera.set(cv2.CAP_PROP_FPS, FPS)
-        
-        if not camera.isOpened():
-            logger.error("Could not open camera")
-            return
-        
-        logger.info(f"Camera opened successfully: {CAMERA_ID}")
-        system_state['camera_running'] = True
-        
-        recognized_people = {}  # Track people recognized in this session
-        
-        while system_state['camera_running']:
-            ret, frame = camera.read()
-            if not ret:
-                logger.error("Failed to read frame from camera")
-                break
-            
-            try:
-                # Flip frame for mirror effect
-                frame = cv2.flip(frame, 1)
-                system_state['total_frames'] += 1
-                
-                # Process frame based on mode
-                if system_state['mode'] == 'attendance':
-                    # Detect and recognize faces using the built-in method
-                    results = recognizer.recognize_frame(frame)
-                    
-                    if not results:
-                        # No faces detected - this is normal, just continue
-                        pass
-                    
-                    for result in results:
-                        x1, y1 = result['bbox'][0], result['bbox'][1]
-                        w, h = result['bbox'][2], result['bbox'][3]
-                        x2, y2 = x1 + w, y1 + h
-                        
-                        # Ensure bbox is within frame bounds
-                        y1 = max(0, y1)
-                        x1 = max(0, x1)
-                        y2 = min(frame.shape[0], y2)
-                        x2 = min(frame.shape[1], x2)
-                        
-                        # Check anti-spoofing on the face crop
-                        face_crop = frame[y1:y2, x1:x2]
-                        if face_crop.size > 0:  # Ensure crop is not empty
-                            is_real, spoof_score = anti_spoofing.analyze(face_crop)
-                        else:
-                            is_real = False
-                        
-                        if not is_real:
-                            # Spoofing detected - draw orange box
-                            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 165, 255), 2)
-                            cv2.putText(frame, "SPOOF", (int(x1), int(y1) - 10),
-                                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 165, 255), 2)
-                        elif result['is_known']:
-                            # Known person - draw green box
-                            person_name = result['name']
-                            
-                            # Mark attendance only once per session
-                            if person_name not in recognized_people:
-                                db.mark_attendance(
-                                    None, 
-                                    person_name, 
-                                    result.get('confidence', 0),
-                                    CAMERA_ID,
-                                    'Present'
-                                )
-                                recognized_people[person_name] = True
-                                system_state['recognized_faces_count'] += 1  # Update counter
-                                logger.info(f"Marked attendance for {person_name}")
-                            
-                            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
-                            cv2.putText(frame, f"{person_name}", (int(x1), int(y1) - 10),
-                                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                        else:
-                            # Unknown person - draw red box
-                            cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 2)
-                            cv2.putText(frame, "Unknown", (int(x1), int(y1) - 10),
-                                      cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                
-                elif system_state['mode'] == 'collection':
-                    # Face collection mode
-                    faces = recognizer.detect_faces(frame)
-                    for face in faces:
-                        # Convert InsightFace face object to bbox coordinates
-                        x1, y1, x2, y2 = recognizer._bbox_to_int(face.bbox, frame.shape)
-                        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                
-                # Update frame buffer
-                with frame_lock:
-                    frame_buffer = frame.copy()
-                    
-            except Exception as e:
-                logger.error(f"Error processing frame: {e}")
-                continue
-        
-        logger.info("Camera worker thread stopped")
-        
-    except Exception as e:
-        logger.error(f"Camera worker error: {e}")
-    finally:
-        if camera is not None:
-            camera.release()
-            logger.info("Camera released")
-        system_state['camera_running'] = False
-
-
-def generate_frames():
-    """Generator for streaming video frames."""
-    while system_state['camera_running']:
-        with frame_lock:
-            if frame_buffer is not None:
-                ret, jpeg = cv2.imencode('.jpg', frame_buffer)
-                if ret:
-                    frame_bytes = jpeg.tobytes()
-                    yield (b'--frame\r\n'
-                           b'Content-Type: image/jpeg\r\n'
-                           b'Content-Length: ' + str(len(frame_bytes)).encode() + b'\r\n\r\n'
-                           + frame_bytes + b'\r\n')
-        
-        # Small delay to avoid overwhelming the client
-        import time
-        time.sleep(0.033)  # ~30 FPS
 
 
 # ============================================================================
@@ -466,19 +334,12 @@ def api_attendance_start():
         system_state['mode'] = 'attendance'
         system_state['is_running'] = True
         system_state['recognized_faces_count'] = 0  # Reset counter for new session
+        system_state['camera_running'] = True
         
-        # Start camera feed processing in background
-        if not system_state['camera_running']:
-            system_state['camera_running'] = True
-            camera_thread = threading.Thread(target=camera_worker, daemon=True)
-            camera_thread.start()
-            system_state['camera_thread'] = camera_thread
-            logger.info("Camera thread started")
-        
-        logger.info("Started attendance tracking")
+        logger.info("Started attendance tracking via Web Camera")
         return jsonify({
             'success': True,
-            'message': 'Attendance tracking started - Camera is now active',
+            'message': 'Attendance tracking started - Web Camera is now active',
         })
     except Exception as e:
         logger.error(f"Error starting attendance: {e}")
@@ -492,11 +353,6 @@ def api_attendance_stop():
         system_state['mode'] = None
         system_state['is_running'] = False
         system_state['camera_running'] = False
-        
-        # Wait for camera thread to finish
-        if system_state['camera_thread'] is not None:
-            system_state['camera_thread'].join(timeout=2)
-            system_state['camera_thread'] = None
         
         logger.info("Stopped attendance tracking")
         return jsonify({
@@ -519,14 +375,74 @@ def api_attendance_status():
     })
 
 
-@app.route('/api/camera/feed')
-def api_camera_feed():
-    """Stream camera feed as video/mjpeg."""
-    return Response(
-        generate_frames(),
-        mimetype='multipart/x-mixed-replace; boundary=frame',
-        headers={'Cache-Control': 'no-cache, no-store, must-revalidate'}
-    )
+@app.route('/api/frame/process', methods=['POST'])
+def api_frame_process():
+    """Process a single frame from the web camera."""
+    if not system_state['is_running'] or not system_state['mode']:
+        return jsonify({'success': False, 'message': 'System not running'})
+        
+    try:
+        data = request.json
+        if not data or 'image' not in data:
+            return jsonify({'success': False, 'message': 'No image provided'})
+            
+        # Decode base64 image
+        encoded_data = data['image'].split(',')[1]
+        nparr = np.frombuffer(base64.b64decode(encoded_data), np.uint8)
+        frame = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+        
+        system_state['total_frames'] += 1
+        
+        if system_state['mode'] == 'attendance':
+            results = recognizer.recognize_frame(frame)
+            if results:
+                for result in results:
+                    x1, y1 = result['bbox'][0], result['bbox'][1]
+                    w, h = result['bbox'][2], result['bbox'][3]
+                    x2, y2 = x1 + w, y1 + h
+                    
+                    y1, x1 = max(0, int(y1)), max(0, int(x1))
+                    y2, x2 = min(frame.shape[0], int(y2)), min(frame.shape[1], int(x2))
+                    
+                    face_crop = frame[y1:y2, x1:x2]
+                    is_real = False
+                    if face_crop.size > 0:
+                        is_real, spoof_score = anti_spoofing.analyze(face_crop)
+                        
+                    if not is_real:
+                        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 165, 255), 2)
+                        cv2.putText(frame, "SPOOF", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 165, 255), 2)
+                    elif result['is_known']:
+                        person_name = result['name']
+                        # Mark attendance
+                        db.mark_attendance(None, person_name, result.get('confidence', 0), CAMERA_ID, 'Present')
+                        # Note: db.mark_attendance handles uniqueness internally per date, but we just increment count here for UI
+                        system_state['recognized_faces_count'] += 1
+                        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                        cv2.putText(frame, person_name, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+                    else:
+                        cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
+                        cv2.putText(frame, "Unknown", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                        
+        elif system_state['mode'] == 'collection':
+            faces = recognizer.detect_faces(frame)
+            if faces:
+                for face in faces:
+                    x1, y1, x2, y2 = recognizer._bbox_to_int(face.bbox, frame.shape)
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    
+        # Encode back to base64 for preview
+        _, buffer = cv2.imencode('.jpg', frame)
+        processed_image = base64.b64encode(buffer).decode('utf-8')
+        
+        return jsonify({
+            'success': True,
+            'image': f'data:image/jpeg;base64,{processed_image}',
+            'recognized': system_state['recognized_faces_count']
+        })
+    except Exception as e:
+        logger.error(f"Error processing frame: {e}")
+        return jsonify({'success': False, 'message': str(e)})
 
 
 # ============================================================================
@@ -654,7 +570,7 @@ if __name__ == '__main__':
     
     app.run(
         host='0.0.0.0',
-        port=5000,
+        port=7860,
         debug=False,
         threaded=True,
     )

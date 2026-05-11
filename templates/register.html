@@ -2,150 +2,447 @@
 
 {% block page_title %}Register Person{% endblock %}
 
-{% block content %}
-<div class="register-container">
-    <div class="section">
-        <h2>Register New Person</h2>
-        <p class="section-description">Follow these steps to add a new person to the system</p>
+{% block extra_css %}
+<style>
+    /* Dynamic Registration Styles */
+    .register-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        animation: fadeIn 0.6s ease-out;
+    }
 
-        <div class="step-indicator">
-            <div class="step active" id="step1">
-                <div class="step-number">1</div>
-                <div class="step-title">Enter Name</div>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: var(--radius-xl);
+        padding: var(--spacing-2xl);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255,255,255,0.7);
+        margin-bottom: var(--spacing-2xl);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .glass-panel::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 4px;
+        background: linear-gradient(90deg, var(--primary), #8B5CF6, var(--primary-light));
+    }
+
+    /* Enhanced Step Indicator */
+    .dynamic-steps {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        margin-bottom: 3rem;
+        padding: 0 1rem;
+    }
+
+    .dynamic-steps::before {
+        content: '';
+        position: absolute;
+        top: 24px;
+        left: 3rem;
+        right: 3rem;
+        height: 3px;
+        background: var(--border-color);
+        z-index: 1;
+        border-radius: 3px;
+    }
+
+    .step-item {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--text-muted);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .step-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: var(--bg-primary);
+        border: 3px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.4s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    }
+
+    .step-label {
+        font-weight: 600;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .step-item.active {
+        color: var(--primary);
+    }
+
+    .step-item.active .step-circle {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 0 0 6px rgba(37, 99, 235, 0.15);
+        transform: scale(1.1);
+        animation: pulse-ring 2s infinite;
+    }
+
+    .step-item.completed {
+        color: var(--success);
+    }
+
+    .step-item.completed .step-circle {
+        border-color: var(--success);
+        background: var(--success);
+        color: white;
+    }
+
+    @keyframes pulse-ring {
+        0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.3); }
+        70% { box-shadow: 0 0 0 15px rgba(37, 99, 235, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+    }
+
+    /* Content Transitions */
+    .step-content {
+        display: none;
+        animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .step-content.active {
+        display: block;
+    }
+
+    @keyframes slideUpFade {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* High-Tech Camera UI */
+    .scanner-container {
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #0f172a;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+        border: 2px solid #334155;
+        min-height: 480px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .scanner-overlay {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: 
+            linear-gradient(rgba(15, 118, 110, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(15, 118, 110, 0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        pointer-events: none;
+        z-index: 10;
+        display: none;
+    }
+
+    .scanner-line {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 4px;
+        background: #0ea5e9;
+        box-shadow: 0 0 15px 5px rgba(14, 165, 233, 0.4);
+        z-index: 11;
+        animation: scan 3s linear infinite;
+        display: none;
+    }
+
+    @keyframes scan {
+        0% { top: 0; opacity: 0; }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { top: 100%; opacity: 0; }
+    }
+
+    .scanner-active .scanner-overlay,
+    .scanner-active .scanner-line {
+        display: block;
+    }
+
+    .camera-hud {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        display: flex;
+        justify-content: space-between;
+        z-index: 20;
+    }
+
+    .hud-box {
+        background: rgba(15, 23, 42, 0.7);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-family: monospace;
+        font-size: 0.85rem;
+    }
+
+    .hud-recording {
+        color: #ef4444;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .recording-dot {
+        width: 10px; height: 10px;
+        background: #ef4444;
+        border-radius: 50%;
+        animation: blink 1s infinite;
+    }
+
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* Animated Progress Bar for Training */
+    .training-progress-container {
+        background: var(--bg-secondary);
+        border-radius: 999px;
+        height: 24px;
+        position: relative;
+        overflow: hidden;
+        margin: 2rem 0;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .training-progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--primary), #8B5CF6);
+        background-size: 200% 200%;
+        animation: gradient-shift 2s ease infinite, fill-up 15s ease-out forwards;
+        border-radius: 999px;
+        box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+    }
+
+    @keyframes gradient-shift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    @keyframes fill-up {
+        0% { width: 0%; }
+        20% { width: 30%; }
+        50% { width: 60%; }
+        80% { width: 85%; }
+        100% { width: 95%; } /* Will jump to 100% via JS */
+    }
+
+    /* Person Cards Hover Effects */
+    .premium-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-xl);
+        padding: var(--spacing-xl);
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: default;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .premium-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: var(--primary);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+        transform-origin: bottom;
+    }
+
+    .premium-card:hover {
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: transparent;
+    }
+
+    .premium-card:hover::before {
+        transform: scaleY(1);
+    }
+
+    .fancy-input {
+        background: var(--bg-base);
+        border: 2px solid transparent;
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    }
+    
+    .fancy-input:focus {
+        background: var(--bg-primary);
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-wrapper">
+    <div class="glass-panel">
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+            <h2 style="font-size: 2.5rem; background: linear-gradient(90deg, var(--primary), #8B5CF6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.5rem;">Add New Member</h2>
+            <p style="color: var(--text-secondary); font-size: 1.1rem;">Follow the high-precision scanning sequence to register a face profile.</p>
+        </div>
+
+        <div class="dynamic-steps">
+            <div class="step-item active" id="step1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Identity</div>
             </div>
-            <div class="step" id="step2">
-                <div class="step-number">2</div>
-                <div class="step-title">Collect Faces</div>
+            <div class="step-item" id="step2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Facial Scan</div>
             </div>
-            <div class="step" id="step3">
-                <div class="step-number">3</div>
-                <div class="step-title">Train Model</div>
+            <div class="step-item" id="step3">
+                <div class="step-circle">3</div>
+                <div class="step-label">AI Training</div>
             </div>
         </div>
 
         <!-- Step 1: Enter Name -->
         <div id="stepContent1" class="step-content active">
-            <div class="form-group">
-                <label for="personName" class="form-label">Person's Name *</label>
-                <input type="text" id="personName" class="form-input" placeholder="Enter full name" required>
-                <div class="form-hint">Example: John Doe, Ahmed Hassan</div>
-            </div>
+            <div style="max-width: 500px; margin: 0 auto; text-align: center;">
+                <div class="form-group">
+                    <label for="personName" class="form-label" style="font-size: 1.1rem;">Subject Name</label>
+                    <input type="text" id="personName" class="form-input fancy-input" placeholder="e.g. John Doe" autocomplete="off" required>
+                    <div class="form-hint" style="margin-top: 1rem;">Please use their full official name.</div>
+                </div>
 
-            <button class="btn btn-primary" onclick="proceedToStep2()">
-                Next: Collect Faces →
-            </button>
+                <button class="btn btn-primary" style="padding: 1rem 2.5rem; font-size: 1.1rem; border-radius: 50px;" onclick="proceedToStep2()">
+                    Initialize Scan Sequence →
+                </button>
+            </div>
         </div>
 
         <!-- Step 2: Collect Faces -->
-        <div id="stepContent2" class="step-content" style="display: none;">
-            <div class="alert alert-info">
-                <span class="alert-icon">ℹ️</span>
+        <div id="stepContent2" class="step-content">
+            <div class="alert alert-info" style="border-radius: 12px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.2);">
+                <span class="alert-icon">🤖</span>
                 <div>
-                    <strong>Camera Instructions:</strong>
-                    <ul>
-                        <li>Position your face clearly in front of the camera</li>
-                        <li>Try different angles and lighting conditions</li>
-                        <li>Collect at least 20-30 face samples for best results</li>
-                        <li>Remove glasses or hats for better recognition</li>
-                    </ul>
+                    <strong>AI Calibration Required:</strong>
+                    Move your head slowly left, right, up, and down while looking at the lens. The system needs at least 15-20 distinct angles for perfect recognition.
                 </div>
             </div>
 
-            <div class="camera-section">
-                <div class="camera-placeholder">
-                    <div class="camera-icon">📷</div>
-                    <div class="camera-text">Camera Feed</div>
-                    <video id="cameraFeed" class="camera-feed" style="display: none;"></video>
+            <div class="scanner-container" id="scannerContainer">
+                <div class="scanner-overlay"></div>
+                <div class="scanner-line"></div>
+                
+                <div class="camera-icon" id="cameraIcon" style="text-align: center; color: #64748B;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;">🎥</div>
+                    <div style="font-family: monospace;">CAMERA INACTIVE</div>
                 </div>
-
-                <div class="camera-info">
-                    <div class="info-row">
-                        <span class="info-label">Person Name:</span>
-                        <span class="info-value" id="collectingPersonName">-</span>
+                
+                <video id="webcamVideo" autoplay playsinline style="display:none;"></video>
+                <canvas id="captureCanvas" style="display:none;"></canvas>
+                <img id="cameraFeed" src="" style="width: 100%; height: auto; display: none;">
+                
+                <div class="camera-hud" id="cameraHud" style="display: none;">
+                    <div class="hud-box">ID: <span id="collectingPersonName" style="color: var(--primary-light)">-</span></div>
+                    <div class="hud-box hud-recording">
+                        <div class="recording-dot"></div> REC
                     </div>
-                    <div class="info-row">
-                        <span class="info-label">Faces Collected:</span>
-                        <span class="info-value" id="facesCollectedCount">0</span>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">Status:</span>
-                        <span class="info-value" id="collectionStatus">Ready</span>
-                    </div>
+                    <div class="hud-box">FRAMES: <span id="facesCollectedCount" style="color: #10B981; font-weight: bold;">0</span></div>
                 </div>
             </div>
 
-            <div class="button-group">
-                <button class="btn btn-success" id="startCollectionBtn" onclick="startCollection()">
-                    ▶️ Start Collection
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem;">
+                <button class="btn btn-secondary" style="border-radius: 50px; padding: 0.75rem 1.5rem;" onclick="backToStep1()">
+                    ← Abort
                 </button>
-                <button class="btn btn-danger" id="stopCollectionBtn" onclick="stopCollection()" style="display: none;">
-                    ⏹️ Stop Collection
-                </button>
-            </div>
-
-            <div class="button-group">
-                <button class="btn btn-secondary" onclick="backToStep1()">
-                    ← Back
-                </button>
-                <button class="btn btn-primary" onclick="proceedToStep3()" id="nextStep3Btn" disabled>
-                    Next: Train Model →
+                
+                <div id="collectionControls">
+                    <button class="btn btn-success" id="startCollectionBtn" onclick="startCollection()" style="border-radius: 50px; padding: 0.75rem 2rem; font-size: 1.1rem; box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);">
+                        ▶️ Begin Capture
+                    </button>
+                    <button class="btn btn-danger" id="stopCollectionBtn" onclick="stopCollection()" style="display: none; border-radius: 50px; padding: 0.75rem 2rem; font-size: 1.1rem; box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);">
+                        ⏹️ Halt Capture
+                    </button>
+                </div>
+                
+                <button class="btn btn-primary" onclick="proceedToStep3()" id="nextStep3Btn" style="border-radius: 50px; padding: 0.75rem 1.5rem;" disabled>
+                    Proceed to Training →
                 </button>
             </div>
         </div>
 
         <!-- Step 3: Train Model -->
-        <div id="stepContent3" class="step-content" style="display: none;">
-            <div class="alert alert-info">
-                <span class="alert-icon">ℹ️</span>
-                <div>
-                    <strong>Training Information:</strong>
-                    The system will process all collected face samples and create a unique profile for this person. This
-                    usually takes 10-30 seconds.
-                </div>
-            </div>
-
-            <div class="training-info">
-                <div class="info-box">
-                    <div class="info-title">Person Details</div>
-                    <div class="info-item">
-                        <span class="label">Name:</span>
-                        <span class="value" id="trainingPersonName">-</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">Total Samples:</span>
-                        <span class="value" id="totalSamplesTrain">0</span>
-                    </div>
-                </div>
-            </div>
-
-            <button class="btn btn-success btn-lg" id="trainBtn" onclick="trainModel()">
-                🚀 Train Model
-            </button>
-
-            <div id="trainingProgress" style="display: none;">
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
-                </div>
-                <div class="progress-text">Training in progress...</div>
-            </div>
-
-            <div class="button-group">
-                <button class="btn btn-secondary" onclick="backToStep2()">
-                    ← Back
+        <div id="stepContent3" class="step-content">
+            <div style="text-align: center; padding: 2rem 0;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🧠</div>
+                <h3>Neural Network Training</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 2rem;">Generating high-dimensional facial embeddings for <strong id="trainingPersonName" style="color: var(--text-heading)">-</strong> using <span id="totalSamplesTrain">0</span> captured frames.</p>
+                
+                <button class="btn btn-primary" id="trainBtn" onclick="trainModel()" style="padding: 1.25rem 3rem; font-size: 1.2rem; border-radius: 50px; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);">
+                    🚀 Initialize Model Training
                 </button>
-                <button class="btn btn-secondary" id="completeBtn" onclick="completeRegistration()"
-                    style="display: none;">
-                    ✓ Complete Registration
+
+                <div id="trainingProgress" style="display: none; max-width: 600px; margin: 0 auto; text-align: left;">
+                    <div style="display: flex; justify-content: space-between; font-family: monospace; color: var(--text-secondary); margin-bottom: 0.5rem;">
+                        <span>Extracting embeddings...</span>
+                        <span style="color: var(--primary);">PROCESSING</span>
+                    </div>
+                    <div class="training-progress-container">
+                        <div class="training-progress-bar" id="progressBarFill"></div>
+                    </div>
+                    <div style="text-align: center; color: var(--text-muted); font-size: 0.9rem;" id="trainingStatusText">Optimizing neural pathways... Please do not close this window.</div>
+                </div>
+                
+                <div id="trainingComplete" style="display: none; animation: slideUpFade 0.5s ease;">
+                    <div style="color: var(--success); font-size: 5rem; margin-bottom: 1rem;">✓</div>
+                    <h3 style="color: var(--success); margin-bottom: 2rem;">Training Successful</h3>
+                    <button class="btn btn-success" id="completeBtn" onclick="completeRegistration()" style="padding: 1rem 3rem; border-radius: 50px; font-size: 1.1rem; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);">
+                        Finalize & Return Home
+                    </button>
+                </div>
+            </div>
+
+            <div class="button-group" style="justify-content: flex-start; margin-top: 1rem;">
+                <button class="btn btn-secondary" id="backToStep2Btn" onclick="backToStep2()" style="border-radius: 50px;">
+                    ← Re-take Scan
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Registered Persons List -->
-    <div class="section">
-        <h2>Registered Persons</h2>
-        <div id="personsList" class="persons-grid">
-            <div class="text-center text-muted">Loading...</div>
+    <div style="margin-top: 4rem;">
+        <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="background: var(--primary-bg); color: var(--primary); width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px;">👥</span>
+            Active Directory
+        </h2>
+        <div id="personsList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+            <div class="text-center text-muted" style="grid-column: 1/-1; padding: 3rem; background: var(--bg-primary); border-radius: var(--radius-xl); border: 1px dashed var(--border-color);">Connecting to database...</div>
         </div>
     </div>
 </div>
@@ -158,6 +455,27 @@
         loadPersonsList();
     });
 
+    function transitionStep(hideId, showId, oldStep, newStep) {
+        const hideEl = document.getElementById(hideId);
+        const showEl = document.getElementById(showId);
+        
+        hideEl.style.display = 'none';
+        hideEl.classList.remove('active');
+        
+        showEl.style.display = 'block';
+        // Force reflow for animation restart
+        void showEl.offsetWidth;
+        showEl.classList.add('active');
+        
+        document.getElementById('step' + oldStep).classList.remove('active');
+        if (oldStep < newStep) {
+            document.getElementById('step' + oldStep).classList.add('completed');
+        } else {
+            document.getElementById('step' + newStep).classList.remove('completed');
+        }
+        document.getElementById('step' + newStep).classList.add('active');
+    }
+
     function proceedToStep2() {
         const name = document.getElementById('personName').value.trim();
         if (!name) {
@@ -167,19 +485,117 @@
 
         currentPerson = name;
         document.getElementById('collectingPersonName').textContent = name;
-
-        // Show step 2
-        document.getElementById('stepContent1').style.display = 'none';
-        document.getElementById('stepContent2').style.display = 'block';
-        document.getElementById('step1').classList.remove('active');
-        document.getElementById('step2').classList.add('active');
+        transitionStep('stepContent1', 'stepContent2', 1, 2);
     }
 
     function backToStep1() {
-        document.getElementById('stepContent2').style.display = 'none';
-        document.getElementById('stepContent1').style.display = 'block';
-        document.getElementById('step1').classList.add('active');
-        document.getElementById('step2').classList.remove('active');
+        transitionStep('stepContent2', 'stepContent1', 2, 1);
+    }
+
+    let webcamStream = null;
+    let processFrameInterval = null;
+    let saveFrameInterval = null;
+    let isProcessing = false;
+
+    async function startWebcam() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+            const video = document.getElementById('webcamVideo');
+            video.srcObject = stream;
+            webcamStream = stream;
+            
+            document.getElementById('cameraIcon').style.display = 'none';
+            document.getElementById('cameraFeed').style.display = 'block';
+            document.getElementById('scannerContainer').classList.add('scanner-active');
+            document.getElementById('cameraHud').style.display = 'flex';
+            
+            processFrameInterval = setInterval(processFrame, 150);
+            saveFrameInterval = setInterval(saveFrame, 500);
+        } catch (err) {
+            console.error("Error accessing webcam:", err);
+            showToast("Camera authorization denied.", "error");
+            stopCollection();
+        }
+    }
+
+    function stopWebcam() {
+        if (processFrameInterval) clearInterval(processFrameInterval);
+        if (saveFrameInterval) clearInterval(saveFrameInterval);
+        if (webcamStream) {
+            webcamStream.getTracks().forEach(track => track.stop());
+        }
+        webcamStream = null;
+        document.getElementById('cameraFeed').src = "";
+        document.getElementById('cameraIcon').style.display = 'block';
+        document.getElementById('cameraFeed').style.display = 'none';
+        document.getElementById('scannerContainer').classList.remove('scanner-active');
+        document.getElementById('cameraHud').style.display = 'none';
+        isProcessing = false;
+    }
+
+    function processFrame() {
+        if (isProcessing) return;
+        const video = document.getElementById('webcamVideo');
+        const canvas = document.getElementById('captureCanvas');
+        if (!video.videoWidth) return;
+        
+        isProcessing = true;
+        
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        const base64Image = canvas.toDataURL('image/jpeg', 0.7);
+        
+        fetch('/api/frame/process', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ image: base64Image })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && data.image) {
+                document.getElementById('cameraFeed').src = data.image;
+            }
+        })
+        .catch(err => console.error(err))
+        .finally(() => {
+            isProcessing = false;
+        });
+    }
+
+    function saveFrame() {
+        const video = document.getElementById('webcamVideo');
+        const canvas = document.getElementById('captureCanvas');
+        if (!video.videoWidth || !currentPerson) return;
+        
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        canvas.toBlob(blob => {
+            if (!blob) return;
+            const formData = new FormData();
+            formData.append('file', blob, 'frame.jpg');
+            formData.append('person_name', currentPerson);
+            
+            fetch('/api/register/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    facesCollected = data.samples_count;
+                    document.getElementById('facesCollectedCount').textContent = facesCollected;
+                }
+            })
+            .catch(err => console.error(err));
+        }, 'image/jpeg', 0.9);
     }
 
     function startCollection() {
@@ -188,61 +604,53 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: currentPerson })
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToast('Started collecting faces', 'success');
-                    document.getElementById('startCollectionBtn').style.display = 'none';
-                    document.getElementById('stopCollectionBtn').style.display = 'inline-block';
-                    document.getElementById('collectionStatus').textContent = 'Collecting...';
-                    // In a real implementation, you would stream camera feed here
-                } else {
-                    showToast(data.message, 'error');
-                }
-            });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('Link established. Scan initiated.', 'success');
+                document.getElementById('startCollectionBtn').style.display = 'none';
+                document.getElementById('stopCollectionBtn').style.display = 'inline-block';
+                startWebcam();
+            } else {
+                showToast(data.message, 'error');
+            }
+        });
     }
 
     function stopCollection() {
         fetch('/api/register/stop', { method: 'POST' })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToast(data.message, 'success');
-                    document.getElementById('startCollectionBtn').style.display = 'inline-block';
-                    document.getElementById('stopCollectionBtn').style.display = 'none';
-                    document.getElementById('collectionStatus').textContent = 'Stopped';
-                    document.getElementById('nextStep3Btn').disabled = false;
-                    facesCollected = 20; // Simulated - in real app, this would be actual count
-                    document.getElementById('facesCollectedCount').textContent = facesCollected;
-                } else {
-                    showToast(data.message, 'error');
-                }
-            });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                document.getElementById('startCollectionBtn').style.display = 'inline-block';
+                document.getElementById('stopCollectionBtn').style.display = 'none';
+                document.getElementById('nextStep3Btn').disabled = false;
+                stopWebcam();
+            } else {
+                showToast(data.message, 'error');
+            }
+        });
     }
 
     function proceedToStep3() {
         if (facesCollected < 5) {
-            showToast('Please collect at least 5 face samples', 'error');
+            showToast('Scan incomplete. Need at least 5 frames.', 'error');
             return;
         }
 
-        document.getElementById('stepContent2').style.display = 'none';
-        document.getElementById('stepContent3').style.display = 'block';
-        document.getElementById('step2').classList.remove('active');
-        document.getElementById('step3').classList.add('active');
+        transitionStep('stepContent2', 'stepContent3', 2, 3);
         document.getElementById('trainingPersonName').textContent = currentPerson;
         document.getElementById('totalSamplesTrain').textContent = facesCollected;
     }
 
     function backToStep2() {
-        document.getElementById('stepContent3').style.display = 'none';
-        document.getElementById('stepContent2').style.display = 'block';
-        document.getElementById('step2').classList.add('active');
-        document.getElementById('step3').classList.remove('active');
+        transitionStep('stepContent3', 'stepContent2', 3, 2);
     }
 
     function trainModel() {
         document.getElementById('trainBtn').style.display = 'none';
+        document.getElementById('backToStep2Btn').style.display = 'none';
         document.getElementById('trainingProgress').style.display = 'block';
 
         fetch('/api/register/train', {
@@ -250,65 +658,70 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ person_name: currentPerson })
         })
-            .then(response => response.json())
-            .then(data => {
+        .then(response => response.json())
+        .then(data => {
+            // Force animation to complete visually before showing success
+            document.getElementById('progressBarFill').style.animation = 'none';
+            document.getElementById('progressBarFill').style.width = '100%';
+            
+            setTimeout(() => {
                 document.getElementById('trainingProgress').style.display = 'none';
                 if (data.success) {
-                    showToast(data.message, 'success');
-                    document.getElementById('completeBtn').style.display = 'inline-block';
+                    document.getElementById('trainingComplete').style.display = 'block';
+                    document.getElementById('step3').classList.add('completed');
                 } else {
                     showToast(data.message, 'error');
                     document.getElementById('trainBtn').style.display = 'inline-block';
+                    document.getElementById('backToStep2Btn').style.display = 'inline-block';
                 }
-            });
+            }, 500);
+        });
     }
 
     function completeRegistration() {
-        showToast('Person registered successfully!', 'success');
-        setTimeout(() => {
-            location.reload();
-        }, 1000);
+        showToast('Profile activated successfully.', 'success');
+        setTimeout(() => { location.reload(); }, 1000);
     }
 
     function loadPersonsList() {
         fetch('/api/persons')
-            .then(response => response.json())
-            .then(persons => {
-                const container = document.getElementById('personsList');
-                if (persons.length === 0) {
-                    container.innerHTML = '<div class="text-center text-muted">No persons registered yet</div>';
-                    return;
-                }
+        .then(response => response.json())
+        .then(persons => {
+            const container = document.getElementById('personsList');
+            if (persons.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted" style="grid-column: 1/-1; padding: 3rem; background: var(--bg-primary); border-radius: var(--radius-xl); border: 1px dashed var(--border-color);">No profiles in database.</div>';
+                return;
+            }
 
-                container.innerHTML = persons.map(person => `
-                    <div class="person-card">
-                        <div class="person-avatar">👤</div>
-                        <div class="person-info">
-                            <div class="person-name">${person.name}</div>
-                            <div class="person-detail">${person.samples} samples</div>
-                        </div>
-                        <button class="btn-icon btn-delete" onclick="deletePerson('${person.name}')">🗑️</button>
+            container.innerHTML = persons.map(person => `
+                <div class="premium-card">
+                    <div style="font-size: 2.5rem; width: 60px; height: 60px; background: var(--primary-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 4px rgba(37, 99, 235, 0.1);">👤</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; font-size: 1.1rem; color: var(--text-heading); margin-bottom: 0.25rem;">${person.name}</div>
+                        <div style="font-size: 0.8rem; color: var(--primary); font-family: monospace; background: var(--primary-bg); padding: 0.2rem 0.6rem; border-radius: 4px; display: inline-block;">${person.samples} frames indexed</div>
                     </div>
-                `).join('');
-            });
+                    <button class="btn-icon btn-delete" onclick="deletePerson('${person.name}')" title="Remove Profile" style="background: var(--danger-bg); color: var(--danger);">🗑️</button>
+                </div>
+            `).join('');
+        });
     }
 
     function deletePerson(name) {
-        if (confirm(`Delete ${name} and all associated data?`)) {
+        if (confirm(`PURGE RECORD: Are you sure you want to completely erase ${name} from the neural database?`)) {
             fetch('/api/person/delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: name })
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast(data.message, 'success');
-                        loadPersonsList();
-                    } else {
-                        showToast(data.message, 'error');
-                    }
-                });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    loadPersonsList();
+                } else {
+                    showToast(data.message, 'error');
+                }
+            });
         }
     }
 </script>
