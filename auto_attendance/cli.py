@@ -9,10 +9,10 @@ import os
 from pathlib import Path
 from datetime import datetime
 
-from logger import setup_logger, get_logger, log_system_event
-from database import AttendanceDatabase
-from face_recognition import FaceRecognitionModule
-from config import (
+from .logger import setup_logger, get_logger, log_system_event
+from .database import AttendanceDatabase
+from .face_recognition import FaceRecognitionModule
+from .config import (
     DATABASE_PATH,
     FACE_DATA_DIR,
     ATTENDANCE_DIR,
@@ -66,7 +66,7 @@ def print_info(text: str) -> None:
 
 def cmd_collect(args) -> int:
     """Collect face samples for training."""
-    from data_collection import DataCollectionModule
+    from .data_collection import DataCollectionModule
     
     print_header("Face Data Collection")
     

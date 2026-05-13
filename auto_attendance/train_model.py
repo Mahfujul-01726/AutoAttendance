@@ -3,7 +3,7 @@ Train the face recognition model
 Run this after collecting training data
 """
 
-from face_recognition import FaceRecognitionModule
+from .face_recognition import FaceRecognitionModule
 
 def train_model():
     """Register face embeddings with the pretrained InsightFace model."""

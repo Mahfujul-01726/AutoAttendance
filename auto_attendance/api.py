@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
-from database import AttendanceDatabase
+from .database import AttendanceDatabase
 
 
 app = FastAPI(title="Advanced Attendance API")

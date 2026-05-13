@@ -79,11 +79,15 @@ Repository = "https://github.com/Mahfujul-01726/AutoAttendance.git"
 Changelog = "https://github.com/Mahfujul-01726/AutoAttendance/releases"
 
 [project.scripts]
-auto-attendance = "cli:main"
-auto-attendance-api = "api:main"
+auto-attendance = "auto_attendance.cli:main"
+auto-attendance-api = "auto_attendance.api:main"
 
 [tool.setuptools]
 packages = ["auto_attendance"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+auto_attendance = ["static/**/*", "templates/**/*"]
 
 [tool.black]
 line-length = 100

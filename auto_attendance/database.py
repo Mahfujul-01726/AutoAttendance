@@ -5,7 +5,7 @@ from datetime import datetime
 
 import numpy as np
 
-from config import DATABASE_PATH, MODELS_DIR
+from .config import DATABASE_PATH, MODELS_DIR
 
 
 class AttendanceDatabase:

@@ -1,7 +1,7 @@
 import cv2
 import os
-from config import CAMERA_ID, FACE_DATA_DIR, FRAME_HEIGHT, FRAME_WIDTH, TRAINING_DATA_DIR
-from face_recognition import FaceRecognitionModule
+from .config import CAMERA_ID, FACE_DATA_DIR, FRAME_HEIGHT, FRAME_WIDTH, TRAINING_DATA_DIR
+from .face_recognition import FaceRecognitionModule
 
 
 class DataCollectionModule:

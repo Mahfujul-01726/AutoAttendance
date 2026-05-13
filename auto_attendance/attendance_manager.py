@@ -10,13 +10,13 @@ from typing import Optional
 
 import pandas as pd
 
-from config import (
+from .config import (
     ATTENDANCE_DIR,
     DATABASE_PATH,
     EXCEL_FILE,
     LOG_FILE,
 )
-from database import AttendanceDatabase
+from .database import AttendanceDatabase
 
 logger = logging.getLogger(__name__)
 

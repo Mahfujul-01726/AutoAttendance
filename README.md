@@ -16,13 +16,24 @@ pinned: false
 
 ### ✨ Test the live stream directly from your browser! ✨
 
+### 📦 Install Now
+
+```bash
+pip install auto-attendance
+```
+
+**Then run:** `auto-attendance --help`
+
+### Badges
+
+![PyPI Version](https://img.shields.io/pypi/v/auto-attendance?style=flat-square&logo=python&color=blue)
 ![Python Version](https://img.shields.io/badge/Python-3.9%2B-blue?style=flat-square&logo=python)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 ![Tests](https://img.shields.io/badge/Tests-Passing-brightgreen?style=flat-square)
 ![Code Coverage](https://img.shields.io/badge/Coverage-70%25-yellowgreen?style=flat-square)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue?style=flat-square&logo=docker)
 ![Status](https://img.shields.io/badge/Status-Production%20Ready-success?style=flat-square)
-![Downloads](https://img.shields.io/badge/Downloads-1K%2B-brightblue?style=flat-square)
+![PyPI Downloads](https://img.shields.io/pypi/dm/auto-attendance?style=flat-square&color=brightblue)
 
 [Quick Start](#-quick-start) • [Live Demo](https://huggingface.co/spaces/mahfuj735/AutoAttendance) • [Documentation](https://github.com/Mahfujul-01726/AutoAttendance/wiki) • [API Docs](./API.md) • [Contributing](./CONTRIBUTING.md) • [Report Issue](https://github.com/Mahfujul-01726/AutoAttendance/issues)
 
@@ -34,14 +45,15 @@ pinned: false
 
 - [Overview](#-overview)
 - [Key Features](#-key-features)
-- [Quick Start](#-quick-start)
 - [Installation](#-installation)
-- [Usage](#-usage)
-- [How It Works](#-how-it-works)
-- [Architecture](#-architecture)
+- [Quick Start (5 Minutes)](#-quick-start-5-minutes)
+- [Common Questions](#-common-first-time-questions)
+- [Next Steps](#-next-steps-after-quick-start)
+- [Usage](#usage-guide)
+- [How It Works](#how-the-system-works)
+- [Architecture](#architecture)
 - [API Documentation](#-api-documentation)
-- [Configuration](#-configuration)
-- [Performance](#-performance)
+- [Configuration](#configuration)
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Support](#-support)
@@ -66,6 +78,28 @@ pinned: false
 - 📱 **Multi-Platform**: Windows, Linux, macOS support
 - 🎨 **Easy to Use**: Simple CLI and web dashboard
 - 📈 **Enterprise-Ready**: Docker, CI/CD, comprehensive testing
+
+---
+
+## 🎬 Get Started in 5 Minutes
+
+**New to AutoAttendance?** Try it right now:
+
+```bash
+# 1. Install (one command)
+pip install auto-attendance
+
+# 2. Collect face samples
+auto-attendance collect --name "Your Name"
+
+# 3. Train the model
+auto-attendance train
+
+# 4. Start attendance
+auto-attendance run
+```
+
+✨ **That's it!** Your attendance system is ready. See [Quick Start](#-quick-start-5-minutes) for detailed steps.
 
 ---
 
@@ -213,57 +247,243 @@ Webcam Feed
 
 ### Prerequisites
 
-- **Python 3.8 or higher** - Download from python.org
-- **Git** (optional) - For cloning the repository
+- **Python 3.9 or higher** - Download from python.org
 - **Webcam** - USB or built-in camera
 - **4GB+ RAM** - Minimum for InsightFace processing
 - **Internet** - For downloading pre-trained models (one-time)
 
-### Step 1: Clone or Download Project
+### Option 1: Install from PyPI (Recommended) ⭐
 
-**Using Git:**
+The easiest way to get started:
+
 ```bash
-git clone <repository-url>
+# Install from PyPI
+pip install auto-attendance
+
+# Verify installation
+auto-attendance --help
+auto-attendance-api --help
+```
+
+**Done!** You can now use `auto-attendance` commands directly.
+
+### Option 2: Install from Source (Development)
+
+For development or if you want to modify the code:
+
+```bash
+# Clone repository
+git clone https://github.com/Mahfujul-01726/AutoAttendance.git
 cd AutoAttendance
+
+# Install in development mode with all tools
+pip install -e ".[dev]"
+
+# Verify installation
+python cli.py --help
 ```
 
-**Or Download ZIP and extract**
+### Option 3: Docker
 
-### Step 2: Install Dependencies
+For isolated environment:
 
 ```bash
-# Install all required packages
-pip install -r requirements.txt
+# Build Docker image
+docker build -t auto-attendance .
+
+# Run container
+docker-compose up
 ```
 
-**Main dependencies:**
-- `opencv-python` - Computer vision
-- `numpy` - Numerical computing
-- `pandas` - Data manipulation
-- `insightface` - Face recognition
-- `onnxruntime` - Deep learning inference
-- `fastapi` & `uvicorn` - Web API
-- `python-dotenv` - Environment variables
-- `openpyxl` & `xlsxwriter` - Excel export
+### Configuration
 
-### Step 3: Configure Environment
+Create `.env` file in your working directory (optional):
 
 ```bash
-# Copy example environment file
-copy .env.example .env
+# Copy example configuration
+cp .env.example .env
 
-# Edit .env with your settings (optional)
+# Edit with your settings:
 # - CAMERA_ID: Try 0, 1, 2, 3 if webcam doesn't work
 # - EMAIL_ADDRESS & EMAIL_PASSWORD: For email alerts
 # - RECOGNITION_THRESHOLD: Tune accuracy vs false positives
 ```
 
-### Step 4: Verify Installation
+### Optional: Install with GPU Support
+
+For faster performance with GPU:
 
 ```bash
-# Check all dependencies installed correctly
-python setup.py
+# PyPI installation
+pip install "auto-attendance[gpu]"
+
+# Source installation
+pip install -e ".[gpu]"
 ```
+
+### Verify Installation
+
+```bash
+# Test CLI commands
+auto-attendance --help
+auto-attendance-api --help
+
+# Run diagnostics
+python -c "from auto_attendance import FaceRecognitionModule; print('✓ Installation successful!')"
+```
+
+---
+
+## � System Workflow
+
+Here's what you'll do with AutoAttendance:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        YOUR WORKFLOW                                │
+└─────────────────────────────────────────────────────────────────────┘
+
+Step 1: Install                  ← You are here! (5 seconds)
+   ↓
+   pip install auto-attendance
+
+Step 2: Collect Face Data        ← Takes 2-3 minutes per person
+   ↓
+   auto-attendance collect --name "John Doe"
+   (Press C to capture, Q to finish)
+
+Step 3: Train the Model          ← Takes 1-2 minutes
+   ↓
+   auto-attendance train
+   (Generates embeddings, saves to database)
+
+Step 4: Start Attendance         ← NOW LIVE!
+   ↓
+   auto-attendance run
+   (Real-time face detection & marking)
+
+Step 5: View Reports             ← Anytime
+   ↓
+   Check data/attendance/ folder
+   (CSV, Excel, or database records)
+
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## �🚀 Quick Start (5 Minutes)
+
+Get up and running in 5 minutes with this simple guide:
+
+### Step 1: Install (1 minute)
+
+```bash
+pip install auto-attendance
+```
+
+### Step 2: Create Data Directory (30 seconds)
+
+```bash
+# Create folders for storing face data
+mkdir -p data/faces data/attendance models
+```
+
+### Step 3: Collect Face Samples (2 minutes)
+
+```bash
+# Start face collection for a person
+auto-attendance collect --name "John Doe"
+```
+
+**What to do:**
+1. A camera window will open
+2. Position your face in the frame
+3. Press **`C`** to capture (do this 20-30 times, varying angles)
+4. Press **`Q`** when done
+5. Repeat for other people ("Jane Smith", etc.)
+
+**💡 Tip:** Collect more samples = better accuracy. Aim for 80-100 samples per person.
+
+### Step 4: Train the Model (1 minute)
+
+```bash
+# Register all collected faces
+auto-attendance train
+```
+
+You'll see:
+```
+✓ Processing John Doe: 95 samples
+✓ Processing Jane Smith: 87 samples
+✓ Training complete! Total people: 2
+```
+
+### Step 5: Start Recognition (Remaining time)
+
+```bash
+# Run real-time attendance marking
+auto-attendance run
+```
+
+**What happens:**
+- Camera opens with live face detection
+- Recognized people are marked with their name
+- Unknown faces trigger an alert
+- Press **`ESC`** to exit
+
+### Step 6: Check Results
+
+```bash
+# View attendance records
+ls data/attendance/
+
+# View database records
+sqlite3 models/attendance.sqlite3 "SELECT * FROM attendance_log LIMIT 5;"
+```
+
+---
+
+## ✨ Common First-Time Questions
+
+### Q: Which camera should I use?
+**A:** By default, your built-in or USB camera (CAMERA_ID=0). If it doesn't work, try 1, 2, or 3.
+
+### Q: How many face samples do I need?
+**A:** Minimum 50, recommended 80-100 per person for best accuracy.
+
+### Q: Can I add more people later?
+**A:** Yes! Just run `auto-attendance collect --name "New Person"` and then retrain.
+
+### Q: How do I export attendance data?
+**A:** Your data is automatically saved. Access it in `data/attendance/` folder.
+
+### Q: Does it work with masks?
+**A:** The anti-spoofing system may reject masked faces. For masked attendance, disable anti-spoofing in `.env`.
+
+---
+
+## 🎯 Next Steps After Quick Start
+
+1. **Configure Email Alerts** (optional)
+   - Set up email notifications for unknown persons
+   - See [Configuration](#configuration) section
+
+2. **Use Web Dashboard** (optional)
+   ```bash
+   auto-attendance api
+   # Visit http://localhost:8000
+   ```
+
+3. **Export Reports**
+   ```bash
+   auto-attendance export --date 2026-05-13
+   ```
+
+4. **Read Full Documentation**
+   - [ARCHITECTURE.md](./ARCHITECTURE.md) - How it works
+   - [API.md](./API.md) - REST API documentation
+   - [CONTRIBUTING.md](./CONTRIBUTING.md) - Contributing guide
 
 ---
 
@@ -706,6 +926,106 @@ If camera doesn't work:
 
 ---
 
+## 🆘 Beginner Troubleshooting (First Time Users)
+
+### Problem: "Command not found: auto-attendance"
+
+**Cause:** Package not installed correctly.
+
+**Solution:**
+```bash
+# Verify installation
+pip show auto-attendance
+
+# If not found, reinstall
+pip install --upgrade auto-attendance
+
+# Verify CLI works
+auto-attendance --help
+```
+
+### Problem: "Camera not detected" or "Cannot find device"
+
+**Cause:** Wrong camera ID or camera not accessible.
+
+**Solution:**
+```bash
+# Try different camera IDs (0, 1, 2, 3)
+# Edit .env or create one with:
+CAMERA_ID=0  # Try 1, 2, 3 if this doesn't work
+
+# Run data collection again
+auto-attendance collect --name "Test"
+```
+
+**Windows:**
+1. Open Device Manager (press `Windows + X` → Device Manager)
+2. Look under "Imaging devices" for your camera
+3. Note the device name and number
+
+### Problem: "No module named auto_attendance"
+
+**Cause:** Installation incomplete or wrong Python version.
+
+**Solution:**
+```bash
+# Check Python version (must be 3.9+)
+python --version
+
+# Reinstall in current environment
+pip uninstall auto-attendance -y
+pip install auto-attendance
+```
+
+### Problem: "Only getting 'Unknown Person' - no one is recognized"
+
+**Cause:** Not enough training data or threshold too high.
+
+**Solution:**
+1. Collect MORE samples: Aim for 100+ samples per person
+2. Collect from different angles and lighting
+3. Lower the threshold in `.env`:
+   ```
+   RECOGNITION_THRESHOLD=0.40
+   ```
+4. Retrain: `auto-attendance train`
+
+### Problem: System crashes or becomes very slow
+
+**Cause:** High resolution or too many frames being processed.
+
+**Solution:**
+Create `.env` file with:
+```
+FRAME_WIDTH=640
+FRAME_HEIGHT=480
+FRAME_PROCESS_INTERVAL=10
+```
+
+Then restart: `auto-attendance run`
+
+### Problem: "AttributeError" or other import errors
+
+**Cause:** Missing dependencies.
+
+**Solution:**
+```bash
+# Reinstall with full requirements
+pip install auto-attendance --upgrade --force-reinstall
+
+# Or install from source
+pip install "auto-attendance[dev]" --upgrade
+```
+
+### Getting Help
+
+If you can't solve the issue:
+1. Check [Full Troubleshooting Guide](#troubleshooting) below
+2. Visit [GitHub Issues](https://github.com/Mahfujul-01726/AutoAttendance/issues)
+3. Read [ARCHITECTURE.md](./ARCHITECTURE.md) for how the system works
+
+---
+
 ## Troubleshooting
 
 ### Issue: Camera Not Found
@@ -874,51 +1194,97 @@ AutoAttendance/
 
 ## Getting Help
 
+### Common Commands for PyPI Installation
+
+If you installed with `pip install auto-attendance`:
+
+```bash
+# Show CLI help
+auto-attendance --help
+
+# Show available commands
+auto-attendance
+
+# Check what version you have
+pip show auto-attendance
+
+# Upgrade to latest version
+pip install auto-attendance --upgrade
+```
+
 ### Common Commands for Debugging
 
 ```bash
 # Test system components
-python cli.py test
+auto-attendance test
 
 # Check camera
 python -c "import cv2; print(cv2.VideoCapture(0).get(cv2.CAP_PROP_FRAME_WIDTH))"
 
 # Verify database
-python -c "from database import AttendanceDatabase; db = AttendanceDatabase(); print(db.get_students())"
+python -c "from auto_attendance.database import AttendanceDatabase; db = AttendanceDatabase(); print(db.get_students())"
 
 # Run diagnostics
-python setup.py
+auto-attendance --version
 ```
 
 ### Log Files
 
 Check `logs/` directory for detailed error messages:
 ```bash
-cat logs/attendance.log
+# View recent logs
+cat logs/attendance.log  # Linux/Mac
+type logs\attendance.log # Windows
 ```
+
+### Online Resources
+
+- **GitHub Issues**: https://github.com/Mahfujul-01726/AutoAttendance/issues
+- **GitHub Discussions**: https://github.com/Mahfujul-01726/AutoAttendance/discussions
+- **PyPI Project**: https://pypi.org/project/auto-attendance/
+- **Live Demo**: https://huggingface.co/spaces/mahfuj735/AutoAttendance
 
 ---
 
-## Next Steps
+## 📚 Documentation & Guides
 
-1. **Install & Setup** - Follow installation guide
-2. **Collect Data** - Run `python cli.py collect` for each person
-3. **Train Model** - Run `python cli.py train`
-4. **Test System** - Run `python cli.py run`
-5. **Configure Email** - Set up alerts (optional)
-6. **Deploy** - Use on production webcam
+| Document | Purpose |
+|----------|---------|
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | How the system works internally |
+| [API.md](./API.md) | REST API documentation |
+| [PUBLISHING.md](./PUBLISHING.md) | Guide to publishing new versions |
+| [GitHub Wiki](https://github.com/Mahfujul-01726/AutoAttendance/wiki) | Community documentation |
+
+---
+
+## Next Steps After Installation
+
+1. **Collect Face Data** - Run `auto-attendance collect --name "Your Name"`
+2. **Train Model** - Run `auto-attendance train`
+3. **Test System** - Run `auto-attendance run`
+4. **View Results** - Check `data/attendance/` folder
+5. **Configure Advanced Features** (optional):
+   - Email alerts for unknown persons
+   - Web dashboard at `http://localhost:8000`
+   - Custom thresholds for recognition accuracy
 
 ---
 
 ## Summary
 
-AutoAttendance is a complete, production-ready attendance system that combines cutting-edge face recognition technology with practical usability. The system is modular, extensible, and designed for easy deployment in any organization.
+**AutoAttendance** is a complete, production-ready attendance system that combines cutting-edge face recognition with ease of use.
 
-**For questions or issues, refer to the documentation files or run `python cli.py --help` for command-line assistance.**
+✨ **Get started now:** `pip install auto-attendance`
+
+**For questions or issues:**
+- Read [Quick Start Guide](#-quick-start-5-minutes) above
+- Check [Beginner Troubleshooting](#-beginner-troubleshooting-first-time-users)
+- Visit [GitHub Issues](https://github.com/Mahfujul-01726/AutoAttendance/issues)
+- Run `auto-attendance --help` for command-line assistance
 
 ---
 
-*Last Updated: May 2026 | AutoAttendance v2.0.0*
+*Last Updated: May 2026 | AutoAttendance v1.0.0 | Now Available on PyPI!*
 
 
 ---

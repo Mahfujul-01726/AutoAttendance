@@ -27,18 +27,16 @@ try:
 except ImportError:
     HAS_WINSOUND = False
 
-from config import (
-    CAMERA_ID,
-    FPS,
-    FRAME_PROCESS_INTERVAL,
-    FRAME_WIDTH,
-    FRAME_HEIGHT,
+from .config import (
+    CAMERA_ID, FRAME_WIDTH, FRAME_HEIGHT, FPS, 
+    FRAME_PROCESS_INTERVAL, RECOGNITION_THRESHOLD,
+    DATABASE_PATH, LOG_FILE, ALERT_SOUND
 )
-from face_recognition import FaceRecognitionModule
-from anti_spoofing import AntiSpoofing
-from attendance_manager import AttendanceManager
-from database import AttendanceDatabase
-from logger import get_logger, log_system_event
+from .face_recognition import FaceRecognitionModule
+from .anti_spoofing import AntiSpoofing
+from .attendance_manager import AttendanceManager
+from .database import AttendanceDatabase
+from .logger import get_logger, log_system_event
 
 # Initialize logger
 logger = get_logger()

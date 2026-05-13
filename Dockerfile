@@ -65,6 +65,6 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD python -c "import cv2; print('OK')" || exit 1
 
 # Default command
-CMD ["python", "web_ui.py"]
+CMD ["python", "app.py"]
 
 EXPOSE 7860

@@ -15,4 +15,6 @@ include pytest.ini
 include .flake8
 include .editorconfig
 recursive-include tests *.py
+recursive-include auto_attendance/static *
+recursive-include auto_attendance/templates *
 recursive-include . *.md

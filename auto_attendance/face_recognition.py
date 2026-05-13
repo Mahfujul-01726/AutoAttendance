@@ -4,7 +4,7 @@ import warnings
 import cv2
 import numpy as np
 
-from config import (
+from .config import (
     DATABASE_PATH,
     FACE_DATA_DIR,
     INSIGHTFACE_DET_SIZE,
@@ -13,7 +13,7 @@ from config import (
     INSIGHTFACE_PROVIDERS,
     RECOGNITION_THRESHOLD,
 )
-from database import AttendanceDatabase
+from .database import AttendanceDatabase
 
 warnings.filterwarnings(
     "ignore",

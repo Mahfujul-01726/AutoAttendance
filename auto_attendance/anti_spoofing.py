@@ -11,7 +11,7 @@ from typing import Tuple, Optional
 import cv2
 import numpy as np
 
-from config import DOG_SIGMA1, DOG_SIGMA2, SPOOF_THRESHOLD
+from .config import DOG_SIGMA1, DOG_SIGMA2, SPOOF_THRESHOLD
 
 logger = logging.getLogger(__name__)
 

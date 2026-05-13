@@ -16,16 +16,16 @@ import cv2
 import numpy as np
 import base64
 
-from database import AttendanceDatabase
-from face_recognition import FaceRecognitionModule
-from anti_spoofing import AntiSpoofing
-from attendance_manager import AttendanceManager
-from data_collection import DataCollectionModule
-from config import (
+from .database import AttendanceDatabase
+from .face_recognition import FaceRecognitionModule
+from .anti_spoofing import AntiSpoofing
+from .attendance_manager import AttendanceManager
+from .data_collection import DataCollectionModule
+from .config import (
     CAMERA_ID, FACE_DATA_DIR, ATTENDANCE_DIR, 
     FRAME_WIDTH, FRAME_HEIGHT, FPS, DATABASE_PATH
 )
-from logger import get_logger
+from .logger import get_logger
 
 # Initialize Flask app
 app = Flask(__name__, template_folder='templates', static_folder='static')
