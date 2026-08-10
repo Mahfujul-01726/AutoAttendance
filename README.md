@@ -41,6 +41,109 @@ pip install auto-attendance
 
 ---
 
+## 🌐 For International Research Collaboration
+
+> **This section is intended for researchers, PhD students, and faculty members interested in collaborating on this project.**
+
+AutoAttendance is not just a production tool — it is also a **research platform** for studying reliable, privacy-aware face template adaptation in real operational environments.
+If you work in biometrics, continual learning, anti-spoofing, or related fields and want to collaborate, this section summarises exactly where the project stands and what we are investigating next.
+
+---
+
+### 📌 Current System Status *(Stable Baseline — Already Implemented)*
+
+| Component | Status | Details |
+|-----------|--------|---------|
+| Face registration | ✅ Complete | InsightFace embeddings (512-dim vectors) |
+| Real-time recognition | ✅ Complete | Cosine similarity matching, 30+ FPS |
+| Anti-spoofing | ✅ Complete | DoG + frequency-domain (FFT) liveness detection |
+| Attendance logging | ✅ Complete | SQLite with timestamped records |
+| REST API | ✅ Complete | FastAPI + OpenAPI/Swagger |
+| Web dashboard | ✅ Complete | Live stats and management UI |
+| CLI | ✅ Complete | `auto-attendance collect / train / run / export` |
+| Docker / CI | ✅ Complete | Docker Compose + GitHub Actions skeleton |
+| PyPI packaging | ✅ Complete | `pip install auto-attendance` |
+| Research novelty | 🔬 In progress | See proposed extension below |
+| Publication-ready evaluation | 🔲 Planned | Experiment design underway |
+| International collaboration pitch | 🔲 Planned | Open to discussion — contact welcome |
+
+---
+
+### 🔬 Proposed Research Extension *(Open for Collaboration)*
+
+The core research question we are investigating:
+
+> **Can reliable operational face observations — filtered by confidence, liveness, image quality, and temporal consistency — safely update a user-specific face template and improve long-term recognition performance, without retraining the backbone recognition model?**
+
+#### Baseline (current)
+
+```
+Webcam → InsightFace detection → 512-dim embedding
+       → Cosine similarity → Known / Unknown
+       → DoG/FFT anti-spoof check
+       → Attendance logged
+```
+
+#### Proposed Extension (research layer)
+
+```
+Baseline (above)
+       ↓
+Reliability Gate
+  ├── Confidence score ≥ threshold?
+  ├── Anti-spoof: liveness confirmed?
+  ├── Image quality score ≥ threshold?
+  └── Temporal consistency: stable across N frames?
+       ↓
+ Safe Template Update
+  ├── Update stored embedding (EMA / prototype mean)
+  ├── Drift detection → rollback if divergence detected
+  └── Log update event for audit trail
+       ↓
+ Evaluation
+  ├── Recognition rate: before vs. after adaptation
+  ├── Wrong-update rate (false positive updates)
+  ├── Longitudinal stability across sessions
+  └── FPS / latency impact
+```
+
+---
+
+### 📊 Research Progress Snapshot
+
+| Research Area | Already Done | Remaining |
+|---------------|:------------:|:---------:|
+| Baseline face recognition system | ✅ | — |
+| Anti-spoofing (DoG + FFT) | ✅ | use as reliability gate |
+| Attendance session logging | ✅ | static vs. dynamic experiments |
+| Deployment & packaging | ✅ | keep stable |
+| Reliability gating logic | 🔲 | design + implement |
+| Online template adaptation | 🔲 | EMA / prototype mean strategy |
+| Drift detection & rollback | 🔲 | safe-update policy |
+| Longitudinal evaluation | 🔲 | controlled experiment |
+| Publication-ready benchmarks | 🔲 | metrics + write-up |
+
+---
+
+### 🤝 Collaboration Interests
+
+We welcome collaboration on any of the following topics:
+
+- **Biometric template adaptation** — incremental/online update of face embeddings in operational systems
+- **Continual / lifelong face recognition** — avoiding catastrophic forgetting without backbone retraining
+- **Anti-spoofing-aware learning** — using liveness signals as a quality gate for safe updates
+- **Drift detection and secure update policies** — preventing wrong or adversarial updates
+- **Longitudinal evaluation of attendance systems** — cross-session recognition stability analysis
+- **Privacy-preserving face recognition** — local adaptation without centralised retraining
+
+---
+
+### 📬 Contact for Collaboration
+
+If you are interested in a research collaboration, joint paper, dataset sharing, or supervision discussion, please open a [GitHub Issue](https://github.com/Mahfujul-01726/AutoAttendance/issues) labelled `research-collaboration` or reach out via the repository contact.
+
+---
+
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
