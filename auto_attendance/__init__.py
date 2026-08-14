@@ -3,9 +3,9 @@ AutoAttendance - Face Recognition Attendance System & UG-Adapt Framework
 A professional real-time attendance tracking and continual biometrics research solution.
 """
 
-__version__ = "2.4.0"
+__version__ = "2.5.0"
 __author__ = "AutoAttendance Team"
-__description__ = "Real-time face recognition attendance system with UG-Adapt continual learning, cancelable biometrics, rPPG, and adversarial immunity"
+__description__ = "Real-time face recognition attendance system with UG-Adapt continual learning, cancelable biometrics, rPPG, and demographic fairness"
 
 from .config import (
     CAMERA_ID,
@@ -36,6 +36,7 @@ from .rppg_pulse_guard import RemotePulseLivenessGuard
 from .differential_privacy import HypersphericalDifferentialPrivacyEngine
 from .adversarial_patch_filter import AdversarialPatchDefenseFilter
 from .optimal_transport_aligner import CrossCameraOptimalTransportAligner
+from .fairness_calibrator import DemographicFairnessCalibrator
 
 # Backward compatibility alias
 AntiSpoofingModule = AntiSpoofing
@@ -57,6 +58,7 @@ __all__ = [
     "HypersphericalDifferentialPrivacyEngine",
     "AdversarialPatchDefenseFilter",
     "CrossCameraOptimalTransportAligner",
+    "DemographicFairnessCalibrator",
     "CAMERA_ID",
     "FRAME_WIDTH",
     "FRAME_HEIGHT",

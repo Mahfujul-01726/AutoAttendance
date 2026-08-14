@@ -29,6 +29,7 @@ from .rppg_pulse_guard import RemotePulseLivenessGuard
 from .differential_privacy import HypersphericalDifferentialPrivacyEngine
 from .adversarial_patch_filter import AdversarialPatchDefenseFilter
 from .optimal_transport_aligner import CrossCameraOptimalTransportAligner
+from .fairness_calibrator import DemographicFairnessCalibrator
 
 warnings.filterwarnings(
     "ignore",
@@ -69,6 +70,7 @@ class FaceRecognitionModule:
         self.dp_engine = HypersphericalDifferentialPrivacyEngine()
         self.patch_filter = AdversarialPatchDefenseFilter()
         self.ot_aligner = CrossCameraOptimalTransportAligner()
+        self.fairness_calibrator = DemographicFairnessCalibrator()
 
     def _load_insightface(self):
         try:

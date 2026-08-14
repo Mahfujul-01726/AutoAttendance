@@ -72,11 +72,11 @@ FRAME_PROCESS_INTERVAL = get_env_int("FRAME_PROCESS_INTERVAL", 5)
 # =============================================================================
 # INSIGHTFACE SETTINGS
 # =============================================================================
-# Face detection and recognition model
+# Face detection and recognition model (0 = unlimited simultaneous faces)
 INSIGHTFACE_MODEL_NAME = os.getenv("INSIGHTFACE_MODEL_NAME", "buffalo_l")
 INSIGHTFACE_DET_SIZE = (320, 320)
 INSIGHTFACE_PROVIDERS = ["CPUExecutionProvider"]  # CPU for compatibility
-INSIGHTFACE_MAX_FACES = get_env_int("INSIGHTFACE_MAX_FACES", 1)
+INSIGHTFACE_MAX_FACES = get_env_int("INSIGHTFACE_MAX_FACES", 0)
 
 # =============================================================================
 # RECOGNITION SETTINGS (Cosine Distance)
