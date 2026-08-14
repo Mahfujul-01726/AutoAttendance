@@ -1,11 +1,11 @@
 """
-AutoAttendance - Face Recognition Attendance System
-A professional real-time attendance tracking solution.
+AutoAttendance - Face Recognition Attendance System & UG-Adapt Framework
+A professional real-time attendance tracking and continual biometrics research solution.
 """
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 __author__ = "AutoAttendance Team"
-__description__ = "Real-time face recognition attendance system with anti-spoofing"
+__description__ = "Real-time face recognition attendance system with UG-Adapt continual learning"
 
 from .config import (
     CAMERA_ID,
@@ -19,17 +19,26 @@ from .config import (
     FACE_DATA_DIR,
     ATTENDANCE_DIR,
     MODELS_DIR,
+    UG_ADAPT_ENABLED,
 )
 from .database import AttendanceDatabase
 from .face_recognition import FaceRecognitionModule
 from .attendance_manager import AttendanceManager
-from .anti_spoofing import AntiSpoofingModule
+from .anti_spoofing import AntiSpoofing
+from .quality_gate import QualityGate
+from .template_adapter import DualMemoryTemplateAdapter
+
+# Backward compatibility alias
+AntiSpoofingModule = AntiSpoofing
 
 __all__ = [
     "AttendanceDatabase",
     "AttendanceManager",
+    "AntiSpoofing",
     "AntiSpoofingModule",
     "FaceRecognitionModule",
+    "QualityGate",
+    "DualMemoryTemplateAdapter",
     "CAMERA_ID",
     "FRAME_WIDTH",
     "FRAME_HEIGHT",
@@ -41,4 +50,5 @@ __all__ = [
     "FACE_DATA_DIR",
     "ATTENDANCE_DIR",
     "MODELS_DIR",
+    "UG_ADAPT_ENABLED",
 ]

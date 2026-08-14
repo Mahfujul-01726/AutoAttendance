@@ -9,7 +9,7 @@ from .config import DATABASE_PATH, MODELS_DIR
 
 
 class AttendanceDatabase:
-    """SQLite storage for students, face embeddings, attendance, and alerts."""
+    """SQLite storage for students, dual-memory face embeddings, attendance, and adaptation audit logs."""
 
     def __init__(self, db_path=DATABASE_PATH):
         self.db_path = db_path
@@ -41,12 +41,31 @@ class AttendanceDatabase:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     student_id INTEGER NOT NULL,
                     embedding BLOB NOT NULL,
+                    anchor_embedding BLOB,
+                    active_embedding BLOB,
                     embedding_dim INTEGER NOT NULL,
                     image_path TEXT,
                     model_name TEXT NOT NULL,
                     quality_score REAL,
+                    adaptation_count INTEGER DEFAULT 0,
+                    last_drift REAL DEFAULT 0.0,
+                    rollback_count INTEGER DEFAULT 0,
                     created_at TEXT NOT NULL,
+                    updated_at TEXT,
                     FOREIGN KEY(student_id) REFERENCES students(id) ON DELETE CASCADE
+                );
+
+                CREATE TABLE IF NOT EXISTS adaptation_audit_logs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    student_id INTEGER,
+                    student_name TEXT NOT NULL,
+                    alpha REAL NOT NULL,
+                    quality_score REAL NOT NULL,
+                    liveness_score REAL NOT NULL,
+                    drift_score REAL NOT NULL,
+                    status TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY(student_id) REFERENCES students(id) ON DELETE SET NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS attendance (
@@ -72,6 +91,29 @@ class AttendanceDatabase:
                 );
                 """
             )
+            # Automatic schema migration for existing databases
+            self._migrate_schema(conn)
+
+    def _migrate_schema(self, conn):
+        """Safely add missing columns to face_embeddings if database was created with old schema."""
+        cursor = conn.execute("PRAGMA table_info(face_embeddings)")
+        columns = [row["name"] for row in cursor.fetchall()]
+        
+        migrations = [
+            ("anchor_embedding", "BLOB"),
+            ("active_embedding", "BLOB"),
+            ("adaptation_count", "INTEGER DEFAULT 0"),
+            ("last_drift", "REAL DEFAULT 0.0"),
+            ("rollback_count", "INTEGER DEFAULT 0"),
+            ("updated_at", "TEXT"),
+        ]
+        
+        for col_name, col_type in migrations:
+            if col_name not in columns:
+                try:
+                    conn.execute(f"ALTER TABLE face_embeddings ADD COLUMN {col_name} {col_type}")
+                except sqlite3.OperationalError:
+                    pass
 
     def upsert_student(self, name, **fields):
         now = datetime.now().isoformat(timespec="seconds")
@@ -106,24 +148,103 @@ class AttendanceDatabase:
 
     def add_embedding(self, student_id, embedding, image_path=None, model_name="unknown", quality_score=None):
         embedding_array = np.asarray(embedding, dtype=np.float32)
+        norm = np.linalg.norm(embedding_array)
+        if norm > 0:
+            embedding_array = embedding_array / norm
+            
+        raw_bytes = embedding_array.tobytes()
         now = datetime.now().isoformat(timespec="seconds")
+        
         with self._connect() as conn:
             conn.execute(
                 """
                 INSERT INTO face_embeddings
-                    (student_id, embedding, embedding_dim, image_path, model_name, quality_score, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                    (student_id, embedding, anchor_embedding, active_embedding, embedding_dim, image_path, model_name, quality_score, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     student_id,
-                    embedding_array.tobytes(),
+                    raw_bytes,
+                    raw_bytes,  # LTM Anchor
+                    raw_bytes,  # STM Active prototype
                     int(embedding_array.shape[0]),
                     image_path,
                     model_name,
                     quality_score,
                     now,
+                    now,
                 ),
             )
+
+    def update_stm_embedding(self, embedding_id: int, new_stm_vector: np.ndarray, drift_score: float, is_rollback: bool = False):
+        """Update the active STM prototype in the database after a safe adaptation or rollback."""
+        stm_array = np.asarray(new_stm_vector, dtype=np.float32)
+        norm = np.linalg.norm(stm_array)
+        if norm > 0:
+            stm_array = stm_array / norm
+            
+        now = datetime.now().isoformat(timespec="seconds")
+        with self._connect() as conn:
+            if is_rollback:
+                conn.execute(
+                    """
+                    UPDATE face_embeddings
+                    SET active_embedding = ?,
+                        last_drift = ?,
+                        rollback_count = rollback_count + 1,
+                        updated_at = ?
+                    WHERE id = ?
+                    """,
+                    (stm_array.tobytes(), float(drift_score), now, embedding_id),
+                )
+            else:
+                conn.execute(
+                    """
+                    UPDATE face_embeddings
+                    SET active_embedding = ?,
+                        last_drift = ?,
+                        adaptation_count = adaptation_count + 1,
+                        updated_at = ?
+                    WHERE id = ?
+                    """,
+                    (stm_array.tobytes(), float(drift_score), now, embedding_id),
+                )
+
+    def log_adaptation_event(
+        self,
+        student_id: int,
+        student_name: str,
+        alpha: float,
+        quality_score: float,
+        liveness_score: float,
+        drift_score: float,
+        status: str
+    ):
+        """Log an adaptation, rollback, or bypass event into adaptation_audit_logs."""
+        now = datetime.now().isoformat(timespec="seconds")
+        with self._connect() as conn:
+            conn.execute(
+                """
+                INSERT INTO adaptation_audit_logs
+                    (student_id, student_name, alpha, quality_score, liveness_score, drift_score, status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (student_id, student_name, float(alpha), float(quality_score), float(liveness_score), float(drift_score), status, now),
+            )
+
+    def list_adaptation_logs(self, limit: int = 100):
+        """Fetch recent adaptation audit log records."""
+        with self._connect() as conn:
+            rows = conn.execute(
+                """
+                SELECT id, student_id, student_name, alpha, quality_score, liveness_score, drift_score, status, created_at
+                FROM adaptation_audit_logs
+                ORDER BY created_at DESC
+                LIMIT ?
+                """,
+                (limit,),
+            ).fetchall()
+        return [dict(row) for row in rows]
 
     def load_embeddings(self):
         with self._connect() as conn:
@@ -133,10 +254,15 @@ class AttendanceDatabase:
                     face_embeddings.id,
                     face_embeddings.student_id,
                     face_embeddings.embedding,
+                    face_embeddings.anchor_embedding,
+                    face_embeddings.active_embedding,
                     face_embeddings.embedding_dim,
                     face_embeddings.image_path,
                     face_embeddings.model_name,
                     face_embeddings.quality_score,
+                    face_embeddings.adaptation_count,
+                    face_embeddings.last_drift,
+                    face_embeddings.rollback_count,
                     students.name AS student_name
                 FROM face_embeddings
                 JOIN students ON students.id = face_embeddings.student_id
@@ -146,16 +272,34 @@ class AttendanceDatabase:
 
         embeddings = []
         for row in rows:
-            vector = np.frombuffer(row["embedding"], dtype=np.float32, count=row["embedding_dim"])
+            dim = int(row["embedding_dim"])
+            # Fallbacks for raw / anchor / active
+            raw_vec = np.frombuffer(row["embedding"], dtype=np.float32, count=dim)
+            
+            if row["anchor_embedding"] is not None:
+                anchor_vec = np.frombuffer(row["anchor_embedding"], dtype=np.float32, count=dim)
+            else:
+                anchor_vec = raw_vec.copy()
+                
+            if row["active_embedding"] is not None:
+                active_vec = np.frombuffer(row["active_embedding"], dtype=np.float32, count=dim)
+            else:
+                active_vec = raw_vec.copy()
+
             embeddings.append(
                 {
                     "id": int(row["id"]),
                     "student_id": int(row["student_id"]),
                     "student_name": row["student_name"],
-                    "embedding": vector,
+                    "embedding": active_vec,              # Backward compatibility
+                    "ltm_anchor": anchor_vec,             # LTM
+                    "stm_prototype": active_vec,          # STM
                     "image_path": row["image_path"],
                     "model_name": row["model_name"],
                     "quality_score": row["quality_score"],
+                    "adaptation_count": int(row["adaptation_count"] or 0),
+                    "last_drift": float(row["last_drift"] or 0.0),
+                    "rollback_count": int(row["rollback_count"] or 0),
                 }
             )
         return embeddings
@@ -256,6 +400,7 @@ class AttendanceDatabase:
                 "students": self.list_students(),
                 "attendance": self.list_attendance(limit=500),
                 "alerts": self.list_alerts(limit=100),
+                "adaptation_audit": self.list_adaptation_logs(limit=100),
             },
             indent=2,
         )

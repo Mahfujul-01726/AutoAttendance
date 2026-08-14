@@ -10,6 +10,12 @@ import time
 import webbrowser
 from pathlib import Path
 
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except (AttributeError, ValueError):
+    pass
+
 def check_requirements():
     """Check if required packages are installed"""
     required_packages = ['flask', 'flask_cors']
@@ -53,7 +59,7 @@ def start_web_server():
         print("🚀 Starting web server...\n")
         
         # Import and run Flask app
-        from web_ui import app
+        from .web_ui import app
         
         # Run Flask
         app.run(

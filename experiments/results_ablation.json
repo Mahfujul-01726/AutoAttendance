@@ -1,0 +1,65 @@
+{
+  "num_pairs": 1000,
+  "ablation_matrix": [
+    {
+      "variant": "Baseline (Static)",
+      "gate": false,
+      "dynamic_alpha": false,
+      "dual_memory": false,
+      "rollback": false,
+      "accuracy_pct": 100.0,
+      "false_update_rate_pct": 0.0,
+      "eer_pct": 0.0,
+      "latency_ms": 0.088,
+      "fps": 11310.6
+    },
+    {
+      "variant": "Variant A (+Gate)",
+      "gate": true,
+      "dynamic_alpha": false,
+      "dual_memory": false,
+      "rollback": false,
+      "accuracy_pct": 99.9,
+      "false_update_rate_pct": 0.0,
+      "eer_pct": 0.0,
+      "latency_ms": 0.079,
+      "fps": 12580.5
+    },
+    {
+      "variant": "Variant B (+Dynamic Alpha)",
+      "gate": true,
+      "dynamic_alpha": true,
+      "dual_memory": false,
+      "rollback": false,
+      "accuracy_pct": 100.0,
+      "false_update_rate_pct": 0.0,
+      "eer_pct": 0.0,
+      "latency_ms": 0.084,
+      "fps": 11941.0
+    },
+    {
+      "variant": "Variant C (+Dual Memory)",
+      "gate": true,
+      "dynamic_alpha": true,
+      "dual_memory": true,
+      "rollback": false,
+      "accuracy_pct": 100.0,
+      "false_update_rate_pct": 0.0,
+      "eer_pct": 0.0,
+      "latency_ms": 0.167,
+      "fps": 5986.8
+    },
+    {
+      "variant": "Full UG-Adapt (All Active)",
+      "gate": true,
+      "dynamic_alpha": true,
+      "dual_memory": true,
+      "rollback": true,
+      "accuracy_pct": 100.0,
+      "false_update_rate_pct": 0.0,
+      "eer_pct": 0.0,
+      "latency_ms": 0.118,
+      "fps": 8500.5
+    }
+  ]
+}

@@ -9,6 +9,12 @@ import os
 from pathlib import Path
 from datetime import datetime
 
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+except (AttributeError, ValueError):
+    pass
+
 from .logger import setup_logger, get_logger, log_system_event
 from .database import AttendanceDatabase
 from .face_recognition import FaceRecognitionModule
