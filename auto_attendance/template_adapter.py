@@ -141,6 +141,21 @@ class DualMemoryTemplateAdapter:
         drift_distance = max(0.0, 1.0 - cosine_sim)
         return float(drift_distance)
 
+    def compute_dynamic_drift_threshold(
+        self,
+        quality_score: float,
+        liveness_score: float = 1.0,
+        adaptation_count: int = 0
+    ) -> float:
+        """
+        Dynamically scale geodesic drift threshold based on observation certainty and temporal tenure:
+        delta_dyn = delta_base * (0.85 + 0.15 * Q_face * S_live) * min(1.15, 1.0 + 0.02 * ln(1 + N_adapt))
+        """
+        certainty = float(np.clip(quality_score * liveness_score, 0.0, 1.0))
+        tenure_factor = float(min(1.15, 1.0 + 0.02 * np.log1p(max(0, adaptation_count))))
+        dyn_threshold = self.drift_threshold * (0.85 + 0.15 * certainty) * tenure_factor
+        return float(np.clip(dyn_threshold, 0.25, 0.42))
+
     def adapt(
         self,
         live_embedding: np.ndarray,
@@ -149,6 +164,7 @@ class DualMemoryTemplateAdapter:
         quality_score: float,
         liveness_score: float = 1.0,
         current_kappa: float = 50.0,
+        adaptation_count: int = 0,
     ) -> Tuple[np.ndarray, str, Dict[str, float]]:
         """
         Execute the Dynamic Template Adaptation & Drift-Guard Policy with vMF Filtering.
@@ -177,25 +193,30 @@ class DualMemoryTemplateAdapter:
         if cand_norm > 0:
             cand_stm = cand_stm / cand_norm
 
-        # 2. Geodesic Drift Check against Immutable LTM Anchor
+        # 2. Dynamic Geodesic Drift Check against Immutable LTM Anchor
         drift_distance = self.calculate_drift_distance(cand_stm, ltm)
+        active_drift_threshold = self.compute_dynamic_drift_threshold(
+            quality_score=quality_score,
+            liveness_score=liveness_score,
+            adaptation_count=adaptation_count
+        )
 
         metrics = {
             "alpha": alpha,
             "drift_distance": drift_distance,
             "quality_score": quality_score,
             "liveness_score": liveness_score,
-            "drift_threshold": self.drift_threshold,
+            "drift_threshold": active_drift_threshold,
             "posterior_kappa": post_kappa,
         }
 
         # 3. Drift Decision
-        if drift_distance <= self.drift_threshold:
-            logger.debug(f"UG-Adapt: Safe update accepted (drift={drift_distance:.4f}, alpha={alpha:.4f}, kappa={post_kappa:.1f})")
+        if drift_distance <= active_drift_threshold:
+            logger.debug(f"UG-Adapt: Safe update accepted (drift={drift_distance:.4f} <= {active_drift_threshold:.4f}, alpha={alpha:.4f}, kappa={post_kappa:.1f})")
             return cand_stm, "UPDATED", metrics
         else:
             logger.warning(
-                f"[ALERT] UG-Adapt: Drift Breach Detected! (drift={drift_distance:.4f} > {self.drift_threshold:.4f}). "
+                f"[ALERT] UG-Adapt: Drift Breach Detected! (drift={drift_distance:.4f} > {active_drift_threshold:.4f}). "
                 f"Triggering Auto-Rollback to LTM anchor."
             )
             # Rollback to pristine LTM anchor

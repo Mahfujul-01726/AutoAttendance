@@ -303,7 +303,8 @@ class FaceRecognitionModule:
             ltm_anchor=ltm,
             current_stm=stm,
             quality_score=q_face,
-            liveness_score=liveness_score
+            liveness_score=liveness_score,
+            adaptation_count=record.get("adaptation_count", 0)
         )
 
         # 3. Persist to DB and update memory cache
