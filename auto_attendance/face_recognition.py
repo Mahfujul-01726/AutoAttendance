@@ -19,6 +19,16 @@ from .config import (
 from .database import AttendanceDatabase
 from .quality_gate import QualityGate
 from .template_adapter import DualMemoryTemplateAdapter
+from .anti_spoofing import AntiSpoofing
+from .cancelable_biometrics import CancelableBiometricsEngine
+from .photometric_harmonization import AdaptiveRetinexHarmonizer
+from .occlusion_gating import OcclusionAwareSubEmbeddingGater
+from .homography_flow_guard import PlanarHomographyFlowGuard
+from .explainable_ai import ExplainableSaliencyAttributor
+from .rppg_pulse_guard import RemotePulseLivenessGuard
+from .differential_privacy import HypersphericalDifferentialPrivacyEngine
+from .adversarial_patch_filter import AdversarialPatchDefenseFilter
+from .optimal_transport_aligner import CrossCameraOptimalTransportAligner
 
 warnings.filterwarnings(
     "ignore",
@@ -45,10 +55,20 @@ class FaceRecognitionModule:
         self.reverse_labels = {}
         self.label_count = 0
         
-        # UG-Adapt Research Modules
+        # UG-Adapt Comprehensive Research Engine Ecosystem
         self.ug_adapt_enabled = ug_adapt_enabled
         self.quality_gate = QualityGate()
         self.adapter = DualMemoryTemplateAdapter()
+        self.anti_spoofing = AntiSpoofing()
+        self.photometric_harmonizer = AdaptiveRetinexHarmonizer()
+        self.cancelable_engine = CancelableBiometricsEngine()
+        self.occlusion_gater = OcclusionAwareSubEmbeddingGater()
+        self.flow_guard = PlanarHomographyFlowGuard()
+        self.xai_attributor = ExplainableSaliencyAttributor()
+        self.rppg_guard = RemotePulseLivenessGuard()
+        self.dp_engine = HypersphericalDifferentialPrivacyEngine()
+        self.patch_filter = AdversarialPatchDefenseFilter()
+        self.ot_aligner = CrossCameraOptimalTransportAligner()
 
     def _load_insightface(self):
         try:
@@ -192,7 +212,16 @@ class FaceRecognitionModule:
             crop = frame[y1:y2, x1:x2]
             landmarks = getattr(face, "kps", None)
 
-            liveness = liveness_scores[idx] if liveness_scores and idx < len(liveness_scores) else 1.0
+            if liveness_scores and idx < len(liveness_scores):
+                liveness = liveness_scores[idx]
+            elif crop.size > 0:
+                _is_live, liveness, _live_meta = self.anti_spoofing.evaluate_spatio_temporal_liveness(
+                    face_crop=crop,
+                    landmarks=landmarks,
+                    subject_key=str(match["student_id"] if match else f"face_{idx}")
+                )
+            else:
+                liveness = 1.0
 
             if match:
                 student_id = match["student_id"]

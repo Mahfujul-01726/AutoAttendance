@@ -122,30 +122,62 @@ class QualityGate:
 
         return pose_score, yaw_deg, pitch_deg
 
+    def compute_disentangled_uncertainty(
+        self,
+        sharpness: float,
+        illumination: float,
+        pose_score: float,
+        liveness_score: float = 1.0,
+    ) -> Tuple[float, float, float]:
+        """
+        Decompose Epistemic vs. Aleatoric Evidential Uncertainty.
+        
+        Returns:
+            (sigma_aleatoric_sq, sigma_epistemic_sq, sigma_total_sq)
+        """
+        # Aleatoric Uncertainty (Ambient / Sensor / Blur Noise)
+        sigma_ale_sq = float(np.clip((1.0 - sharpness) * 0.55 + (1.0 - illumination) * 0.45, 0.0, 1.0))
+        
+        # Epistemic Uncertainty (Model Out-of-Distribution / Spoof / Extreme Pose)
+        sigma_epi_sq = float(np.clip((1.0 - liveness_score) * 0.60 + (1.0 - pose_score) * 0.40, 0.0, 1.0))
+        
+        sigma_total_sq = float(np.clip(0.50 * sigma_ale_sq + 0.50 * sigma_epi_sq, 0.0, 1.0))
+        return sigma_ale_sq, sigma_epi_sq, sigma_total_sq
+
     def evaluate_composite_quality(
         self,
         face_crop: np.ndarray,
         landmarks: Optional[np.ndarray] = None
     ) -> Tuple[float, Dict[str, float]]:
-        """Compute composite Face Quality Score Q_face."""
-        s_score = self.calculate_sharpness(face_crop)
-        i_score = self.calculate_illumination(face_crop)
-        p_score, yaw, pitch = self.calculate_pose_score(landmarks)
+        """Compute composite Face Quality Score Q_face and Disentangled Uncertainty."""
+        sharpness = self.calculate_sharpness(face_crop)
+        illumination = self.calculate_illumination(face_crop)
+        pose_score, yaw_deg, pitch_deg = self.calculate_pose_score(landmarks)
 
         q_face = (
-            self.w_sharpness * s_score +
-            self.w_illumination * i_score +
-            self.w_pose * p_score
+            self.w_sharpness * sharpness
+            + self.w_illumination * illumination
+            + self.w_pose * pose_score
         )
-        q_face = max(0.0, min(1.0, float(q_face)))
+        q_face = float(np.clip(q_face, 0.0, 1.0))
+
+        ale_unc, epi_unc, tot_unc = self.compute_disentangled_uncertainty(
+            sharpness=sharpness,
+            illumination=illumination,
+            pose_score=pose_score,
+            liveness_score=1.0
+        )
 
         metrics = {
-            "q_face": q_face,
-            "sharpness": s_score,
-            "illumination": i_score,
-            "pose_score": p_score,
-            "yaw_deg": yaw,
-            "pitch_deg": pitch,
+            "sharpness": sharpness,
+            "illumination": illumination,
+            "pose_score": pose_score,
+            "yaw_degrees": yaw_deg,
+            "pitch_degrees": pitch_deg,
+            "composite_quality": q_face,
+            "aleatoric_uncertainty": ale_unc,
+            "epistemic_uncertainty": epi_unc,
+            "total_uncertainty": tot_unc,
         }
         return q_face, metrics
 

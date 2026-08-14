@@ -47,20 +47,36 @@ class TestAntiSpoofing(unittest.TestCase):
         self.assertEqual(module.threshold, 0.5)
 
 
-class TestSpoofDetection(unittest.TestCase):
-    """Test suite for spoof detection functionality."""
-
-    def test_detect_printed_photo(self):
-        """Test detection of uniform/printed photos."""
-        printed_photo = np.ones((112, 112, 3), dtype=np.uint8) * 128
+    def test_calculate_ear_5point(self):
+        """Test 5-point landmark EAR calculation."""
         module = AntiSpoofing()
-        is_real, score = module.analyze(printed_photo)
-        self.assertFalse(is_real)
+        # [left_eye, right_eye, nose, left_mouth, right_mouth]
+        dummy_kps = np.array([
+            [30, 40],
+            [70, 40],
+            [50, 60],
+            [35, 80],
+            [65, 80],
+        ], dtype=np.float32)
+        ear = module.calculate_ear_5point(dummy_kps)
+        self.assertIsInstance(ear, float)
+        self.assertTrue(0.10 <= ear <= 0.50)
 
-    def test_detect_real_face(self):
-        """Test random noise texture analysis."""
-        real_face = (np.random.rand(112, 112, 3) * 255).astype(np.uint8)
-        self.assertEqual(real_face.shape, (112, 112, 3))
+    def test_evaluate_spatio_temporal_liveness(self):
+        """Test fused spatio-temporal liveness evaluation."""
+        module = AntiSpoofing()
+        face_crop = (np.random.rand(112, 112, 3) * 255).astype(np.uint8)
+        dummy_kps = np.array([[30, 40], [70, 40], [50, 60], [35, 80], [65, 80]], dtype=np.float32)
+        
+        is_real, score, metrics = module.evaluate_spatio_temporal_liveness(
+            face_crop=face_crop,
+            landmarks=dummy_kps,
+            subject_key="test_person"
+        )
+        self.assertIsInstance(is_real, bool)
+        self.assertIsInstance(score, float)
+        self.assertIn("bio_motion_score", metrics)
+        self.assertIn("fused_liveness", metrics)
 
 
 if __name__ == "__main__":

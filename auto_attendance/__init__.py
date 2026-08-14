@@ -3,9 +3,9 @@ AutoAttendance - Face Recognition Attendance System & UG-Adapt Framework
 A professional real-time attendance tracking and continual biometrics research solution.
 """
 
-__version__ = "2.0.0"
+__version__ = "2.4.0"
 __author__ = "AutoAttendance Team"
-__description__ = "Real-time face recognition attendance system with UG-Adapt continual learning"
+__description__ = "Real-time face recognition attendance system with UG-Adapt continual learning, cancelable biometrics, rPPG, and adversarial immunity"
 
 from .config import (
     CAMERA_ID,
@@ -27,6 +27,15 @@ from .attendance_manager import AttendanceManager
 from .anti_spoofing import AntiSpoofing
 from .quality_gate import QualityGate
 from .template_adapter import DualMemoryTemplateAdapter
+from .cancelable_biometrics import CancelableBiometricsEngine
+from .photometric_harmonization import AdaptiveRetinexHarmonizer
+from .occlusion_gating import OcclusionAwareSubEmbeddingGater
+from .homography_flow_guard import PlanarHomographyFlowGuard
+from .explainable_ai import ExplainableSaliencyAttributor
+from .rppg_pulse_guard import RemotePulseLivenessGuard
+from .differential_privacy import HypersphericalDifferentialPrivacyEngine
+from .adversarial_patch_filter import AdversarialPatchDefenseFilter
+from .optimal_transport_aligner import CrossCameraOptimalTransportAligner
 
 # Backward compatibility alias
 AntiSpoofingModule = AntiSpoofing
@@ -39,6 +48,15 @@ __all__ = [
     "FaceRecognitionModule",
     "QualityGate",
     "DualMemoryTemplateAdapter",
+    "CancelableBiometricsEngine",
+    "AdaptiveRetinexHarmonizer",
+    "OcclusionAwareSubEmbeddingGater",
+    "PlanarHomographyFlowGuard",
+    "ExplainableSaliencyAttributor",
+    "RemotePulseLivenessGuard",
+    "HypersphericalDifferentialPrivacyEngine",
+    "AdversarialPatchDefenseFilter",
+    "CrossCameraOptimalTransportAligner",
     "CAMERA_ID",
     "FRAME_WIDTH",
     "FRAME_HEIGHT",

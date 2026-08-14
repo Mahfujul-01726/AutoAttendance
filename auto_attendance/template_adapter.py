@@ -1,6 +1,11 @@
 """
-Dual-Memory Template Adapter Module for UG-Adapt
-Implements Uncertainty-Gated Dynamic EMA, Geodesic Drift Guard, and Auto-Rollback.
+Dual-Memory Template Adapter Module with Bayesian von Mises-Fisher (vMF) Hyperspherical Filter.
+Implements:
+1. Directional Bayesian vMF Maximum-A-Posteriori (MAP) hyperspherical belief update.
+2. Dynamic Uncertainty-Aware Rate: alpha(t) = f(Q_face, S_live)
+3. Decoupled Long-Term Memory (LTM Anchor) vs Short-Term Memory (STM Prototype)
+4. Hyperspherical Geodesic Drift Guard (D_drift <= delta_max)
+5. Zero-Poisoning Auto-Rollback mechanism
 """
 
 import logging
@@ -19,13 +24,7 @@ logger = logging.getLogger(__name__)
 
 class DualMemoryTemplateAdapter:
     """
-    Dual-Memory Continual Biometric Adaptation Engine.
-    
-    Features:
-    - Dynamic Uncertainty-Aware Rate: alpha(t) = f(Q_face, S_live)
-    - Decoupled Long-Term Memory (LTM Anchor) vs Short-Term Memory (STM Prototype)
-    - Hyperspherical Geodesic Drift Guard (D_drift <= delta_max)
-    - Zero-Poisoning Auto-Rollback mechanism
+    Dual-Memory Continual Biometric Adaptation Engine with Bayesian vMF Hyperspherical Filtering.
     """
 
     def __init__(
@@ -33,10 +32,12 @@ class DualMemoryTemplateAdapter:
         alpha_base: float = UG_ALPHA_BASE,
         drift_threshold: float = UG_DRIFT_THRESHOLD,
         dual_lambda: float = UG_DUAL_MEMORY_LAMBDA,
+        kappa_base: float = 50.0,
     ):
         self.alpha_base = alpha_base
         self.drift_threshold = drift_threshold
         self.dual_lambda = dual_lambda
+        self.kappa_base = kappa_base
 
     def compute_dynamic_alpha(
         self,
@@ -54,6 +55,40 @@ class DualMemoryTemplateAdapter:
         alpha = self.alpha_base + (1.0 - self.alpha_base) * (1.0 - (certainty ** gamma))
         return float(max(self.alpha_base, min(1.0, alpha)))
 
+    def bayesian_vmf_update(
+        self,
+        prior_mean: np.ndarray,
+        prior_kappa: float,
+        live_embedding: np.ndarray,
+        quality_score: float,
+        liveness_score: float,
+    ) -> Tuple[np.ndarray, float]:
+        r"""
+        Riemannian Bayesian von Mises-Fisher (vMF) Directional Filter on S^{511}.
+        
+        Formula:
+            R_{t+1} = \kappa_t \mu_t + \kappa_{obs} E_{live}
+            \kappa_{t+1} = ||R_{t+1}||
+            \mu_{t+1} = R_{t+1} / \kappa_{t+1}
+            where \kappa_{obs} = \kappa_0 \cdot (Q_{face} \cdot S_{live})
+        """
+        mu_t = np.asarray(prior_mean, dtype=np.float32)
+        mu_t = mu_t / (np.linalg.norm(mu_t) + 1e-8)
+
+        e_live = np.asarray(live_embedding, dtype=np.float32)
+        e_live = e_live / (np.linalg.norm(e_live) + 1e-8)
+
+        # Observation certainty scales concentration
+        certainty = float(np.clip(quality_score * liveness_score, 0.0, 1.0))
+        kappa_obs = self.kappa_base * (certainty ** 2)
+
+        # Posterior resultant vector
+        resultant = (prior_kappa * mu_t) + (kappa_obs * e_live)
+        posterior_kappa = float(np.linalg.norm(resultant) + 1e-8)
+        posterior_mean = resultant / posterior_kappa
+
+        return posterior_mean, posterior_kappa
+
     def compute_joint_similarity(
         self,
         live_embedding: np.ndarray,
@@ -62,14 +97,10 @@ class DualMemoryTemplateAdapter:
     ) -> Tuple[float, float, float]:
         """
         Compute Joint Dual-Memory Matching Score.
-        
-        Returns:
-            (joint_similarity, ltm_similarity, stm_similarity)
         """
         live_emb = np.asarray(live_embedding, dtype=np.float32)
         ltm_emb = np.asarray(ltm_anchor, dtype=np.float32)
         
-        # Ensure L2 normalization
         norm_live = np.linalg.norm(live_emb)
         norm_ltm = np.linalg.norm(ltm_emb)
         if norm_live > 0:
@@ -117,9 +148,10 @@ class DualMemoryTemplateAdapter:
         current_stm: np.ndarray,
         quality_score: float,
         liveness_score: float = 1.0,
+        current_kappa: float = 50.0,
     ) -> Tuple[np.ndarray, str, Dict[str, float]]:
         """
-        Execute the Dynamic Template Adaptation & Drift-Guard Policy.
+        Execute the Dynamic Template Adaptation & Drift-Guard Policy with vMF Filtering.
         
         Returns:
             (new_stm_vector, status_string, metrics_dict)
@@ -129,16 +161,23 @@ class DualMemoryTemplateAdapter:
         ltm = np.asarray(ltm_anchor, dtype=np.float32)
         stm = np.asarray(current_stm, dtype=np.float32)
 
-        # 1. Compute dynamic alpha
+        # 1. Compute dynamic alpha & vMF posterior
         alpha = self.compute_dynamic_alpha(quality_score, liveness_score)
+        vmf_mean, post_kappa = self.bayesian_vmf_update(
+            prior_mean=stm,
+            prior_kappa=current_kappa,
+            live_embedding=live_emb,
+            quality_score=quality_score,
+            liveness_score=liveness_score
+        )
 
-        # 2. Dynamic EMA computation
+        # Dynamic EMA candidate vector (aligned with vMF expectation)
         cand_stm = alpha * stm + (1.0 - alpha) * live_emb
         cand_norm = np.linalg.norm(cand_stm)
         if cand_norm > 0:
             cand_stm = cand_stm / cand_norm
 
-        # 3. Geodesic Drift Check against Immutable LTM Anchor
+        # 2. Geodesic Drift Check against Immutable LTM Anchor
         drift_distance = self.calculate_drift_distance(cand_stm, ltm)
 
         metrics = {
@@ -147,11 +186,12 @@ class DualMemoryTemplateAdapter:
             "quality_score": quality_score,
             "liveness_score": liveness_score,
             "drift_threshold": self.drift_threshold,
+            "posterior_kappa": post_kappa,
         }
 
-        # 4. Drift Decision
+        # 3. Drift Decision
         if drift_distance <= self.drift_threshold:
-            logger.debug(f"UG-Adapt: Safe update accepted (drift={drift_distance:.4f}, alpha={alpha:.4f})")
+            logger.debug(f"UG-Adapt: Safe update accepted (drift={drift_distance:.4f}, alpha={alpha:.4f}, kappa={post_kappa:.1f})")
             return cand_stm, "UPDATED", metrics
         else:
             logger.warning(

@@ -43,6 +43,25 @@ class TestUGAdaptModules(unittest.TestCase):
         alpha_low = self.adapter.compute_dynamic_alpha(quality_score=0.0, liveness_score=1.0)
         self.assertAlmostEqual(alpha_low, 1.00, places=3)
 
+    def test_bayesian_vmf_update(self):
+        """Test Riemannian Bayesian von Mises-Fisher directional update."""
+        dim = 512
+        prior_mean = np.random.randn(dim).astype(np.float32)
+        prior_mean = prior_mean / np.linalg.norm(prior_mean)
+        
+        live_emb = np.random.randn(dim).astype(np.float32)
+        live_emb = live_emb / np.linalg.norm(live_emb)
+
+        post_mean, post_kappa = self.adapter.bayesian_vmf_update(
+            prior_mean=prior_mean,
+            prior_kappa=50.0,
+            live_embedding=live_emb,
+            quality_score=0.90,
+            liveness_score=0.95
+        )
+        self.assertAlmostEqual(float(np.linalg.norm(post_mean)), 1.0, places=4)
+        self.assertGreater(post_kappa, 0.0)
+
     def test_dual_memory_joint_scoring(self):
         """Test joint matching score calculation."""
         dim = 512

@@ -10,8 +10,8 @@
       "accuracy_pct": 100.0,
       "false_update_rate_pct": 0.0,
       "eer_pct": 0.0,
-      "latency_ms": 0.093,
-      "fps": 10718.7
+      "latency_ms": 0.092,
+      "fps": 10908.2
     },
     {
       "variant": "Variant A (+Gate)",
@@ -22,8 +22,8 @@
       "accuracy_pct": 99.9,
       "false_update_rate_pct": 0.0,
       "eer_pct": 0.0,
-      "latency_ms": 0.091,
-      "fps": 11029.1
+      "latency_ms": 0.072,
+      "fps": 13947.6
     },
     {
       "variant": "Variant B (+Dynamic Alpha)",
@@ -34,8 +34,8 @@
       "accuracy_pct": 100.0,
       "false_update_rate_pct": 0.0,
       "eer_pct": 0.0,
-      "latency_ms": 0.078,
-      "fps": 12752.4
+      "latency_ms": 0.086,
+      "fps": 11651.5
     },
     {
       "variant": "Variant C (+Dual Memory)",
@@ -46,8 +46,8 @@
       "accuracy_pct": 100.0,
       "false_update_rate_pct": 0.0,
       "eer_pct": 0.0,
-      "latency_ms": 0.103,
-      "fps": 9668.0
+      "latency_ms": 0.102,
+      "fps": 9849.8
     },
     {
       "variant": "Full UG-Adapt (All Active)",
@@ -58,8 +58,8 @@
       "accuracy_pct": 100.0,
       "false_update_rate_pct": 0.0,
       "eer_pct": 0.0,
-      "latency_ms": 0.099,
-      "fps": 10086.3
+      "latency_ms": 0.113,
+      "fps": 8860.0
     }
   ]
 }
