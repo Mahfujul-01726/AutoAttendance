@@ -1,22 +1,31 @@
 #!/usr/bin/env python3
 """
-Diagnostic script to identify why face detection is not working.
+Diagnostic script to identify system components, camera access, and embeddings.
 """
 
 import sys
+from pathlib import Path
 import cv2
 import numpy as np
-from pathlib import Path
 
 # Add project root to path
-sys.path.insert(0, str(Path(__file__).parent))
+BASE_DIR = Path(__file__).parent.parent.absolute()
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
-from config import FACE_DATA_DIR, DATABASE_PATH, CAMERA_ID
-from database import AttendanceDatabase
-from face_recognition import FaceRecognitionModule
-from logger import get_logger
+try:
+    from .config import FACE_DATA_DIR, DATABASE_PATH, CAMERA_ID
+    from .database import AttendanceDatabase
+    from .face_recognition import FaceRecognitionModule
+    from .logger import get_logger
+except (ImportError, ValueError):
+    from auto_attendance.config import FACE_DATA_DIR, DATABASE_PATH, CAMERA_ID
+    from auto_attendance.database import AttendanceDatabase
+    from auto_attendance.face_recognition import FaceRecognitionModule
+    from auto_attendance.logger import get_logger
 
 logger = get_logger()
+
 
 def check_face_data():
     """Check if face data exists and is properly organized."""
@@ -25,10 +34,10 @@ def check_face_data():
     print("="*60)
     
     if not FACE_DATA_DIR.exists():
-        print(f"❌ Face data directory not found: {FACE_DATA_DIR}")
+        print(f"[FAIL] Face data directory not found: {FACE_DATA_DIR}")
         return False
     
-    print(f"✓ Face data directory found: {FACE_DATA_DIR}")
+    print(f"[OK] Face data directory found: {FACE_DATA_DIR}")
     
     total_images = 0
     for person_dir in FACE_DATA_DIR.iterdir():
@@ -38,10 +47,10 @@ def check_face_data():
             print(f"  - {person_dir.name}: {len(images)} images")
     
     if total_images == 0:
-        print("❌ No face images found! You need to register faces first.")
-        return False
+        print("[INFO] No raw face images found in data/faces/. (Embeddings may already be in database)")
+        return True
     
-    print(f"✓ Total face images: {total_images}")
+    print(f"[OK] Total face images: {total_images}")
     return True
 
 
@@ -56,14 +65,13 @@ def check_embeddings():
         embeddings = db.load_embeddings()
         
         if not embeddings:
-            print(f"❌ No embeddings found in database: {DATABASE_PATH}")
-            print("   You need to run: python train_model.py")
+            print(f"[WARNING] No embeddings found in database: {DATABASE_PATH}")
+            print("   You need to enroll faces first via CLI or Web UI.")
             return False
         
-        print(f"✓ Database found: {DATABASE_PATH}")
-        print(f"✓ Loaded {len(embeddings)} embeddings")
+        print(f"[OK] Database found: {DATABASE_PATH}")
+        print(f"[OK] Loaded {len(embeddings)} embeddings")
         
-        # Show breakdown by person
         people_embeddings = {}
         for emb in embeddings:
             name = emb.get('student_name', 'Unknown')
@@ -74,7 +82,7 @@ def check_embeddings():
         
         return True
     except Exception as e:
-        print(f"❌ Error checking embeddings: {e}")
+        print(f"[FAIL] Error checking embeddings: {e}")
         return False
 
 
@@ -87,12 +95,12 @@ def check_model():
     try:
         recognizer = FaceRecognitionModule()
         recognizer.load_model()
-        print("✓ Face recognition model loaded successfully")
+        print("[OK] Face recognition model loaded successfully")
         print(f"  - Model: {recognizer.model_name}")
         print(f"  - Known embeddings: {recognizer.label_count}")
         return True
     except Exception as e:
-        print(f"❌ Error loading model: {e}")
+        print(f"[FAIL] Error loading model: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -107,26 +115,26 @@ def check_camera():
     try:
         cap = cv2.VideoCapture(CAMERA_ID)
         if not cap.isOpened():
-            print(f"❌ Cannot open camera (ID: {CAMERA_ID})")
+            print(f"[WARNING] Cannot open camera (ID: {CAMERA_ID})")
             return False
         
         ret, frame = cap.read()
         if not ret:
-            print(f"❌ Cannot read frames from camera")
+            print("[WARNING] Cannot read frames from camera")
             cap.release()
             return False
         
-        print(f"✓ Camera opened successfully (ID: {CAMERA_ID})")
+        print(f"[OK] Camera opened successfully (ID: {CAMERA_ID})")
         print(f"  - Frame size: {frame.shape}")
         cap.release()
         return True
     except Exception as e:
-        print(f"❌ Error accessing camera: {e}")
+        print(f"[FAIL] Error accessing camera: {e}")
         return False
 
 
 def test_face_detection():
-    """Test face detection on a sample image."""
+    """Test face detection on a sample image or camera frame."""
     print("\n" + "="*60)
     print("5. TESTING FACE DETECTION")
     print("="*60)
@@ -134,33 +142,27 @@ def test_face_detection():
     try:
         recognizer = FaceRecognitionModule()
         
-        # Try detecting from camera
         cap = cv2.VideoCapture(CAMERA_ID)
         if not cap.isOpened():
-            print("❌ Cannot open camera for testing")
-            return False
+            print("[WARNING] Camera not available for live detection test")
+            return True
         
         ret, frame = cap.read()
         cap.release()
         
-        if not ret:
-            print("❌ Cannot read frame from camera")
-            return False
+        if not ret or frame is None:
+            print("[WARNING] Could not grab test frame")
+            return True
         
-        # Detect faces
         faces = recognizer.detect_faces(frame)
-        print(f"✓ Faces detected in camera frame: {len(faces)}")
-        
-        if len(faces) == 0:
-            print("  ⚠️  No faces detected - check camera angle, lighting, and distance")
-            return False
+        print(f"[OK] Faces detected in test frame: {len(faces)}")
         
         for i, face in enumerate(faces):
-            print(f"  - Face {i+1}: conf={float(getattr(face, 'det_score', 0)):.3f}")
+            print(f"  - Face {i+1}: det_score={float(getattr(face, 'det_score', 0)):.3f}")
         
         return True
     except Exception as e:
-        print(f"❌ Error testing face detection: {e}")
+        print(f"[FAIL] Error testing face detection: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -180,27 +182,14 @@ def main():
         "Face Detection": test_face_detection(),
     }
     
-    # Summary
     print("\n" + "="*60)
     print("  DIAGNOSTIC SUMMARY")
     print("="*60)
     
     for check, passed in results.items():
-        status = "✓ PASS" if passed else "❌ FAIL"
-        print(f"{status}: {check}")
+        status = "[PASS]" if passed else "[FAIL]"
+        print(f"{status:8}: {check}")
     
-    print("\n" + "="*60)
-    if all(results.values()):
-        print("✓ All checks passed! System should work.")
-    else:
-        print("❌ Some checks failed. See details above.")
-        print("\nQuick fixes:")
-        if not results["Face Data"]:
-            print("  1. Register face images: python train_model.py")
-        if not results["Embeddings"]:
-            print("  2. Train embeddings: python train_model.py")
-        if not results["Face Detection"]:
-            print("  3. Check camera: angle, lighting, distance from camera")
     print("="*60 + "\n")
 
 

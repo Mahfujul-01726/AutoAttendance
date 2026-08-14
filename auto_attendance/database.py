@@ -1,3 +1,4 @@
+import contextlib
 import json
 import os
 import sqlite3
@@ -16,11 +17,16 @@ class AttendanceDatabase:
         os.makedirs(os.path.dirname(db_path) or MODELS_DIR, exist_ok=True)
         self._init_schema()
 
+    @contextlib.contextmanager
     def _connect(self):
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys = ON")
-        return conn
+        try:
+            with conn:
+                yield conn
+        finally:
+            conn.close()
 
     def _init_schema(self):
         with self._connect() as conn:
