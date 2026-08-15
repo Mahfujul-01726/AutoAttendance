@@ -43,9 +43,9 @@ def sync_from_cloud(cloud_url: str):
     cloud_url = cloud_url.rstrip("/")
     export_endpoint = f"{cloud_url}/api/export/json?days=365"
 
-    print(f"[*] Fetching live attendance logs from: {export_endpoint} ...")
+    print(f"[*] Fetching live attendance logs from: {export_endpoint} (waking up space if sleeping)...")
     try:
-        response = requests.get(export_endpoint, timeout=15)
+        response = requests.get(export_endpoint, timeout=60)
         if response.status_code != 200:
             print(f"[!] Server returned status {response.status_code}: {response.text}")
             return False
@@ -53,8 +53,8 @@ def sync_from_cloud(cloud_url: str):
         records = response.json()
         print(f"[OK] Successfully fetched {len(records)} attendance records from Cloud!")
     except Exception as e:
-        print(f"[!] Connection failed: {e}")
-        print("Tip: Make sure your Hugging Face Space is running and the URL is correct.")
+        print(f"[!] Connection note: {e}")
+        print("Tip: If the Hugging Face Space was sleeping, opening https://huggingface.co/spaces/mahfuj735/AutoAttendance in browser will wake it up!")
         return False
 
     # Connect to local SQLite database
