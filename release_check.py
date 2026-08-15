@@ -13,6 +13,12 @@ import os
 import sys
 from pathlib import Path
 
+try:
+    if sys.stdout.encoding.lower() != 'utf-8':
+        sys.stdout.reconfigure(encoding='utf-8')
+except Exception:
+    pass
+
 def print_header(text):
     """Print formatted header"""
     print(f"\n{'='*70}")
