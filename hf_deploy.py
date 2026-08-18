@@ -17,7 +17,11 @@ try:
         folder_path=".",
         repo_id=repo_id,
         repo_type="space",
-        ignore_patterns=[".git", ".github", "__pycache__", "ProjectReport", "*.mp4", "*.ipynb", "logs/*"],
+        ignore_patterns=[
+            ".git", ".git/*", ".github", ".github/*", "__pycache__", "*/__pycache__/*",
+            "ProjectReport", "ProjectReport/*", "*.mp4", "*.ipynb", "logs/*",
+            "dist", "dist/*", "build", "build/*", "*.egg-info", "*.egg-info/*", "*.whl"
+        ],
         token=token
     )
     print(f"Successfully deployed! View it at: https://huggingface.co/spaces/{repo_id}")
