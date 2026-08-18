@@ -94,6 +94,20 @@ class TestAttendanceDatabase(unittest.TestCase):
         self.assertEqual(len(records), 1)
         self.assertEqual(records[0]["student_name"], "Attendance Tester")
 
+    def test_delete_student_and_attendance(self):
+        """Test deleting a student and their attendance."""
+        student_id = self.db.upsert_student("Delete Me")
+        self.db.mark_attendance(student_id, "Delete Me", confidence=0.2)
+        
+        # Test delete attendance
+        today = "2026-08-18"
+        self.db.delete_attendance("Delete Me", today)
+        
+        # Test delete student
+        deleted = self.db.delete_student("Delete Me")
+        self.assertTrue(deleted)
+        self.assertEqual(len(self.db.list_students()), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

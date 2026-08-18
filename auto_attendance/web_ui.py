@@ -120,6 +120,27 @@ def get_dashboard_stats():
         return {'total_persons': 0, 'total_embeddings': 0, 'present_today': 0}
 
 
+def get_attendance_records(days=7):
+    """Get recent attendance records."""
+    try:
+        records = []
+        for i in range(days):
+            date = (datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d')
+            attendance_list = db.get_attendance_by_date(date)
+            if attendance_list:
+                for record in attendance_list:
+                    records.append({
+                        'name': record[0],
+                        'date': date,
+                        'time': record[1],
+                        'distance': f"{record[2]:.3f}" if len(record) > 2 else "N/A",
+                    })
+        return sorted(records, key=lambda x: x['date'], reverse=True)[:50]
+    except Exception as e:
+        logger.error(f"Error getting attendance records: {e}")
+        return []
+
+
 # ============================================================================
 # ROUTES - MAIN PAGES
 # ============================================================================
