@@ -229,6 +229,16 @@ def restore_from_cloud(repo_id: str = None) -> bool:
             cloud_faces = hf_hub_download(repo_id=repo, filename="faces_backup_latest.zip", repo_type="dataset", token=token)
             if os.path.exists(cloud_faces) and os.path.getsize(cloud_faces) > 0:
                 FACE_DATA_DIR.mkdir(parents=True, exist_ok=True)
+                # Clean local folder first to ensure deleted users are completely purged
+                for item in list(FACE_DATA_DIR.iterdir()):
+                    if item.is_dir():
+                        shutil.rmtree(item, ignore_errors=True)
+                    else:
+                        try:
+                            os.remove(item)
+                        except Exception:
+                            pass
+                            
                 with zipfile.ZipFile(cloud_faces, "r") as zf:
                     zf.extractall(path=FACE_DATA_DIR)
                 logger.info("Restored face samples from cloud repository!")
