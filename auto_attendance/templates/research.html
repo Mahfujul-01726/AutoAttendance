@@ -341,29 +341,21 @@
     }
 
     function exportLatexTable() {
-        const latexCode = `% AutoAttendance UG-Adapt: Benchmark Comparison Table (IEEE Format)
-\\begin{table}[t]
-\\caption{Performance Comparison of UG-Adapt against Baselines}
-\\label{tab:benchmark_comparison}
-\\centering
-\\resizebox{\\columnwidth}{!}{%
-\\begin{tabular}{lcccccc}
-\\toprule
-\\textbf{Method} & \\textbf{Acc (\\%)} & \\textbf{FAR (\\%)} & \\textbf{FRR (\\%)} & \\textbf{FUR (\\%)} & \\textbf{FPS} & \\textbf{Privacy} \\\\
-\\midrule
-Static ArcFace & 84.20 & 3.40 & 12.40 & N/A & 31.0 & Plaintext \\\\
-Naive Self-Update & 61.50 & 24.80 & 13.70 & 28.40 & 29.5 & Plaintext \\\\
-\\textbf{UG-Adapt (Ours)} & \\textbf{99.85} & \\textbf{0.00} & \\textbf{0.15} & \\textbf{0.00} & \\textbf{30.2} & \\textbf{ISO/IEC 24745} \\\\
-\\bottomrule
-\\end{tabular}%
-}
-\\end{table}`;
-
-        navigator.clipboard.writeText(latexCode).then(() => {
-            showToast('✓ IEEE LaTeX Table code copied to clipboard!', 'success');
-        }).catch(() => {
-            prompt('Copy LaTeX code below:', latexCode);
-        });
+        fetch('/api/research/export/latex')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success && data.latex) {
+                    navigator.clipboard.writeText(data.latex).then(() => {
+                        showToast('✓ IEEE LaTeX Table code copied to clipboard!', 'success');
+                    }).catch(() => {
+                        prompt('Copy LaTeX code below:', data.latex);
+                    });
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showToast('Failed to generate LaTeX table', 'error');
+            });
     }
 
     function exportResearchCsv() {
