@@ -403,6 +403,8 @@ def api_frame_process():
         
         system_state['total_frames'] += 1
         
+        newly_marked_name = None
+        recognized_name = None
         if system_state['mode'] == 'attendance':
             results = recognizer.recognize_frame(frame)
             if results:
@@ -425,11 +427,13 @@ def api_frame_process():
                         cv2.putText(frame, "SPOOF", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 165, 255), 2)
                     elif result['is_known']:
                         person_name = result['name']
+                        recognized_name = person_name
                         student_id = result.get('student_id')
                         # Mark attendance in database
                         marked = db.mark_attendance(student_id, person_name, result.get('confidence', 0), CAMERA_ID, 'Present')
                         if marked:
                             system_state['recognized_faces_count'] += 1
+                            newly_marked_name = person_name
                         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                         cv2.putText(frame, person_name, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
                     else:
@@ -450,7 +454,10 @@ def api_frame_process():
         return jsonify({
             'success': True,
             'image': f'data:image/jpeg;base64,{processed_image}',
-            'recognized': system_state['recognized_faces_count']
+            'recognized': system_state['recognized_faces_count'],
+            'newly_marked': newly_marked_name is not None,
+            'marked_name': newly_marked_name,
+            'recognized_name': recognized_name
         })
     except Exception as e:
         logger.error(f"Error processing frame: {e}")

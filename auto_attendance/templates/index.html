@@ -58,22 +58,36 @@
     </div>
 
     <!-- Camera Feed (shown when attendance is running) -->
-    <div id="cameraSection" class="section" style="display: none;">
+    <div id="cameraSection" class="section" style="display: none; animation: slideUpFade 0.4s ease;">
         <div class="section-header">
-            <h2>📹 Live Camera Feed</h2>
-            <button class="link-text" onclick="stopAttendance()" style="color: #EF4444; cursor: pointer;">Stop
-                ⏹️</button>
+            <h2>📹 Live Biometric Scanner</h2>
+            <button class="link-text" onclick="stopAttendance(false)" style="color: #EF4444; font-weight: 600; cursor: pointer; background: rgba(239,68,68,0.1); padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid rgba(239,68,68,0.2);">Stop Scanner ⏹️</button>
         </div>
-        <div style="width: 100%; display: flex; justify-content: center; margin-bottom: 1.5rem;">
+
+        <!-- Floating Attendance Success Banner -->
+        <div id="attendanceSuccessBanner" style="display: none; background: linear-gradient(135deg, #10B981, #059669); color: white; padding: 1rem 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4); text-align: center; animation: bounceIn 0.5s ease;">
+            <div style="font-size: 1.5rem; font-weight: bold; margin-bottom: 0.25rem;">✓ Attendance Confirmed!</div>
+            <div style="font-size: 1.1rem; opacity: 0.95;"><span id="confirmedStudentName" style="font-weight: bold; text-decoration: underline;">Student</span> has been marked <strong style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px;">PRESENT</strong></div>
+            <div id="autoCloseTimerNotice" style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.85; font-family: monospace;">Camera auto-closing in 2.5s...</div>
+        </div>
+
+        <div style="width: 100%; display: flex; justify-content: center; margin-bottom: 1rem;">
             <video id="webcamVideo" autoplay playsinline style="display:none;"></video>
             <canvas id="captureCanvas" style="display:none;"></canvas>
             <img id="cameraFeed" src="" alt="Camera Feed"
-                style="width: 100%; max-width: 640px; border-radius: 8px; border: 2px solid #0F766E; background: #000; height: auto;">
+                style="width: 100%; max-width: 640px; border-radius: 12px; border: 2px solid #0F766E; background: #000; height: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
         </div>
-        <div style="text-align: center; padding: 1rem; background: #f0f9f8; border-radius: 8px;">
-            <div style="color: #0F766E; font-size: 14px;">🔍 Detecting faces in real-time...</div>
-            <div style="color: #666; font-size: 12px; margin-top: 0.5rem;">Recognized faces: <span
-                    id="recognizedCount">0</span></div>
+        
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; padding: 1rem; background: rgba(15, 118, 110, 0.06); border-radius: 12px; border: 1px solid rgba(15, 118, 110, 0.15);">
+            <div style="color: #0F766E; font-size: 14px; font-weight: 600;">🔍 Scanning face in real-time... (ArcFace + Anti-Spoofing active)</div>
+            <div style="color: #64748B; font-size: 13px;">Recognized today: <span id="recognizedCount" style="font-weight: bold; color: #0F766E;">0</span> students</div>
+            
+            <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; background: white; padding: 0.4rem 1rem; border-radius: 50px; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                <input type="checkbox" id="autoCloseToggle" checked style="cursor: pointer; width: 16px; height: 16px; accent-color: #0F766E;">
+                <label for="autoCloseToggle" style="cursor: pointer; font-size: 13px; font-weight: 500; color: #334155; user-select: none;">
+                    ⚡ <strong>Auto-Close Camera</strong> upon successful attendance
+                </label>
+            </div>
         </div>
     </div>
 
@@ -135,6 +149,30 @@
 </div>
 
 <script>
+    // Audio synthesizer for pleasant success chime
+    function playChime(freq = 880, type = 'sine', duration = 0.15) {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + duration);
+        } catch (e) {
+            console.warn('Audio chime skipped:', e);
+        }
+    }
+
+    function playSuccessChime() {
+        playChime(587.33, 'sine', 0.12);
+        setTimeout(() => playChime(880, 'sine', 0.25), 130);
+    }
+
     // Load dashboard data on page load
     document.addEventListener('DOMContentLoaded', function () {
         loadDashboardData();
@@ -154,7 +192,7 @@
                 // Show camera if attendance is running
                 if (data.system_status === 'running') {
                     document.getElementById('cameraSection').style.display = 'block';
-                } else {
+                } else if (!isProcessing && !webcamStream) {
                     document.getElementById('cameraSection').style.display = 'none';
                 }
             })
@@ -164,7 +202,6 @@
         fetch('/api/attendance/status')
             .then(response => response.json())
             .then(data => {
-                console.log('Attendance status:', data);  // Debug log
                 document.getElementById('recognizedCount').textContent = data.recognized_faces || 0;
             })
             .catch(error => console.error('Error loading attendance status:', error));
@@ -179,10 +216,10 @@
                 }
                 tbody.innerHTML = data.map(record => `
                     <tr>
-                        <td>${record.name}</td>
+                        <td><strong>${record.name}</strong></td>
                         <td>${record.date}</td>
                         <td>${record.time}</td>
-                        <td>${record.distance}</td>
+                        <td><span class="badge badge-success">${record.distance}</span></td>
                     </tr>
                 `).join('');
             })
@@ -205,6 +242,8 @@
     let webcamStream = null;
     let processFrameInterval = null;
     let isProcessing = false;
+    let autoCloseTimer = null;
+    let hasMarkedInSession = false;
 
     async function startWebcam() {
         try {
@@ -212,17 +251,23 @@
             const video = document.getElementById('webcamVideo');
             video.srcObject = stream;
             webcamStream = stream;
+            hasMarkedInSession = false;
             
+            document.getElementById('attendanceSuccessBanner').style.display = 'none';
             processFrameInterval = setInterval(processFrame, 150); // ~6.6 FPS
         } catch (err) {
             console.error("Error accessing webcam:", err);
             showToast("Could not access webcam. Please allow permissions.", "error");
-            stopAttendance();
+            stopAttendance(false);
         }
     }
 
     function stopWebcam() {
         if (processFrameInterval) clearInterval(processFrameInterval);
+        if (autoCloseTimer) {
+            clearTimeout(autoCloseTimer);
+            autoCloseTimer = null;
+        }
         if (webcamStream) {
             webcamStream.getTracks().forEach(track => track.stop());
         }
@@ -242,7 +287,6 @@
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         const ctx = canvas.getContext('2d');
-        // Flip horizontally to match a mirror
         ctx.translate(canvas.width, 0);
         ctx.scale(-1, 1);
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -259,6 +303,42 @@
             if (data.success && data.image) {
                 document.getElementById('cameraFeed').src = data.image;
                 document.getElementById('recognizedCount').textContent = data.recognized || 0;
+
+                // Handle Newly Marked Attendance or Known Face Recognition
+                if (data.newly_marked || (data.recognized_name && !hasMarkedInSession)) {
+                    const studentName = data.marked_name || data.recognized_name;
+                    if (studentName && !hasMarkedInSession) {
+                        hasMarkedInSession = true;
+                        playSuccessChime();
+                        
+                        // Show celebratory banner
+                        const banner = document.getElementById('attendanceSuccessBanner');
+                        document.getElementById('confirmedStudentName').textContent = studentName;
+                        banner.style.display = 'block';
+                        showToast(`✓ Attendance Recorded: ${studentName} Marked Present!`, 'success');
+                        
+                        // Auto-close camera if toggle is checked
+                        const autoClose = document.getElementById('autoCloseToggle').checked;
+                        if (autoClose) {
+                            let countdown = 2;
+                            const timerText = document.getElementById('autoCloseTimerNotice');
+                            timerText.textContent = `Camera auto-closing in ${countdown}s...`;
+                            
+                            const countInterval = setInterval(() => {
+                                countdown--;
+                                if (countdown > 0) {
+                                    timerText.textContent = `Camera auto-closing in ${countdown}s...`;
+                                } else {
+                                    clearInterval(countInterval);
+                                }
+                            }, 1000);
+
+                            autoCloseTimer = setTimeout(() => {
+                                stopAttendance(false);
+                            }, 2400);
+                        }
+                    }
+                }
             }
         })
         .catch(err => console.error("Error processing frame:", err))
@@ -268,42 +348,37 @@
     }
 
     function startAttendance() {
-        if (confirm('Start attendance tracking? The system will request access to your web camera.')) {
-            fetch('/api/attendance/start', { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast(data.message, 'success');
-                        // Show camera feed section
-                        document.getElementById('cameraSection').style.display = 'block';
-                        startWebcam(); // Start the browser camera
-                        loadDashboardData();
-                        // Refresh data more frequently during attendance
-                        if (window.dashboardInterval) clearInterval(window.dashboardInterval);
-                        window.dashboardInterval = setInterval(loadDashboardData, 3000);
-                    } else {
-                        showToast(data.message, 'error');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('Failed to start attendance', 'error');
-                });
-        }
+        fetch('/api/attendance/start', { method: 'POST' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Biometric scanner activated. Please look at the camera.', 'success');
+                    document.getElementById('cameraSection').style.display = 'block';
+                    startWebcam();
+                    loadDashboardData();
+                    if (window.dashboardInterval) clearInterval(window.dashboardInterval);
+                    window.dashboardInterval = setInterval(loadDashboardData, 3000);
+                } else {
+                    showToast(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to start attendance', 'error');
+            });
     }
 
-    function stopAttendance() {
-        if (confirm('Stop attendance tracking?')) {
+    function stopAttendance(askConfirm = true) {
+        if (!askConfirm || confirm('Stop attendance tracking?')) {
             fetch('/api/attendance/stop', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        showToast(data.message, 'success');
-                        // Hide camera feed section
+                        showToast(data.message || 'Scanner closed.', 'success');
                         document.getElementById('cameraSection').style.display = 'none';
-                        stopWebcam(); // Stop browser camera
+                        document.getElementById('attendanceSuccessBanner').style.display = 'none';
+                        stopWebcam();
                         loadDashboardData();
-                        // Reset to normal refresh rate
                         if (window.dashboardInterval) clearInterval(window.dashboardInterval);
                         window.dashboardInterval = setInterval(loadDashboardData, 5000);
                     } else {
