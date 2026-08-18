@@ -330,6 +330,11 @@ class AttendanceDatabase:
         created_at = timestamp.isoformat(timespec="seconds")
 
         with self._connect() as conn:
+            if student_id is None and student_name:
+                row = conn.execute("SELECT id FROM students WHERE name = ?", (student_name,)).fetchone()
+                if row:
+                    student_id = int(row["id"])
+
             cursor = conn.execute(
                 """
                 INSERT OR IGNORE INTO attendance
@@ -399,6 +404,28 @@ class AttendanceDatabase:
                 (date,)
             ).fetchall()
         return [tuple(row) for row in rows]
+
+    def delete_student(self, name):
+        """Delete a student and all related embeddings and logs."""
+        with self._connect() as conn:
+            student = conn.execute("SELECT id FROM students WHERE name = ?", (name,)).fetchone()
+            if student:
+                student_id = student["id"]
+                conn.execute("DELETE FROM face_embeddings WHERE student_id = ?", (student_id,))
+                conn.execute("DELETE FROM attendance WHERE student_id = ? OR student_name = ?", (student_id, name))
+                conn.execute("DELETE FROM adaptation_audit_logs WHERE student_id = ? OR student_name = ?", (student_id, name))
+                conn.execute("DELETE FROM students WHERE id = ?", (student_id,))
+                return True
+            else:
+                conn.execute("DELETE FROM attendance WHERE student_name = ?", (name,))
+                conn.execute("DELETE FROM adaptation_audit_logs WHERE student_name = ?", (name,))
+            return False
+
+    def delete_attendance(self, student_name, date):
+        """Delete attendance record for a specific student and date."""
+        with self._connect() as conn:
+            conn.execute("DELETE FROM attendance WHERE student_name = ? AND date = ?", (student_name, date))
+            return True
 
     def export_snapshot(self):
         return json.dumps(

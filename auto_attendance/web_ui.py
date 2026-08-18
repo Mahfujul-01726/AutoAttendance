@@ -74,10 +74,38 @@ except Exception as e:
 # UTILITY FUNCTIONS
 # ============================================================================
 
-def get_dashboard_stats():
-    """Get statistics for dashboard."""
+def get_person_list():
+    """Get list of all active registered persons synchronized with database."""
     try:
-        total_persons = len(db.list_students())
+        persons_dict = {}
+        # 1. Read from folders with samples
+        if FACE_DATA_DIR.exists():
+            for person_dir in FACE_DATA_DIR.iterdir():
+                if person_dir.is_dir():
+                    face_files = list(person_dir.glob('*.jpg')) + list(person_dir.glob('*.png'))
+                    if len(face_files) > 0:
+                        persons_dict[person_dir.name] = len(face_files)
+
+        # 2. Check DB students with embeddings
+        db_students = db.list_students()
+        for st in db_students:
+            name = st.get("name")
+            emb_cnt = st.get("embedding_count", 0)
+            if name and name not in persons_dict and emb_cnt > 0:
+                persons_dict[name] = emb_cnt
+
+        persons = [{'name': name, 'samples': samples} for name, samples in persons_dict.items()]
+        return sorted(persons, key=lambda x: x['name'])
+    except Exception as e:
+        logger.error(f"Error getting person list: {e}")
+        return []
+
+
+def get_dashboard_stats():
+    """Get statistics for dashboard, synchronized with active person list."""
+    try:
+        persons = get_person_list()
+        total_persons = len(persons)
         total_embeddings = db.get_total_embeddings()
         today = datetime.now().strftime('%Y-%m-%d')
         present_today = db.get_attendance_by_date(today)
@@ -90,45 +118,6 @@ def get_dashboard_stats():
     except Exception as e:
         logger.error(f"Error getting dashboard stats: {e}")
         return {'total_persons': 0, 'total_embeddings': 0, 'present_today': 0}
-
-
-def get_attendance_records(days=7):
-    """Get recent attendance records."""
-    try:
-        records = []
-        for i in range(days):
-            date = (datetime.now() - timedelta(days=i)).strftime('%Y-%m-%d')
-            attendance_list = db.get_attendance_by_date(date)
-            if attendance_list:
-                for record in attendance_list:
-                    records.append({
-                        'name': record[0],
-                        'date': date,
-                        'time': record[1],
-                        'distance': f"{record[2]:.3f}" if len(record) > 2 else "N/A",
-                    })
-        return sorted(records, key=lambda x: x['date'], reverse=True)[:50]
-    except Exception as e:
-        logger.error(f"Error getting attendance records: {e}")
-        return []
-
-
-def get_person_list():
-    """Get list of all registered persons."""
-    try:
-        persons = []
-        if FACE_DATA_DIR.exists():
-            for person_dir in FACE_DATA_DIR.iterdir():
-                if person_dir.is_dir():
-                    face_files = list(person_dir.glob('*.jpg')) + list(person_dir.glob('*.png'))
-                    persons.append({
-                        'name': person_dir.name,
-                        'samples': len(face_files),
-                    })
-        return sorted(persons, key=lambda x: x['name'])
-    except Exception as e:
-        logger.error(f"Error getting person list: {e}")
-        return []
 
 
 # ============================================================================
@@ -410,14 +399,16 @@ def api_frame_process():
                         is_real, spoof_score = anti_spoofing.analyze(face_crop)
                         
                     if not is_real:
+                        db.add_alert('spoof', f"Spoof attempt detected (score: {spoof_score:.3f})")
                         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 165, 255), 2)
                         cv2.putText(frame, "SPOOF", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 165, 255), 2)
                     elif result['is_known']:
                         person_name = result['name']
-                        # Mark attendance
-                        db.mark_attendance(None, person_name, result.get('confidence', 0), CAMERA_ID, 'Present')
-                        # Note: db.mark_attendance handles uniqueness internally per date, but we just increment count here for UI
-                        system_state['recognized_faces_count'] += 1
+                        student_id = result.get('student_id')
+                        # Mark attendance in database
+                        marked = db.mark_attendance(student_id, person_name, result.get('confidence', 0), CAMERA_ID, 'Present')
+                        if marked:
+                            system_state['recognized_faces_count'] += 1
                         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                         cv2.putText(frame, person_name, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
                     else:
@@ -501,11 +492,19 @@ def api_person_delete():
         if not person_name:
             return jsonify({'success': False, 'message': 'Person name required'}), 400
         
+        # 1. Delete physical directory
         person_dir = FACE_DATA_DIR / person_name
         if person_dir.exists():
             import shutil
-            shutil.rmtree(person_dir)
-            logger.info(f"Deleted person: {person_name}")
+            shutil.rmtree(person_dir, ignore_errors=True)
+            logger.info(f"Deleted person folder: {person_name}")
+
+        # 2. Delete from SQLite database
+        db.delete_student(person_name)
+
+        # 3. Reload model embeddings
+        recognizer.load_model()
+        logger.info(f"Reloaded face recognizer model after deleting {person_name}")
         
         return jsonify({
             'success': True,

@@ -188,6 +188,45 @@ class FaceRecognitionModule:
         self.load_model()
         return people_count, saved_count
 
+    def train_on_faces(self, person_name: str, face_data_dir=FACE_DATA_DIR):
+        """Train and register embeddings for a specific person or directory."""
+        from pathlib import Path
+        person_path = Path(face_data_dir) / person_name
+        if not person_path.exists() or not person_path.is_dir():
+            return self.train_from_directory(face_data_dir)
+
+        student_id = self.db.upsert_student(person_name)
+        with self.db._connect() as conn:
+            conn.execute("DELETE FROM face_embeddings WHERE student_id = ?", (student_id,))
+
+        image_files = [
+            f for f in person_path.iterdir()
+            if f.is_file() and f.suffix.lower() in ('.jpg', '.jpeg', '.png', '.bmp')
+        ]
+
+        saved_count = 0
+        for img_path in image_files:
+            image = cv2.imread(str(img_path))
+            if image is None:
+                continue
+
+            embedding, quality_score = self._embedding_from_image(image)
+            if embedding is None:
+                continue
+
+            self.db.add_embedding(
+                student_id,
+                embedding,
+                image_path=str(img_path),
+                model_name=self.model_name,
+                quality_score=quality_score,
+            )
+            saved_count += 1
+
+        self.load_model()
+        logger.info(f"Registered {saved_count} embeddings for {person_name}")
+        return saved_count
+
     def recognize_face(self, face_image):
         """Recognize a single image and return (student_id, cosine_distance)."""
         embedding, _quality_score = self._embedding_from_image(face_image)
