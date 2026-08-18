@@ -3,6 +3,7 @@
 import pytest
 import numpy as np
 from unittest.mock import Mock, patch, MagicMock
+from auto_attendance.face_recognition import FaceRecognitionModule
 
 
 @pytest.mark.unit
@@ -11,24 +12,20 @@ class TestFaceRecognitionModule:
 
     def test_module_initialization(self):
         """Test that FaceRecognitionModule initializes without errors."""
-        with patch('face_recognition.InsightFace'):
-            from face_recognition import FaceRecognitionModule
+        with patch.object(FaceRecognitionModule, '_load_insightface', return_value=MagicMock()):
             module = FaceRecognitionModule()
             assert module is not None
 
     def test_model_loading(self):
         """Test model loading functionality."""
-        with patch('face_recognition.InsightFace'):
-            from face_recognition import FaceRecognitionModule
+        with patch.object(FaceRecognitionModule, '_load_insightface', return_value=MagicMock()):
             module = FaceRecognitionModule()
-            with patch.object(module, 'app', create=True):
-                # Test passes if no exception is raised
-                assert module is not None
+            module.load_model()
+            assert module is not None
 
     def test_embedding_extraction(self):
         """Test face embedding extraction."""
-        with patch('face_recognition.InsightFace'):
-            from face_recognition import FaceRecognitionModule
+        with patch.object(FaceRecognitionModule, '_load_insightface', return_value=MagicMock()):
             module = FaceRecognitionModule()
             
             # Create mock face image

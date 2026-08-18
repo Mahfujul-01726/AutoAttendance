@@ -1,14 +1,7 @@
 name: Test PyPI Upload
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - 'pyproject.toml'
-      - 'setup.py'
-      - 'auto_attendance/**'
-  pull_request:
-    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: read
