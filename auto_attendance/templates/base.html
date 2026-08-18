@@ -40,6 +40,10 @@
                     <span class="nav-icon">📋</span>
                     <span class="nav-label">Attendance Records</span>
                 </a>
+                <a href="/research" class="nav-item {% if request.endpoint == 'research' %}active{% endif %}">
+                    <span class="nav-icon">🔬</span>
+                    <span class="nav-label">AI Research Lab</span>
+                </a>
                 <a href="/settings" class="nav-item {% if request.endpoint == 'settings' %}active{% endif %}">
                     <span class="nav-icon">⚙️</span>
                     <span class="nav-label">Settings</span>

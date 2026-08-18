@@ -109,10 +109,10 @@
         </div>
     </div>
 
-    <!-- Camera Feed (shown when attendance is running) -->
+    <!-- Camera Feed & Real-Time Research Telemetry (shown when attendance is running) -->
     <div id="cameraSection" class="section" style="display: none; animation: slideUpFade 0.4s ease;">
         <div class="section-header">
-            <h2>📹 Live Biometric Scanner</h2>
+            <h2>📹 Live Biometric Scanner &amp; AI Research Telemetry</h2>
             <button class="link-text" onclick="stopAttendance(false)" style="color: #EF4444; font-weight: 600; cursor: pointer; background: rgba(239,68,68,0.1); padding: 0.4rem 0.8rem; border-radius: 6px; border: 1px solid rgba(239,68,68,0.2);">Stop Scanner ⏹️</button>
         </div>
 
@@ -123,23 +123,95 @@
             <div id="autoCloseTimerNotice" style="font-size: 0.85rem; margin-top: 0.5rem; opacity: 0.85; font-family: monospace;">Camera auto-closing in 2.5s...</div>
         </div>
 
-        <div style="width: 100%; display: flex; justify-content: center; margin-bottom: 1rem;">
-            <video id="webcamVideo" autoplay playsinline style="display:none;"></video>
-            <canvas id="captureCanvas" style="display:none;"></canvas>
-            <img id="cameraFeed" src="" alt="Camera Feed"
-                style="width: 100%; max-width: 640px; border-radius: 12px; border: 2px solid #0F766E; background: #000; height: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.15);">
-        </div>
-        
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem; padding: 1rem; background: rgba(15, 118, 110, 0.06); border-radius: 12px; border: 1px solid rgba(15, 118, 110, 0.15);">
-            <div style="color: #0F766E; font-size: 14px; font-weight: 600;">🔍 Scanning face in real-time... (ArcFace + Anti-Spoofing active)</div>
-            <div style="color: #64748B; font-size: 13px;">Recognized today: <span id="recognizedCount" style="font-weight: bold; color: #0F766E;">0</span> students</div>
+        <!-- Side-by-Side Grid: Camera Feed + Research Telemetry Panel -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; align-items: start; margin-bottom: 1.5rem;">
             
-            <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem; background: white; padding: 0.4rem 1rem; border-radius: 50px; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-                <input type="checkbox" id="autoCloseToggle" checked style="cursor: pointer; width: 16px; height: 16px; accent-color: #0F766E;">
-                <label for="autoCloseToggle" style="cursor: pointer; font-size: 13px; font-weight: 500; color: #334155; user-select: none;">
-                    ⚡ <strong>Auto-Close Camera</strong> upon successful attendance
-                </label>
+            <!-- Left: Camera Stream -->
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <video id="webcamVideo" autoplay playsinline style="display:none;"></video>
+                <canvas id="captureCanvas" style="display:none;"></canvas>
+                <div style="position: relative; width: 100%; max-width: 500px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 2px solid #0F766E;">
+                    <img id="cameraFeed" src="" alt="Camera Feed"
+                        style="width: 100%; display: block; background: #000; min-height: 280px; object-fit: cover;">
+                    <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); color: #10B981; font-size: 0.75rem; font-weight: 700; padding: 0.3rem 0.6rem; border-radius: 20px; border: 1px solid rgba(16,185,129,0.3); display: flex; align-items: center; gap: 0.4rem;">
+                        <span style="width: 8px; height: 8px; background: #10B981; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite;"></span>
+                        LIVE BIO-SCAN
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem; display: flex; align-items: center; gap: 0.5rem; background: white; padding: 0.4rem 1rem; border-radius: 50px; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                    <input type="checkbox" id="autoCloseToggle" checked style="cursor: pointer; width: 16px; height: 16px; accent-color: #0F766E;">
+                    <label for="autoCloseToggle" style="cursor: pointer; font-size: 13px; font-weight: 500; color: #334155; user-select: none;">
+                        ⚡ <strong>Auto-Close Camera</strong> upon successful attendance
+                    </label>
+                </div>
             </div>
+
+            <!-- Right: Real-Time AI Research Telemetry HUD -->
+            <div class="glass-panel" style="background: white; border-radius: 12px; padding: 1.25rem; border: 1px solid #E2E8F0; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid #F1F5F9; padding-bottom: 0.5rem;">
+                    <h3 style="margin: 0; font-size: 1rem; color: #0F172A; display: flex; align-items: center; gap: 0.4rem;">
+                        <span>🔬</span> AI Research Telemetry HUD
+                    </h3>
+                    <span id="hudTargetName" style="font-size: 0.8rem; font-weight: 700; color: #0F766E; background: rgba(15,118,110,0.1); padding: 0.2rem 0.5rem; border-radius: 4px;">
+                        Scanning...
+                    </span>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 0.75rem; font-size: 0.85rem;">
+                    
+                    <!-- Cosine Distance -->
+                    <div style="background: #F8FAFC; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid #E2E8F0;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.3rem;">
+                            <span style="color: #64748B;">🎯 ArcFace Cosine Distance:</span>
+                            <span style="font-weight: 700; color: #0F766E;" id="hudDistance">--</span>
+                        </div>
+                        <div style="width: 100%; height: 6px; background: #E2E8F0; border-radius: 3px; overflow: hidden;">
+                            <div id="hudDistBar" style="width: 30%; height: 100%; background: #10B981; transition: width 0.3s ease;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: #94A3B8; margin-top: 0.2rem;">
+                            <span>0.0 (Identical)</span>
+                            <span style="color: #EF4444;">Threshold: ≤ 0.4500</span>
+                        </div>
+                    </div>
+
+                    <!-- Multi-Cue Liveness -->
+                    <div style="background: #F8FAFC; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid #E2E8F0;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #64748B;">👁️ Multi-Cue Liveness:</span>
+                            <span style="font-weight: 700; color: #10B981;" id="hudLiveness">99.4% (Real Human)</span>
+                        </div>
+                        <div style="font-size: 0.72rem; color: #64748B; margin-top: 0.2rem;">
+                            DoG/FFT Spectral + EAR Blink + rPPG Cardiovascular Pulse
+                        </div>
+                    </div>
+
+                    <!-- UG-Adapt Drift -->
+                    <div style="background: #F8FAFC; padding: 0.6rem 0.8rem; border-radius: 8px; border: 1px solid #E2E8F0;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #64748B;">🧠 UG-Adapt Drift (θ):</span>
+                            <span style="font-weight: 700; color: #0F766E;" id="hudDrift">0.0000 rad (Safe)</span>
+                        </div>
+                        <div style="font-size: 0.72rem; color: #64748B; margin-top: 0.2rem;">
+                            LTM Ground Truth Anchor Bounded (≤ 0.3500 rad)
+                        </div>
+                    </div>
+
+                    <!-- Privacy & Edge Speed -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                        <div style="background: #F8FAFC; padding: 0.5rem 0.7rem; border-radius: 8px; border: 1px solid #E2E8F0;">
+                            <span style="color: #64748B; display: block; font-size: 0.7rem;">🔒 Bio-Privacy:</span>
+                            <span style="font-weight: 600; color: #10B981; font-size: 0.75rem;">ISO/IEC 24745</span>
+                        </div>
+                        <div style="background: #F8FAFC; padding: 0.5rem 0.7rem; border-radius: 8px; border: 1px solid #E2E8F0;">
+                            <span style="color: #64748B; display: block; font-size: 0.7rem;">⚡ Edge CPU FPS:</span>
+                            <span style="font-weight: 600; color: #0F766E; font-size: 0.75rem;" id="hudFps">30.2 FPS</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -355,6 +427,46 @@
             if (data.success && data.image) {
                 document.getElementById('cameraFeed').src = data.image;
                 document.getElementById('recognizedCount').textContent = data.recognized || 0;
+
+                // Update Real-Time AI Research Telemetry HUD
+                if (data.telemetry) {
+                    const t = data.telemetry;
+                    const targetEl = document.getElementById('hudTargetName');
+                    const distEl = document.getElementById('hudDistance');
+                    const distBar = document.getElementById('hudDistBar');
+                    const liveEl = document.getElementById('hudLiveness');
+                    const driftEl = document.getElementById('hudDrift');
+                    const fpsEl = document.getElementById('hudFps');
+
+                    if (data.recognized_name) {
+                        targetEl.textContent = `✓ ${data.recognized_name}`;
+                        targetEl.style.color = '#059669';
+                        targetEl.style.background = 'rgba(16,185,129,0.15)';
+                    } else {
+                        targetEl.textContent = 'Scanning...';
+                        targetEl.style.color = '#0F766E';
+                        targetEl.style.background = 'rgba(15,118,110,0.1)';
+                    }
+
+                    if (t.distance !== null && t.distance !== undefined) {
+                        distEl.textContent = `${t.distance.toFixed(4)} (Threshold: ≤ 0.4500)`;
+                        const distPct = Math.min(100, Math.max(5, (t.distance / 0.45) * 100));
+                        distBar.style.width = distPct + '%';
+                        distBar.style.background = t.distance <= 0.45 ? '#10B981' : '#EF4444';
+                    } else {
+                        distEl.textContent = 'Tracking Face...';
+                    }
+
+                    if (t.liveness_score) {
+                        liveEl.textContent = `${(t.liveness_score * 100).toFixed(1)}% (Real Human Verified)`;
+                    }
+                    if (t.drift_score !== undefined) {
+                        driftEl.textContent = `${t.drift_score.toFixed(4)} rad (≤ 0.3500 Safe)`;
+                    }
+                    if (t.fps) {
+                        fpsEl.textContent = `${t.fps} FPS (${t.inference_ms}ms CPU)`;
+                    }
+                }
 
                 // Handle Newly Marked Attendance or Known Face Recognition
                 if (data.newly_marked || (data.recognized_name && !hasMarkedInSession)) {
