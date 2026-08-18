@@ -112,5 +112,6 @@ logs/
 data/attendance/*.xlsx
 data/attendance/attendance.log
 models/*.yml
+models/backups/
 data/unknown_faces/
 data/training/

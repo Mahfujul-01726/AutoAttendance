@@ -16,6 +16,7 @@ import cv2
 import numpy as np
 import base64
 
+from . import cloud_backup
 from .database import AttendanceDatabase
 from .face_recognition import FaceRecognitionModule
 from .anti_spoofing import AntiSpoofing
@@ -323,7 +324,10 @@ def api_register_train():
         # Train the recognizer
         recognizer.train_on_faces(person_name)
         
-        logger.info(f"Trained model for {person_name} with {samples} samples")
+        # Auto-sync persistent database to cloud repository
+        cloud_backup.sync_to_cloud_async()
+        
+        logger.info(f"Trained model for {person_name} with {samples} samples and synced to cloud")
         return jsonify({
             'success': True,
             'message': f'Successfully trained model for {person_name} ({samples} samples)',
@@ -532,7 +536,10 @@ def api_person_delete():
 
         # 3. Reload model embeddings
         recognizer.load_model()
-        logger.info(f"Reloaded face recognizer model after deleting {person_name}")
+        
+        # 4. Sync deletion to cloud repository
+        cloud_backup.sync_to_cloud_async()
+        logger.info(f"Reloaded face recognizer model after deleting {person_name} and synced to cloud")
         
         return jsonify({
             'success': True,
@@ -555,6 +562,7 @@ def api_attendance_delete():
             return jsonify({'success': False, 'message': 'Name and date required'}), 400
         
         db.delete_attendance(person_name, date)
+        cloud_backup.sync_to_cloud_async()
         logger.info(f"Deleted attendance for {person_name} on {date}")
         
         return jsonify({
@@ -563,6 +571,86 @@ def api_attendance_delete():
         })
     except Exception as e:
         logger.error(f"Error deleting attendance: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+# ============================================================================
+# API ENDPOINTS - BACKUP & PERSISTENCE
+# ============================================================================
+
+@app.route('/api/backup/status')
+def api_backup_status():
+    """Get backup status and statistics."""
+    try:
+        status = cloud_backup.get_backup_status()
+        return jsonify({'success': True, **status})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/backup/download')
+def api_backup_download():
+    """Download a complete backup archive."""
+    try:
+        format_type = request.args.get('format', 'zip')
+        if format_type == 'sqlite3':
+            if not os.path.exists(DATABASE_PATH):
+                return jsonify({'success': False, 'message': 'Database not found'}), 404
+            return send_file(str(DATABASE_PATH), as_attachment=True, download_name="attendance.sqlite3")
+        else:
+            archive_path = cloud_backup.export_full_archive()
+            if not archive_path or not os.path.exists(archive_path):
+                return jsonify({'success': False, 'message': 'Failed to create backup'}), 500
+            return send_file(str(archive_path), as_attachment=True, download_name=archive_path.name)
+    except Exception as e:
+        logger.error(f"Error downloading backup: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/backup/upload', methods=['POST'])
+def api_backup_upload():
+    """Upload and restore a database backup archive."""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'success': False, 'message': 'No file uploaded'}), 400
+            
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'success': False, 'message': 'Empty file'}), 400
+            
+        filename = secure_filename(file.filename)
+        temp_path = cloud_backup.BACKUP_DIR / f"uploaded_{filename}"
+        file.save(str(temp_path))
+        
+        success = cloud_backup.import_full_archive(temp_path)
+        if temp_path.exists():
+            try:
+                os.remove(temp_path)
+            except Exception:
+                pass
+            
+        if success:
+            recognizer.load_model()
+            cloud_backup.sync_to_cloud_async()
+            return jsonify({'success': True, 'message': 'Database and face profiles restored successfully!'})
+        else:
+            return jsonify({'success': False, 'message': 'Invalid backup file format (.sqlite3 or .zip required)'}), 400
+    except Exception as e:
+        logger.error(f"Error restoring backup: {e}")
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/backup/sync', methods=['POST'])
+def api_backup_sync():
+    """Manually trigger immediate cloud sync."""
+    try:
+        success = cloud_backup.sync_to_cloud()
+        if success:
+            return jsonify({'success': True, 'message': 'Database and face profiles synced to cloud successfully!'})
+        else:
+            return jsonify({'success': False, 'message': 'Cloud sync failed. Check Hugging Face token.'}), 500
+    except Exception as e:
+        logger.error(f"Error during manual cloud sync: {e}")
         return jsonify({'success': False, 'message': str(e)}), 500
 
 

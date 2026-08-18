@@ -54,6 +54,58 @@
                 <span class="action-icon">📥</span>
                 <span class="action-text">Export Data</span>
             </button>
+            <button class="action-button action-secondary" onclick="openBackupModal()" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.05);">
+                <span class="action-icon">💾</span>
+                <span class="action-text">Cloud Backup</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Backup & Database Persistence Modal -->
+    <div id="backupModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+        <div class="glass-panel" style="background: white; border-radius: 16px; max-width: 550px; width: 90%; padding: 2rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); animation: bounceIn 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid #E2E8F0; padding-bottom: 1rem;">
+                <h3 style="margin: 0; color: #0F172A; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>🛡️</span> Database & Cloud Persistence
+                </h3>
+                <button onclick="closeBackupModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748B;">&times;</button>
+            </div>
+            
+            <div style="background: #F8FAFC; padding: 1rem; border-radius: 10px; border: 1px solid #E2E8F0; margin-bottom: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+                    <span style="color: #64748B;">Cloud Auto-Sync:</span>
+                    <span style="font-weight: bold; color: #10B981;" id="cloudSyncStatus">🟢 Protected & Active</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                    <span style="color: #64748B;">Storage Target:</span>
+                    <span style="font-family: monospace; color: #0F766E;" id="cloudRepoTarget">mahfuj735/AutoAttendance-Storage</span>
+                </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div style="display: flex; gap: 0.75rem;">
+                    <button class="btn btn-primary" onclick="downloadBackup('zip')" style="flex: 1; border-radius: 8px; padding: 0.75rem;">
+                        📥 Download Full ZIP
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadBackup('sqlite3')" style="flex: 1; border-radius: 8px; padding: 0.75rem;">
+                        📄 Download .sqlite3
+                    </button>
+                </div>
+
+                <button class="btn btn-success" onclick="triggerManualCloudSync()" id="manualSyncBtn" style="border-radius: 8px; padding: 0.75rem; font-weight: 600;">
+                    🔄 Sync to Cloud Storage Now
+                </button>
+
+                <div style="border-top: 1px dashed #CBD5E1; padding-top: 1rem; margin-top: 0.5rem;">
+                    <label style="display: block; font-size: 0.9rem; font-weight: 600; color: #334155; margin-bottom: 0.5rem;">
+                        📤 Restore Database from File (.sqlite3 or .zip)
+                    </label>
+                    <input type="file" id="backupFileInput" accept=".sqlite3,.db,.zip" style="width: 100%; font-size: 0.85rem; margin-bottom: 0.5rem;">
+                    <button class="btn btn-warning" onclick="uploadAndRestoreBackup()" style="width: 100%; border-radius: 8px; padding: 0.6rem;">
+                        Restore & Reload System
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -398,6 +450,88 @@
             window.location.href = `/api/export/${format}`;
             showToast('Download started', 'success');
         }
+    }
+
+    function openBackupModal() {
+        document.getElementById('backupModal').style.display = 'flex';
+        fetch('/api/backup/status')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('cloudSyncStatus').textContent = data.cloud_sync_enabled ? '🟢 Protected & Active' : '🟡 Offline Local Mode';
+                    document.getElementById('cloudRepoTarget').textContent = data.backup_repo;
+                }
+            })
+            .catch(e => console.error(e));
+    }
+
+    function closeBackupModal() {
+        document.getElementById('backupModal').style.display = 'none';
+    }
+
+    function downloadBackup(type) {
+        window.location.href = `/api/backup/download?format=${type}`;
+        showToast(`Preparing ${type.toUpperCase()} database backup download...`, 'success');
+    }
+
+    function triggerManualCloudSync() {
+        const btn = document.getElementById('manualSyncBtn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Syncing to Cloud...';
+        
+        fetch('/api/backup/sync', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.textContent = '🔄 Sync to Cloud Storage Now';
+                if (data.success) {
+                    showToast(data.message, 'success');
+                } else {
+                    showToast(data.message, 'error');
+                }
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.textContent = '🔄 Sync to Cloud Storage Now';
+                showToast('Failed to sync to cloud', 'error');
+            });
+    }
+
+    function uploadAndRestoreBackup() {
+        const fileInput = document.getElementById('backupFileInput');
+        if (!fileInput.files || fileInput.files.length === 0) {
+            showToast('Please select a backup file (.sqlite3 or .zip)', 'error');
+            return;
+        }
+
+        if (!confirm('Are you sure you want to restore this database? Current in-memory models will reload.')) {
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        showToast('Restoring database & embeddings...', 'info');
+
+        fetch('/api/backup/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showToast('✓ ' + data.message, 'success');
+                closeBackupModal();
+                loadDashboardData();
+                setTimeout(() => location.reload(), 1200);
+            } else {
+                showToast(data.message, 'error');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            showToast('Error restoring backup file', 'error');
+        });
     }
 </script>
 {% endblock %}
