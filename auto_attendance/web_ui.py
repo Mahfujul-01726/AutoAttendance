@@ -76,26 +76,20 @@ except Exception as e:
 # ============================================================================
 
 def get_person_list():
-    """Get list of all active registered persons synchronized with database."""
+    """Get list of all active registered persons strictly from the database."""
     try:
-        persons_dict = {}
-        # 1. Read from folders with samples
-        if FACE_DATA_DIR.exists():
-            for person_dir in FACE_DATA_DIR.iterdir():
-                if person_dir.is_dir():
-                    face_files = list(person_dir.glob('*.jpg')) + list(person_dir.glob('*.png'))
-                    if len(face_files) > 0:
-                        persons_dict[person_dir.name] = len(face_files)
-
-        # 2. Check DB students with embeddings
         db_students = db.list_students()
+        persons = []
         for st in db_students:
             name = st.get("name")
             emb_cnt = st.get("embedding_count", 0)
-            if name and name not in persons_dict and emb_cnt > 0:
-                persons_dict[name] = emb_cnt
-
-        persons = [{'name': name, 'samples': samples} for name, samples in persons_dict.items()]
+            if name and emb_cnt > 0:
+                person_dir = FACE_DATA_DIR / name
+                samples = len(list(person_dir.glob('*.jpg')) + list(person_dir.glob('*.png'))) if person_dir.exists() else emb_cnt
+                persons.append({
+                    'name': name,
+                    'samples': samples or emb_cnt
+                })
         return sorted(persons, key=lambda x: x['name'])
     except Exception as e:
         logger.error(f"Error getting person list: {e}")
