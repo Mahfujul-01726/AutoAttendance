@@ -451,6 +451,7 @@ def api_frame_process():
                         cv2.putText(frame, person_name, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
                     else:
                         matched_dist = float(result.get('confidence', 0.6500))
+                        db.add_alert('unknown', f"Unregistered face probe rejected (max_dist: {matched_dist:.4f})")
                         cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
                         cv2.putText(frame, "Unknown", (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                         
